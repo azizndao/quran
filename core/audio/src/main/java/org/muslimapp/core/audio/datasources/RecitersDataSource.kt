@@ -1,0 +1,242 @@
+package org.muslimapp.core.audio.datasources
+
+import org.alquran.audio.models.Reciter
+
+
+internal val RecitersDataSource = listOf(
+    Reciter(
+        id = "abdul_basit_mujawwad",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/2.png",
+        name = "Abdul Basit Mujawwad",
+        subfolder = "https://download.quranicaudio.com/quran/abdulbaset_mujawwad",
+    ),
+    Reciter(
+        id = "abdul_basit_murattal",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/2.png",
+        name = "Abdul Basit Murattal",
+        subfolder = "https://download.quranicaudio.com/quran/abdul_basit_murattal",
+    ),
+    Reciter(
+        id = "mishari_alafasy",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/8.png",
+        name = "Mishary Alafasy",
+        subfolder = "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee",
+    ),
+    Reciter(
+        id = "mishari_alafasy_cali",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/8.png",
+        name = "Mishary Alafasy (California)",
+        subfolder = "https://download.quranicaudio.com/quran/mishaari_california",
+    ),
+    Reciter(
+        id = "mishari_walk",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/8.png",
+        name = "AlAfasy & Ibrahim Walk",
+        subfolder = "https://download.quranicaudio.com/quran/mishaari_w_ibrahim_walk_si",
+    ),
+    Reciter(
+        id = "abdullah_matroud",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/33.png",
+        name = "Abdullah Matroud",
+        subfolder = "https://download.quranicaudio.com/quran/abdullah_matroud/reencode",
+    ),
+    Reciter(
+        id = "sa3d_alghamidi",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/9.png",
+        name = "Saad Al-Ghamadi",
+        subfolder = "https://download.quranicaudio.com/quran/sa3d_al-ghaamidi/complete",
+    ),
+    Reciter(
+        id = "sudais_murattal",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/4.png",
+        name = "Abdurrahmaan As-Sudais",
+        subfolder = "https://download.quranicaudio.com/quran/abdurrahmaan_as-sudays",
+    ),
+    Reciter(
+        id = "shatri",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/6.png",
+        name = "Abu Bakr Ash-Shaatri",
+        subfolder = "https://download.quranicaudio.com/quran/abu_bakr_ash-shaatree",
+    ),
+    Reciter(
+        id = "abdullah_basfar",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/3.png",
+        name = "Abdullah Basfar",
+        subfolder = "https://download.quranicaudio.com/quran/abdullaah_basfar",
+    ),
+    Reciter(
+        id = "ahmed_al3ajamy",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/7.png",
+        name = "Ahmed ibn Ali al-Ajamy",
+        subfolder = "https://download.quranicaudio.com/quran/ahmed_ibn_3ali_al-3ajamy",
+    ),
+    Reciter(
+        id = "hani_rifai",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/10.png",
+        name = "Hani Rifai",
+        subfolder = "https://download.quranicaudio.com/quran/rifai",
+    ),
+    Reciter(
+        id = "husary",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/11.png",
+        name = "Hussary",
+        subfolder = "https://download.quranicaudio.com/quran/mahmood_khaleel_al-husaree",
+    ),
+    Reciter(
+        id = "ali_hudhayfi",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/13.png",
+        name = "Hudhaify",
+        subfolder = "https://download.quranicaudio.com/quran/huthayfi",
+    ),
+    Reciter(
+        id = "ibrahim_alakhdar",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/14.png",
+        name = "Ibrahim Akhdar",
+        subfolder = "https://download.quranicaudio.com/quran/ibrahim_al_akhdar",
+    ),
+    Reciter(
+        id = "muaiqly_kfgqpc",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/15.png",
+        name = "Maher Al Muaiqly",
+        subfolder = "https://download.quranicaudio.com/quran/maher_almu3aiqly/year1440",
+    ),
+    Reciter(
+        id = "mohammad_altablawi",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/19.png",
+        name = "Mohammad Al Tablaway",
+        subfolder = "https://download.quranicaudio.com/quran/mohammad_altablawi",
+    ),
+    Reciter(
+        id = "muhammad_ayyoub",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/20.png",
+        name = "Muhammad Ayyoub",
+        subfolder = "https://download.quranicaudio.com/quran/muhammad_ayyoob",
+    ),
+    Reciter(
+        id = "mjibreel",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/21.png",
+        name = "Muhammad Jibreel",
+        subfolder = "https://download.quranicaudio.com/quran/muhammad_jibreel/complete",
+    ),
+    Reciter(
+        id = "salah_bukhatir",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/29.png",
+        name = "Salaah AbdulRahman Bukhatir",
+        subfolder = "https://download.quranicaudio.com/quran/salaah_bukhaatir",
+    ),
+    Reciter(
+        id = "abdul_muhsin_alqasim",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/30.png",
+        name = "Muhsin Al Qasim",
+        subfolder = "https://download.quranicaudio.com/quran/abdul_muhsin_alqasim",
+    ),
+    Reciter(
+        id = "abdullah_juhany",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/31.png",
+        name = "Abdullah Al-Johany",
+        subfolder = "https://download.quranicaudio.com/quran/abdullaah_3awwaad_al-juhaynee",
+    ),
+    Reciter(
+        id = "salah_budair",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/32.png",
+        name = "Salah Al Budair",
+        subfolder = "https://download.quranicaudio.com/quran/salahbudair",
+    ),
+    Reciter(
+        id = "ahmad_nauina",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/34.png",
+        name = "Ahmed Neana",
+        subfolder = "https://download.quranicaudio.com/quran/ahmad_nauina",
+    ),
+//    Reciter(
+//        id = 35,
+//        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/35.png",
+//        name = "Muhammad AbdulKareem",
+//        subfolder = "https://download.quranicaudio.com/quran/muhammad_abdulkareem",
+//    ),
+    Reciter(
+        id = "khalifa_taniji",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/36.png",
+        name = "Khalefa Al-Tunaiji",
+        subfolder = "https://download.quranicaudio.com/quran/khalifah_taniji",
+    ),
+    Reciter(
+        id = "mahmoud_ali_albana",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/37.png",
+        name = "Mahmoud Ali Al-Banna",
+        subfolder = "https://download.quranicaudio.com/quran/mahmood_ali_albana",
+    ),
+    Reciter(
+        id = "husary_muallim",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/41.png",
+        name = "Hussary (Muallim)",
+        subfolder = "https://download.quranicaudio.com/quran/husary_muallim",
+    ),
+    Reciter(
+        id = "khalid_alqahtani",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/42.png",
+        name = "Khalid Abdullah al-Qahtani",
+        subfolder = "https://download.quranicaudio.com/quran/khaalid_al-qahtaanee",
+    ),
+    Reciter(
+        id = "yasser_dussary",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/43.png",
+        name = "Yasser Ad-Dussary",
+        subfolder = "https://download.quranicaudio.com/quran/yasser_ad-dussary",
+    ),
+    Reciter(
+        id = "qatami",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/44.png",
+        name = "Nasser Alqatami",
+        subfolder = "https://download.quranicaudio.com/quran/nasser_bin_ali_alqatami",
+    ),
+    Reciter(
+        id = "ali_hajjaj_alsouasi",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/45.png",
+        name = "Ali Hajjaj Al-Suesy",
+        subfolder = "https://download.quranicaudio.com/quran/ali_hajjaj_alsouasi",
+    ),
+    Reciter(
+        id = "yasser_dussary",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/46.png",
+        name = "Sahl Yassin",
+        subfolder = "https://download.quranicaudio.com/quran/sahl_yaaseen",
+    ),
+    Reciter(
+        id = "aziz_alili",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/49.png",
+        name = "Aziz Alili",
+        subfolder = "https://download.quranicaudio.com/quran/aziz_alili",
+    ),
+    Reciter(
+        id = "akram_al_alaqmi",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/51.png",
+        name = "Akram Al Alaqimy",
+        subfolder = "https://download.quranicaudio.com/quran/akram_al_alaqmi",
+    ),
+    Reciter(
+        id = "fares_abbad",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/52.png",
+        name = "Fares Abbad",
+        subfolder = "https://download.quranicaudio.com/quran/fares",
+    ),
+    Reciter(
+        id = "ibrahim_walk",
+        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/23.png",
+        name = "(English) Ibrahim Walk",
+        subfolder = "https://download.quranicaudio.com/quran/ibrahim_walk",
+        language = "en"
+    ),
+//    Reciter(
+//        id = 24,
+//        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/24.png",
+//        name = "Basfar & Walk",
+//        subfolder = "https://download.quranicaudio.com/quran/abdullah_basfar_w_ibrahim_walk_si",
+//    ),
+//    Reciter(
+//        id = 24,
+//        image = "https://zesfefssvwcigbnloyno.supabase.co/storage/v1/object/public/images/reciters/24.png",
+//        name = "Abdul Basit & Walk",
+//        subfolder = "https://download.quranicaudio.com/quran/abdulbasit_w_ibrahim_walk_si",
+//    ),
+)

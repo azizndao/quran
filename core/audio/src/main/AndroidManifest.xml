@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools">
+
+    <uses-permission android:name="android.permission.WAKE_LOCK"/>
+    <uses-permission android:name="android.permission.INTERNET"/>
+
+    <application>
+
+        <service
+            android:name="org.alquran.audio.PlaybackService"
+            android:exported="true"
+            android:foregroundServiceType="mediaPlayback"
+            tools:ignore="ExportedService">
+            <intent-filter>
+                <action android:name="androidx.media3.session.MediaLibraryService" />
+                <action android:name="android.media.browse.MediaBrowserService" />
+            </intent-filter>
+        </service>
+
+        <service
+            android:name="org.alquran.audio.MediaDownloadService"
+            android:exported="false">
+            <!-- This is needed for Scheduler -->
+            <intent-filter>
+                <action android:name="com.google.android.exoplayer.downloadService.action.RESTART" />
+                <category android:name="android.intent.category.DEFAULT" />
+            </intent-filter>
+        </service>
+
+    </application>
+</manifest>

@@ -1,0 +1,119 @@
+plugins {
+    id 'com.android.application'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlinx-serialization'
+    id 'com.google.devtools.ksp' version '1.7.20-1.0.8'
+}
+
+android {
+    namespace 'org.alquran'
+    compileSdk 33
+
+    defaultConfig {
+        applicationId "org.alquran"
+        minSdk 24
+        targetSdk 33
+        versionCode 1
+        versionName "1.0.0"
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        vectorDrawables {
+            useSupportLibrary true
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled true
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
+            signingConfig signingConfigs.debug
+            applicationIdSuffix '.debug'
+            versionNameSuffix '-DEBUG'
+        }
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = "1.8"
+        freeCompilerArgs = freeCompilerArgs + [
+                "-opt-in=kotlin.RequiresOptIn",
+                // Enable experimental coroutines APIs, including Flow
+                "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
+                "-opt-in=kotlinx.coroutines.FlowPreview",
+                "-opt-in=kotlin.Experimental",
+                // Enable experimental kotlinx serialization APIs
+                "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
+                "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
+                "-opt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
+                "-opt-in=androidx.lifecycle.compose.ExperimentalLifecycleComposeApi",
+                "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
+                "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
+                "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
+                "-opt-in=com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi",
+                "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
+                "-opt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
+        ]
+    }
+    buildFeatures {
+        compose true
+    }
+    composeOptions {
+        kotlinCompilerExtensionVersion compose_compiler_version
+    }
+    packagingOptions {
+        resources {
+            excludes += '/META-INF/{AL2.0,LGPL2.1}'
+        }
+    }
+    kotlin {
+        sourceSets {
+            main.kotlin.srcDirs += 'build/generated/ksp/main/kotlin'
+            test.kotlin.srcDirs += 'build/generated/ksp/test/kotlin'
+        }
+    }
+}
+
+dependencies {
+
+    implementation project(":core:common")
+    implementation project(":core:datastore")
+    implementation project(":core:translation")
+    implementation project(":core:network")
+    implementation project(":core:audio")
+    implementation project(':core:quran')
+    implementation project(':core:bookmarks')
+    implementation project(":domain:quran")
+
+    implementation 'com.google.accompanist:accompanist-navigation-material:0.29.1-alpha'
+    implementation 'com.github.bumptech.glide:compose:1.0.0-alpha.1'
+
+    implementation 'org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1'
+
+    implementation "io.insert-koin:koin-android:$koin_android_version"
+    implementation "io.insert-koin:koin-androidx-compose:$koin_android_compose_version"
+
+    implementation "androidx.room:room-ktx:2.5.0"
+    ksp "androidx.room:room-compiler:2.5.0"
+
+    implementation 'androidx.core:core-ktx:1.9.0'
+    implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
+    implementation 'androidx.activity:activity-compose:1.6.1'
+    implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version"
+    implementation 'androidx.compose.animation:animation-graphics:1.4.0-beta01'
+    // implementation platform("androidx.compose:compose-bom:$compose_bom_version")
+    implementation 'androidx.compose.ui:ui-text-google-fonts:1.4.0-beta01'
+    implementation 'androidx.compose.ui:ui:1.4.0-beta01'
+    implementation 'androidx.compose.ui:ui-graphics:1.4.0-beta01'
+    implementation 'androidx.compose.ui:ui-tooling-preview:1.4.0-beta01'
+    implementation 'androidx.compose.material3:material3:1.1.0-alpha06'
+    implementation 'androidx.compose.material:material:1.4.0-beta01'
+    testImplementation 'junit:junit:4.13.2'
+    androidTestImplementation 'androidx.test.ext:junit:1.1.5'
+    androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
+    // androidTestImplementation platform("androidx.compose:compose-bom:$compose_bom_version")
+    androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.4.0-beta01'
+    debugImplementation 'androidx.compose.ui:ui-tooling:1.4.0-beta01'
+    debugImplementation 'androidx.compose.ui:ui-test-manifest:1.4.0-beta01'
+}

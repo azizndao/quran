@@ -1,0 +1,39 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+
+    <!-- End Number picker Strings -->
+    <string name="quran_rob3" translatable="false">¼</string>
+    <string name="quran_nos" translatable="false">½</string>
+    <string name="quran_talt_arb3" translatable="false">¾</string>
+    <string name="quran_hizb" translatable="false">Hizb</string>
+    <string name="quran_juz2" translatable="false">Juz\'</string>
+    <string name="quran_page">Page</string>
+    <string name="quran_sura">Surah\'s</string>
+    <string name="quran_ayah">Ayah %1$d</string>
+    <string name="quran_ayah_details">%1$s - Ayah %2$s, Juz\' %3$s</string>
+    <string name="quran_sura_title">Surah %1$s</string>
+    <string name="sura_ayah_notification_str">Surah %1$s, Ayah %2$d</string>
+    <string name="sura_ayah_sharing_str">Surah %1$s: %2$d</string>
+
+    <string name="index_loading">Loading&#8230;</string>
+
+    <string name="canceling">Canceling&#8230;</string>
+    <string name="juz2_description">Juz\' %1$s</string>
+
+    <string name="comma_with_spaces" translatable="false"> , </string>
+    <string name="page_description">Page %1$s, Juz\' %2$s</string>
+    <string name="highlighting_database">Required Files</string>
+    <string name="timing_database">Required Files</string>
+    <string name="infinity" translatable="false">&#8734;</string>
+
+    <!-- sura metainfo -->
+    <string name="makki" translatable="false">Makkah</string>
+    <string name="madani" translatable="false">Medina</string>
+    <plurals name="verses">
+        <item quantity="one">One verse</item>
+        <item quantity="other">%s verses</item>
+    </plurals>
+
+    <string name="bismillah" translatable="false">\u200f\ue8db \u200f\ue338\u200f\ue48e \u200f\ue338\u200f\ue0af\u200f\ue238\u200f\ue903 \u200f\ue338\u200f\ue0af\u200f\ue238\u200f\ue045\u200f\ue1c0\u200f\ue2e5</string>
+    <string name="surah">Surah %s</string>
+</resources>

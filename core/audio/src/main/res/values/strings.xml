@@ -1,0 +1,8 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="number_of_surahs">%d surahs in progress</string>
+    <string name="download_notification_channel">Downloads</string>
+    <string name="download_notification_channel_desc">This channel is used to download in progress</string>
+    <string name="cancel">Cancel</string>
+    <string name="waiting_downloads">Waiting downloads</string>
+</resources>

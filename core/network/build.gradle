@@ -1,0 +1,39 @@
+plugins {
+    id 'com.android.library'
+    id 'org.jetbrains.kotlin.android'
+    id 'kotlinx-serialization'
+}
+
+android {
+    namespace 'org.quran.network'
+    compileSdk 33
+
+    defaultConfig {
+        minSdk 24
+        targetSdk 33
+
+        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        consumerProguardFiles "consumer-rules.pro"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    kotlinOptions {
+        jvmTarget = '1.8'
+    }
+}
+
+dependencies {
+    implementation project(":core:common")
+
+    api 'io.ktor:ktor-client-core:2.2.3'
+    implementation 'io.ktor:ktor-client-okhttp:2.2.3'
+    implementation 'io.ktor:ktor-client-content-negotiation:2.2.3'
+    api 'io.ktor:ktor-serialization-kotlinx-json:2.2.3'
+
+    implementation "io.insert-koin:koin-android:$koin_android_version"
+
+    // implementation 'com.squareup.retrofit2:retrofit:2.9.0'
+    // implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+}

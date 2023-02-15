@@ -1,0 +1,17 @@
+syntax = "proto3";
+
+option java_package = "org.quran.datastore";
+option java_multiple_files = true;
+
+message AudioPreferences {
+
+  string current_reciter = 1;
+
+  RecentPlayback recent_playback = 2;
+}
+
+message RecentPlayback {
+  uint32 surah = 1;
+  uint32 ayah = 2;
+  string reciterId = 3;
+}

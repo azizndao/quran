@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+option java_package = "org.quran.datastore";
+option java_multiple_files = true;
+
+message QuranPreferences {
+
+  int32 font_version = 1;
+
+  FontScale quran_font_scale = 3;
+  FontScale translation_font_scale = 4;
+
+  repeated string selected_translations = 5;
+
+  DisplayMode display_mode = 6;
+}
+
+enum DisplayMode {
+  QURAN_TRANSLATION = 0;
+  QURAN = 1;
+}
+
+enum QuranEdition {
+  KING_FAHAD_COMPLEX_V1 = 0;
+  KING_FAHAD_COMPLEX_V2 = 1;
+  KING_FAHAD_COMPLEX_UTHMANI_HAFS = 2;
+  INDOPAK = 3;
+  TAJWEED = 4;
+}
+
+enum FontScale {
+  NORMAL = 0;
+  SMALL = 1;
+  LARGE = 2;
+}

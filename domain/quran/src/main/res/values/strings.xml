@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="download_notification_channel">Downloads</string>
+    <string name="download_notification_channel_desc">This channel is used to download in progress</string>
+    <string name="downloading_quran_fonts">Downloading Qu\'ran fonts</string>
+    <string name="downloading_quran_verses">Dowloading Qu\'ran verses</string>
+</resources>

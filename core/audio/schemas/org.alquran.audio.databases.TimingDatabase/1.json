@@ -1,0 +1,47 @@
+{
+  "formatVersion": 1,
+  "database": {
+    "version": 1,
+    "identityHash": "7d8f31c8ca8aeab0407e5dbb595b8fa5",
+    "entities": [
+      {
+        "tableName": "timings",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sura` INTEGER NOT NULL, `ayah` INTEGER NOT NULL, `time` INTEGER NOT NULL, PRIMARY KEY(`sura`, `ayah`))",
+        "fields": [
+          {
+            "fieldPath": "sura",
+            "columnName": "sura",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ayah",
+            "columnName": "ayah",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "INTEGER",
+            "notNull": true
+          }
+        ],
+        "primaryKey": {
+          "autoGenerate": false,
+          "columnNames": [
+            "sura",
+            "ayah"
+          ]
+        },
+        "indices": [],
+        "foreignKeys": []
+      }
+    ],
+    "views": [],
+    "setupQueries": [
+      "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7d8f31c8ca8aeab0407e5dbb595b8fa5')"
+    ]
+  }
+}

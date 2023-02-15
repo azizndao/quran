@@ -1,0 +1,23 @@
+syntax = "proto3";
+
+option java_package = "org.quran.datastore";
+option java_multiple_files = true;
+
+message TranslationList {
+  repeated TranslationEdition editions = 1;
+}
+
+message TranslationEdition {
+  int32 id = 1;
+  string name = 2;
+  string authorName = 3;
+  string languageCode = 4;
+  string slug = 5;
+  LanguageDirection direction = 6;
+  bool downloaded = 7;
+}
+
+enum LanguageDirection {
+  LTR = 0;
+  RTL = 1;
+}
