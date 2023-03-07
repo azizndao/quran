@@ -19,125 +19,125 @@ import org.alquran.R
 
 @Composable
 fun SwitchListItem(
-    modifier: Modifier = Modifier,
-    checked: Boolean,
-    enabled: Boolean = true,
-    onCheckedChange: (Boolean) -> Unit,
-    leadingContent: @Composable (() -> Unit)? = null,
-    supportingText: @Composable (() -> Unit)? = null,
-    overlineText: @Composable (() -> Unit)? = null,
-    colors: ListItemColors = ListItemDefaults.colors(),
-    tonalElevation: Dp = ListItemDefaults.Elevation,
-    shadowElevation: Dp = ListItemDefaults.Elevation,
-    headlineText: @Composable () -> Unit,
+  modifier: Modifier = Modifier,
+  checked: Boolean,
+  enabled: Boolean = true,
+  onCheckedChange: (Boolean) -> Unit,
+  leadingContent: @Composable (() -> Unit)? = null,
+  supportingText: @Composable (() -> Unit)? = null,
+  overlineText: @Composable (() -> Unit)? = null,
+  colors: ListItemColors = ListItemDefaults.colors(),
+  tonalElevation: Dp = ListItemDefaults.Elevation,
+  shadowElevation: Dp = ListItemDefaults.Elevation,
+  headlineText: @Composable () -> Unit,
 ) {
-    ListItem(
-        modifier = modifier,
-        colors = colors,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation,
-        leadingContent = leadingContent,
-        headlineText = headlineText,
-        supportingText = supportingText,
-        overlineText = overlineText,
-        trailingContent = {
-            Row(modifier = Modifier.width(72.dp), verticalAlignment = Alignment.CenterVertically) {
-                Box(
-                    Modifier
-                        .width(3.dp)
-                        .height(38.dp)
-                        .background(
-                            MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
-                            CircleShape
-                        )
-                )
-                Switch(
-                    checked = checked,
-                    onCheckedChange = onCheckedChange,
-                    enabled = enabled,
-                    modifier = Modifier
-                        .weight(1f)
-                        .padding(start = 16.dp)
-                )
-            }
-        }
-    )
+  ListItem(
+    modifier = modifier,
+    colors = colors,
+    tonalElevation = tonalElevation,
+    shadowElevation = shadowElevation,
+    leadingContent = leadingContent,
+    headlineText = headlineText,
+    supportingText = supportingText,
+    overlineText = overlineText,
+    trailingContent = {
+      Row(modifier = Modifier.width(72.dp), verticalAlignment = Alignment.CenterVertically) {
+        Box(
+          Modifier
+            .width(3.dp)
+            .height(38.dp)
+            .background(
+              MaterialTheme.colorScheme.onSurface.copy(alpha = 0.12f),
+              CircleShape
+            )
+        )
+        Switch(
+          checked = checked,
+          onCheckedChange = onCheckedChange,
+          enabled = enabled,
+          modifier = Modifier
+            .weight(1f)
+            .padding(start = 16.dp)
+        )
+      }
+    }
+  )
 }
 
 @Composable
 fun RadioButtonListItem(
-    modifier: Modifier = Modifier,
-    selected: Boolean,
-    enabled: Boolean = true,
-    onClick: () -> Unit,
-    leadingContent: @Composable (() -> Unit)? = null,
-    secondaryText: @Composable (() -> Unit)? = null,
-    overlineText: @Composable (() -> Unit)? = null,
-    colors: ListItemColors = ListItemDefaults.colors(),
-    tonalElevation: Dp = ListItemDefaults.Elevation,
-    shadowElevation: Dp = ListItemDefaults.Elevation,
-    headlineText: @Composable () -> Unit,
+  modifier: Modifier = Modifier,
+  selected: Boolean,
+  enabled: Boolean = true,
+  onClick: () -> Unit,
+  leadingContent: @Composable (() -> Unit)? = null,
+  secondaryText: @Composable (() -> Unit)? = null,
+  overlineText: @Composable (() -> Unit)? = null,
+  colors: ListItemColors = ListItemDefaults.colors(),
+  tonalElevation: Dp = ListItemDefaults.Elevation,
+  shadowElevation: Dp = ListItemDefaults.Elevation,
+  headlineText: @Composable () -> Unit,
 ) {
-    ListItem(
-        modifier = modifier.clickable(enabled) { onClick() },
-        leadingContent = leadingContent,
-        headlineText = headlineText,
-        supportingText = secondaryText,
-        overlineText = overlineText,
-        colors = colors,
-        tonalElevation = tonalElevation,
-        shadowElevation = shadowElevation,
-        trailingContent = {
-            RadioButton(
-                selected = selected,
-                onClick = onClick,
-                enabled = enabled,
-            )
-        }
-    )
+  ListItem(
+    modifier = modifier.clickable(enabled) { onClick() },
+    leadingContent = leadingContent,
+    headlineText = headlineText,
+    supportingText = secondaryText,
+    overlineText = overlineText,
+    colors = colors,
+    tonalElevation = tonalElevation,
+    shadowElevation = shadowElevation,
+    trailingContent = {
+      RadioButton(
+        selected = selected,
+        onClick = onClick,
+        enabled = enabled,
+      )
+    }
+  )
 }
 
 @Composable
 fun ExpendableListItem(
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    leadingContent: @Composable (() -> Unit)? = null,
-    secondaryText: @Composable (() -> Unit)? = null,
-    overlineText: @Composable (() -> Unit)? = null,
-    headlineText: @Composable () -> Unit,
-    colors: ListItemColors = ListItemDefaults.colors(),
-    tonalElevation: Dp = ListItemDefaults.Elevation,
-    shadowElevation: Dp = ListItemDefaults.Elevation,
-    content: @Composable (ColumnScope.() -> Unit),
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  leadingContent: @Composable (() -> Unit)? = null,
+  secondaryText: @Composable (() -> Unit)? = null,
+  overlineText: @Composable (() -> Unit)? = null,
+  headlineText: @Composable () -> Unit,
+  colors: ListItemColors = ListItemDefaults.colors(),
+  tonalElevation: Dp = ListItemDefaults.Elevation,
+  shadowElevation: Dp = ListItemDefaults.Elevation,
+  content: @Composable (ColumnScope.() -> Unit),
 ) {
 
-    var expanded by remember { mutableStateOf(false) }
-    val rotation by animateFloatAsState(if (expanded) 180f else 0f)
+  var expanded by remember { mutableStateOf(false) }
+  val rotation by animateFloatAsState(if (expanded) 180f else 0f)
 
-    Column(modifier = modifier.clickable(!expanded) { expanded = !expanded }) {
-        ListItem(
-            leadingContent = leadingContent,
-            headlineText = headlineText,
-            supportingText = secondaryText,
-            overlineText = overlineText,
-            colors = colors,
-            tonalElevation = tonalElevation,
-            shadowElevation = shadowElevation,
-            trailingContent = {
-                IconButton(onClick = { expanded = !expanded }, enabled = enabled) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_arrow_down),
-                        contentDescription = null,
-                        modifier = Modifier.rotate(rotation)
-                    )
-                }
-            })
-
-        AnimatedVisibility(expanded) {
-            Column {
-                content()
-                LineSeparator()
-            }
+  Column(modifier = modifier.clickable(!expanded) { expanded = !expanded }) {
+    ListItem(
+      leadingContent = leadingContent,
+      headlineText = headlineText,
+      supportingText = secondaryText,
+      overlineText = overlineText,
+      colors = colors,
+      tonalElevation = tonalElevation,
+      shadowElevation = shadowElevation,
+      trailingContent = {
+        IconButton(onClick = { expanded = !expanded }, enabled = enabled) {
+          Icon(
+            painter = painterResource(R.drawable.ic_arrow_down),
+            contentDescription = null,
+            modifier = Modifier.rotate(rotation)
+          )
         }
+      })
+
+    AnimatedVisibility(expanded) {
+      Column {
+        content()
+        LineSeparator()
+      }
     }
+  }
 }

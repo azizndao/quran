@@ -8,23 +8,23 @@ import androidx.compose.ui.Modifier
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun AnimatedCounter(
-    modifier: Modifier = Modifier,
-    count: Int,
-    content: @Composable AnimatedVisibilityScope.(targetState: Int) -> Unit,
+  modifier: Modifier = Modifier,
+  count: Int,
+  content: @Composable AnimatedVisibilityScope.(targetState: Int) -> Unit,
 ) {
-    AnimatedContent(
-        modifier = modifier,
-        targetState = count,
-        transitionSpec = {
-            if (targetState > initialState) {
-                slideInVertically { height -> height } + fadeIn() with
-                        slideOutVertically { height -> -height } + fadeOut()
-            } else {
-                slideInVertically { height -> -height } + fadeIn() with
-                        slideOutVertically { height -> height } + fadeOut()
-            }
-        },
-        content = content,
-        contentAlignment = Alignment.Center
-    )
+  AnimatedContent(
+    modifier = modifier,
+    targetState = count,
+    transitionSpec = {
+      if (targetState > initialState) {
+        slideInVertically { height -> height } + fadeIn() with
+          slideOutVertically { height -> -height } + fadeOut()
+      } else {
+        slideInVertically { height -> -height } + fadeIn() with
+          slideOutVertically { height -> height } + fadeOut()
+      }
+    },
+    content = content,
+    contentAlignment = Alignment.Center
+  )
 }

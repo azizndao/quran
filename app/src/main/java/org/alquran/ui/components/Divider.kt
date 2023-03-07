@@ -12,20 +12,22 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 
 val ColorScheme.DividerColor
-    @Composable get() = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
+  @Composable get() = MaterialTheme.colorScheme.outline.copy(alpha = 0.25f)
 
 val MaterialTheme.DividerThickness get() = Dp.Hairline
 
 @Composable
 fun LineSeparator(
-    modifier: Modifier = Modifier,
-    color: Color = MaterialTheme.colorScheme.surfaceVariant,
-    thickness: Dp = MaterialTheme.DividerThickness,
-    startIndent: Dp = 0.dp,
+  modifier: Modifier = Modifier,
+  color: Color = MaterialTheme.colorScheme.surfaceVariant,
+  thickness: Dp = MaterialTheme.DividerThickness,
+  startIndent: Dp = 0.dp,
 ) {
-    Divider(
-        modifier = modifier.padding(start = startIndent).fillMaxWidth(),
-        color = color,
-        thickness = thickness,
-    )
+  Divider(
+    modifier = modifier
+      .padding(start = startIndent)
+      .fillMaxWidth(),
+    color = color,
+    thickness = thickness,
+  )
 }

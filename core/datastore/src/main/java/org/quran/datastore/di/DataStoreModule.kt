@@ -7,51 +7,59 @@ import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
 import androidx.datastore.preferences.core.emptyPreferences
 import org.koin.dsl.module
-import org.quran.datastore.*
-import org.quran.datastore.repositories.*
-import org.quran.datastore.serializers.*
+import org.quran.datastore.AudioPreferences
+import org.quran.datastore.QuranPreferences
+import org.quran.datastore.ReadingPositionPreferences
+import org.quran.datastore.TranslationList
+import org.quran.datastore.repositories.AudioPreferencesRepository
+import org.quran.datastore.repositories.QuranPreferencesRepository
+import org.quran.datastore.repositories.ReadingPreferencesRepository
+import org.quran.datastore.serializers.AudioPreferencesSerializer
+import org.quran.datastore.serializers.QuranPreferencesSerializer
+import org.quran.datastore.serializers.ReadingPositionSerializer
+import org.quran.datastore.serializers.TranslationsListSerializer
 
 
 val DataStoreModule = module {
-    single {
-        AudioPreferencesRepository(
-            DataStoreFactory.create(
-                corruptionHandler = ReplaceFileCorruptionHandler { AudioPreferences.getDefaultInstance() },
-                produceFile = { get<Context>().dataStoreFile("audio") },
-                serializer = AudioPreferencesSerializer()
-            )
-        )
-    }
+  single {
+    AudioPreferencesRepository(
+      DataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler { AudioPreferences.getDefaultInstance() },
+        produceFile = { get<Context>().dataStoreFile("audio") },
+        serializer = AudioPreferencesSerializer()
+      )
+    )
+  }
 
-    single {
-        QuranPreferencesRepository(
-            DataStoreFactory.create(
-                corruptionHandler = ReplaceFileCorruptionHandler { QuranPreferences.getDefaultInstance() },
-                produceFile = { get<Context>().dataStoreFile("quran") },
-                serializer = QuranPreferencesSerializer()
-            ),
-            DataStoreFactory.create(
-                corruptionHandler = ReplaceFileCorruptionHandler { TranslationList.getDefaultInstance() },
-                produceFile = { get<Context>().dataStoreFile("translations") },
-                serializer = TranslationsListSerializer()
-            ),
-        )
-    }
+  single {
+    QuranPreferencesRepository(
+      DataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler { QuranPreferences.getDefaultInstance() },
+        produceFile = { get<Context>().dataStoreFile("quran") },
+        serializer = QuranPreferencesSerializer()
+      ),
+      DataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler { TranslationList.getDefaultInstance() },
+        produceFile = { get<Context>().dataStoreFile("translations") },
+        serializer = TranslationsListSerializer()
+      ),
+    )
+  }
 
-    single {
-        ReadingPreferencesRepository(
-            DataStoreFactory.create(
-                corruptionHandler = ReplaceFileCorruptionHandler { ReadingPositionPreferences.getDefaultInstance() },
-                produceFile = { get<Context>().dataStoreFile("reading") },
-                serializer = ReadingPositionSerializer()
-            )
-        )
-    }
+  single {
+    ReadingPreferencesRepository(
+      DataStoreFactory.create(
+        corruptionHandler = ReplaceFileCorruptionHandler { ReadingPositionPreferences.getDefaultInstance() },
+        produceFile = { get<Context>().dataStoreFile("reading") },
+        serializer = ReadingPositionSerializer()
+      )
+    )
+  }
 
-    single {
-        PreferenceDataStoreFactory.create(
-            corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
-            produceFile = { get<Context>().dataStoreFile("user_settings") },
-        )
-    }
+  single {
+    PreferenceDataStoreFactory.create(
+      corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
+      produceFile = { get<Context>().dataStoreFile("user_settings") },
+    )
+  }
 }

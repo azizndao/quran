@@ -11,31 +11,31 @@ import org.quran.datastore.FontScale
 
 @Composable
 fun ProviderQuranTextStyle(
-    page: Int,
-    fontScale: FontScale,
-    content: @Composable () -> Unit
+  page: Int,
+  fontScale: FontScale,
+  content: @Composable () -> Unit
 ) {
 
-    val oldStyle = LocalQuranTextStyle.current
+  val oldStyle = LocalQuranTextStyle.current
 
-    val context = LocalContext.current
+  val context = LocalContext.current
 
-    val style by remember(fontScale, page, oldStyle) {
-        derivedStateOf {
-            val fontFamily = FontFamily(
-                Font("v1/fonts/ttf/p${page}.ttf", assetManager = context.assets)
-            )
+  val style by remember(fontScale, page, oldStyle) {
+    derivedStateOf {
+      val fontFamily = FontFamily(
+        Font("v1/fonts/ttf/p${page}.ttf", assetManager = context.assets)
+      )
 
-            oldStyle.copy(
-                fontFamily = fontFamily,
-                fontSize = when (fontScale) {
-                    FontScale.UNRECOGNIZED, FontScale.NORMAL -> 24f
-                    FontScale.SMALL -> 20f
-                    FontScale.LARGE -> 26f
-                }.sp
-            )
-        }
+      oldStyle.copy(
+        fontFamily = fontFamily,
+        fontSize = when (fontScale) {
+          FontScale.UNRECOGNIZED, FontScale.NORMAL -> 24f
+          FontScale.SMALL -> 20f
+          FontScale.LARGE -> 26f
+        }.sp
+      )
     }
+  }
 
-    CompositionLocalProvider(LocalQuranTextStyle provides style, content = content)
+  CompositionLocalProvider(LocalQuranTextStyle provides style, content = content)
 }

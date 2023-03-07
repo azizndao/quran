@@ -24,31 +24,31 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun RowScope.NiaNavigationBarItem(
-    selected: Boolean,
-    onClick: () -> Unit,
-    icon: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    selectedIcon: @Composable () -> Unit = icon,
-    enabled: Boolean = true,
-    label: @Composable (() -> Unit)? = null,
-    alwaysShowLabel: Boolean = true
+  selected: Boolean,
+  onClick: () -> Unit,
+  icon: @Composable () -> Unit,
+  modifier: Modifier = Modifier,
+  selectedIcon: @Composable () -> Unit = icon,
+  enabled: Boolean = true,
+  label: @Composable (() -> Unit)? = null,
+  alwaysShowLabel: Boolean = true
 ) {
-    NavigationBarItem(
-        selected = selected,
-        onClick = onClick,
-        icon = if (selected) selectedIcon else icon,
-        modifier = modifier,
-        enabled = enabled,
-        label = label,
-        alwaysShowLabel = alwaysShowLabel,
-        colors = NavigationBarItemDefaults.colors(
-            selectedIconColor = NiaNavigationDefaults.navigationSelectedItemColor(),
-            unselectedIconColor = NiaNavigationDefaults.navigationContentColor(),
-            selectedTextColor = NiaNavigationDefaults.navigationSelectedItemColor(),
-            unselectedTextColor = NiaNavigationDefaults.navigationContentColor(),
-            indicatorColor = NiaNavigationDefaults.navigationIndicatorColor()
-        )
+  NavigationBarItem(
+    selected = selected,
+    onClick = onClick,
+    icon = if (selected) selectedIcon else icon,
+    modifier = modifier,
+    enabled = enabled,
+    label = label,
+    alwaysShowLabel = alwaysShowLabel,
+    colors = NavigationBarItemDefaults.colors(
+      selectedIconColor = NiaNavigationDefaults.navigationSelectedItemColor(),
+      unselectedIconColor = NiaNavigationDefaults.navigationContentColor(),
+      selectedTextColor = NiaNavigationDefaults.navigationSelectedItemColor(),
+      unselectedTextColor = NiaNavigationDefaults.navigationContentColor(),
+      indicatorColor = NiaNavigationDefaults.navigationIndicatorColor()
     )
+  )
 }
 
 /**
@@ -60,18 +60,18 @@ fun RowScope.NiaNavigationBarItem(
  */
 @Composable
 fun NiaNavigationBar(
-    modifier: Modifier = Modifier,
-    content: @Composable RowScope.() -> Unit
+  modifier: Modifier = Modifier,
+  content: @Composable RowScope.() -> Unit
 ) {
-    Surface(shadowElevation = 4.dp) {
-        NavigationBar(
-            modifier = modifier,
-            containerColor = NiaNavigationDefaults.NavigationContainerColor,
-            contentColor = NiaNavigationDefaults.navigationContentColor(),
-            tonalElevation = 0.dp,
-            content = content
-        )
-    }
+  Surface(shadowElevation = 4.dp) {
+    NavigationBar(
+      modifier = modifier,
+      containerColor = NiaNavigationDefaults.NavigationContainerColor,
+      contentColor = NiaNavigationDefaults.navigationContentColor(),
+      tonalElevation = 0.dp,
+      content = content
+    )
+  }
 }
 
 /**
@@ -91,31 +91,31 @@ fun NiaNavigationBar(
  */
 @Composable
 fun NiaNavigationRailItem(
-    selected: Boolean,
-    onClick: () -> Unit,
-    icon: @Composable () -> Unit,
-    modifier: Modifier = Modifier,
-    selectedIcon: @Composable () -> Unit = icon,
-    enabled: Boolean = true,
-    label: @Composable (() -> Unit)? = null,
-    alwaysShowLabel: Boolean = true
+  selected: Boolean,
+  onClick: () -> Unit,
+  icon: @Composable () -> Unit,
+  modifier: Modifier = Modifier,
+  selectedIcon: @Composable () -> Unit = icon,
+  enabled: Boolean = true,
+  label: @Composable (() -> Unit)? = null,
+  alwaysShowLabel: Boolean = true
 ) {
-    NavigationRailItem(
-        selected = selected,
-        onClick = onClick,
-        icon = if (selected) selectedIcon else icon,
-        modifier = modifier,
-        enabled = enabled,
-        label = label,
-        alwaysShowLabel = alwaysShowLabel,
-        colors = NavigationRailItemDefaults.colors(
-            selectedIconColor = NiaNavigationDefaults.navigationSelectedItemColor(),
-            unselectedIconColor = NiaNavigationDefaults.navigationContentColor(),
-            selectedTextColor = NiaNavigationDefaults.navigationSelectedItemColor(),
-            unselectedTextColor = NiaNavigationDefaults.navigationContentColor(),
-            indicatorColor = NiaNavigationDefaults.navigationIndicatorColor()
-        )
+  NavigationRailItem(
+    selected = selected,
+    onClick = onClick,
+    icon = if (selected) selectedIcon else icon,
+    modifier = modifier,
+    enabled = enabled,
+    label = label,
+    alwaysShowLabel = alwaysShowLabel,
+    colors = NavigationRailItemDefaults.colors(
+      selectedIconColor = NiaNavigationDefaults.navigationSelectedItemColor(),
+      unselectedIconColor = NiaNavigationDefaults.navigationContentColor(),
+      selectedTextColor = NiaNavigationDefaults.navigationSelectedItemColor(),
+      unselectedTextColor = NiaNavigationDefaults.navigationContentColor(),
+      indicatorColor = NiaNavigationDefaults.navigationIndicatorColor()
     )
+  )
 }
 
 /**
@@ -128,33 +128,33 @@ fun NiaNavigationRailItem(
  */
 @Composable
 fun NiaNavigationRail(
-    modifier: Modifier = Modifier,
-    header: @Composable (ColumnScope.() -> Unit)? = null,
-    content: @Composable ColumnScope.() -> Unit
+  modifier: Modifier = Modifier,
+  header: @Composable (ColumnScope.() -> Unit)? = null,
+  content: @Composable ColumnScope.() -> Unit
 ) {
-    NavigationRail(
-        modifier = modifier,
-        containerColor = NiaNavigationDefaults.NavigationContainerColor,
-        contentColor = NiaNavigationDefaults.navigationContentColor(),
-        header = header,
-        content = content
-    )
+  NavigationRail(
+    modifier = modifier,
+    containerColor = NiaNavigationDefaults.NavigationContainerColor,
+    contentColor = NiaNavigationDefaults.navigationContentColor(),
+    header = header,
+    content = content
+  )
 }
 
 /**
  * Now in Android navigation default values.
  */
 object NiaNavigationDefaults {
-    val NavigationContainerColor
-        @Composable
-        get() = MaterialTheme.colorScheme.background
-
+  val NavigationContainerColor
     @Composable
-    fun navigationContentColor() = MaterialTheme.colorScheme.onSurfaceVariant
+    get() = MaterialTheme.colorScheme.background
 
-    @Composable
-    fun navigationSelectedItemColor() = MaterialTheme.colorScheme.onPrimaryContainer
+  @Composable
+  fun navigationContentColor() = MaterialTheme.colorScheme.onSurfaceVariant
 
-    @Composable
-    fun navigationIndicatorColor() = MaterialTheme.colorScheme.primaryContainer
+  @Composable
+  fun navigationSelectedItemColor() = MaterialTheme.colorScheme.onPrimaryContainer
+
+  @Composable
+  fun navigationIndicatorColor() = MaterialTheme.colorScheme.primaryContainer
 }

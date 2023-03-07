@@ -2,12 +2,16 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlinx-serialization'
-    id 'com.google.devtools.ksp' version '1.7.20-1.0.8'
+    id 'com.google.devtools.ksp' version "$kotlin_ksp_version"
 }
 
 android {
     namespace 'org.quram.common'
     compileSdk 33
+
+    ksp {
+        arg("room.schemaLocation", "$projectDir/schemas")
+    }
 
     defaultConfig {
         minSdk 24
@@ -27,7 +31,9 @@ android {
 }
 
 dependencies {
-    api "org.jetbrains.kotlinx:kotlinx-serialization-json:1.4.1"
+    implementation project(":core:models")
+
+    api "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization"
 
     api "io.insert-koin:koin-android:$koin_android_version"
     api 'com.jakewharton.timber:timber:5.0.1'

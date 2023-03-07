@@ -2,7 +2,7 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlinx-serialization'
-    id 'com.google.devtools.ksp' version '1.7.20-1.0.8'
+    id 'com.google.devtools.ksp' version "$kotlin_ksp_version"
 }
 
 android {
@@ -23,7 +23,7 @@ android {
 
     compileOptions {
         sourceCompatibility JavaVersion.VERSION_1_8
-                targetCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
     }
     kotlinOptions {
         jvmTarget = '1.8'
@@ -40,6 +40,7 @@ dependencies {
     implementation 'androidx.core:core-ktx:1.9.0'
 
     implementation "androidx.room:room-ktx:$room_version"
+    implementation project(path: ':core:models')
     ksp "androidx.room:room-compiler:$room_version"
 
     api "androidx.media3:media3-exoplayer:$media3_version"

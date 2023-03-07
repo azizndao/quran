@@ -3,11 +3,7 @@ package org.alquran.ui.screen.pager.components
 import android.content.res.Configuration
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.*
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
@@ -32,52 +28,52 @@ import org.alquran.ui.uistate.TranslationPage
 @OptIn(ExperimentalAnimationApi::class)
 @Composable
 fun SurahHeader(
-    modifier: Modifier = Modifier,
-    suraNumber: Int,
-    surahName: String,
+  modifier: Modifier = Modifier,
+  suraNumber: Int,
+  surahName: String,
 ) {
 
-    Column(modifier = modifier) {
+  Column(modifier = modifier) {
 
-        SurahHeader(name = surahName)
+    SurahHeader(name = surahName)
 
-        if (suraNumber != 1 && suraNumber != 9) {
-            Image(
-                painter = painterResource(id = R.drawable.bismillah),
-                contentDescription = null,
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .height(40.dp)
-                    .padding(top = 8.dp),
-                contentScale = ContentScale.Inside,
-                colorFilter = ColorFilter.tint(LocalContentColor.current)
-            )
-        }
+    if (suraNumber != 1 && suraNumber != 9) {
+      Image(
+        painter = painterResource(id = R.drawable.bismillah),
+        contentDescription = null,
+        modifier = Modifier
+          .fillMaxWidth()
+          .height(40.dp)
+          .padding(top = 8.dp),
+        contentScale = ContentScale.Inside,
+        colorFilter = ColorFilter.tint(LocalContentColor.current)
+      )
     }
+  }
 }
 
 @ExperimentalAnimationApi
 @Composable
 private fun SurahHeader(modifier: Modifier = Modifier, name: String) {
 
-    Box(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 12.dp)
-            .paint(
-                painterResource(id = R.drawable.ic_surah_border),
-                contentScale = ContentScale.Fit,
-                colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
-            )
-    ) {
+  Box(
+    modifier = modifier
+      .fillMaxWidth()
+      .padding(horizontal = 12.dp)
+      .paint(
+        painterResource(id = R.drawable.ic_surah_border),
+        contentScale = ContentScale.Fit,
+        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+      )
+  ) {
 
-        Text(
-            text = stringResource(id = R.string.surah, name),
-            textAlign = TextAlign.Center,
-            style = MaterialTheme.typography.titleSmall,
-            modifier = Modifier.align(Alignment.Center)
-        )
-    }
+    Text(
+      text = stringResource(id = R.string.surah, name),
+      textAlign = TextAlign.Center,
+      style = MaterialTheme.typography.titleSmall,
+      modifier = Modifier.align(Alignment.Center)
+    )
+  }
 }
 
 @ExperimentalAnimationApi
@@ -85,13 +81,13 @@ private fun SurahHeader(modifier: Modifier = Modifier, name: String) {
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun NewSurahItemPreview() {
-    val sura = remember {
-        TranslationPage.Surah(number = 2, name = "Al-Baqarah")
+  val sura = remember {
+    TranslationPage.Surah(number = 2, name = "Al-Baqarah")
+  }
+  QuranTheme {
+    Surface {
+      SurahHeader(surahName = sura.name, suraNumber = sura.number)
     }
-    QuranTheme {
-        Surface {
-            SurahHeader(surahName = sura.name, suraNumber = sura.number)
-        }
-    }
+  }
 }
 

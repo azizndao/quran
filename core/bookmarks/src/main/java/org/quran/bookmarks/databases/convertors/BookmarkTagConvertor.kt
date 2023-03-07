@@ -8,9 +8,9 @@ import org.quran.bookmarks.model.BookmarkTag
 
 class BookmarkTagConvertor {
 
-    @TypeConverter
-    fun encode(tag: BookmarkTag): String = Json.encodeToString(tag)
+  @TypeConverter
+  fun encode(tag: BookmarkTag): String = Json.encodeToString(tag)
 
-    @TypeConverter
-    fun decode(str: String): BookmarkTag = Json.decodeFromString(str)
+  @TypeConverter
+  fun decode(str: String): BookmarkTag = Json.decodeFromString(str)
 }

@@ -16,50 +16,50 @@ data class AppBarParams(val modifier: Modifier, val elevate: Boolean = false)
 
 @Composable
 fun CustomScrollView(
-    isScrollable: Boolean,
-    topAppBar: @Composable AppBarParams.() -> Unit,
-    content: (PaddingValues) -> Unit
+  isScrollable: Boolean,
+  topAppBar: @Composable AppBarParams.() -> Unit,
+  content: (PaddingValues) -> Unit
 ) {
-    val windowInsets = WindowInsets.statusBars.asPaddingValues()
-    val toolbarHeight by derivedStateOf { 56.dp + windowInsets.calculateTopPadding() }
+  val windowInsets = WindowInsets.statusBars.asPaddingValues()
+  val toolbarHeight by derivedStateOf { 56.dp + windowInsets.calculateTopPadding() }
 
-    val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
-    var toolbarOffsetHeightPx by remember { mutableStateOf(0f) }
+  val toolbarHeightPx = with(LocalDensity.current) { toolbarHeight.roundToPx().toFloat() }
+  var toolbarOffsetHeightPx by remember { mutableStateOf(0f) }
 
-    val nestedScrollConnection = remember {
-        object : NestedScrollConnection {
-            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
-                val delta = available.y
-                val newOffset = toolbarOffsetHeightPx + delta
-                toolbarOffsetHeightPx = newOffset.coerceIn(-toolbarHeightPx, 0f)
-                return Offset.Zero
-            }
-        }
+  val nestedScrollConnection = remember {
+    object : NestedScrollConnection {
+      override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+        val delta = available.y
+        val newOffset = toolbarOffsetHeightPx + delta
+        toolbarOffsetHeightPx = newOffset.coerceIn(-toolbarHeightPx, 0f)
+        return Offset.Zero
+      }
     }
+  }
 
-    val modifier = if (isScrollable) {
+  val modifier = if (isScrollable) {
+    Modifier
+      .fillMaxSize()
+      .nestedScroll(nestedScrollConnection)
+  } else {
+    Modifier.fillMaxSize()
+  }
+
+  Box(modifier) {
+
+    content(
+      PaddingValues(
+        top = toolbarHeight,
+        bottom = 56.dp + windowInsets.calculateBottomPadding(),
+      )
+    )
+
+    topAppBar(
+      AppBarParams(
         Modifier
-            .fillMaxSize()
-            .nestedScroll(nestedScrollConnection)
-    } else {
-        Modifier.fillMaxSize()
-    }
-
-    Box(modifier) {
-
-        content(
-            PaddingValues(
-                top = toolbarHeight,
-                bottom = 56.dp + windowInsets.calculateBottomPadding(),
-            )
-        )
-
-        topAppBar(
-            AppBarParams(
-                Modifier
-                    .height(toolbarHeight)
-                    .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.roundToInt()) },
-            )
-        )
-    }
+          .height(toolbarHeight)
+          .offset { IntOffset(x = 0, y = toolbarOffsetHeightPx.roundToInt()) },
+      )
+    )
+  }
 }

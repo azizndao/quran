@@ -10,7 +10,7 @@ import org.quran.translation.workers.DownloadTranslationWorker
 
 val TranslationModule = module {
 
-    workerOf(::DownloadTranslationWorker)
+  workerOf(::DownloadTranslationWorker)
 
-    factoryOf(::TranslationRepositoryImpl) bind TranslationRepository::class
+  factoryOf(::TranslationRepositoryImpl) bind TranslationRepository::class
 }

@@ -7,5 +7,5 @@ import org.alquran.ui.theme.QuranFontFamilies
 
 
 enum class QuranFont(val fontFamily: FontFamily, @StringRes val nameId: Int) {
-    HafsSmartV8(QuranFontFamilies.Hafs, R.string.uthmani_hafs_font),
+  HafsSmartV8(QuranFontFamilies.Hafs, R.string.uthmani_hafs_font),
 }

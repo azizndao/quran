@@ -1,18 +1,18 @@
 package org.alquran.ui.screen.audioSheet
 
-import org.alquran.audio.models.Reciter
+import arg.quran.models.audio.Qari
 
 
 internal sealed class AudioEvent {
-    object SkipPrevious : AudioEvent()
+  object SkipPrevious : AudioEvent()
 
-    object SkipNext : AudioEvent()
+  object SkipNext : AudioEvent()
 
-    class Play(val reciter: String, val sura: Int, val aya: Int = 1) : AudioEvent()
+  class Play(val reciter: String, val sura: Int, val aya: Int = 1) : AudioEvent()
 
-    object PlayOrPause : AudioEvent()
+  object PlayOrPause : AudioEvent()
 
-    object SetRepeatMode : AudioEvent()
+  object SetRepeatMode : AudioEvent()
 
-    class ChangeReciter(val reciter: Reciter) : AudioEvent()
+  class ChangeReciter(val reciter: Qari) : AudioEvent()
 }

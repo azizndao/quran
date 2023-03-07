@@ -17,223 +17,212 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.core.text.HtmlCompat.fromHtml
+import arg.quran.models.audio.WordSegment
+import arg.quran.models.quran.CharType
+import arg.quran.models.quran.VerseKey
+import arg.quran.models.quran.VerseTranslation
 import org.alquran.R
-import org.alquran.audio.models.AudioState
-import org.alquran.hafs.model.Verse
 import org.alquran.ui.theme.quran
 import org.alquran.ui.theme.translation
+import org.alquran.ui.uistate.TranslationPage
 import org.alquran.utils.extensions.toAnnotatedString
-import org.quram.common.model.VerseKey
-import org.quran.network.model.CharType
 
 @Composable
 fun VerseItemView(
-    modifier: Modifier = Modifier,
-    verse: Verse,
-    audioState: AudioState,
+  modifier: Modifier = Modifier,
+  verse: TranslationPage.Verse,
+  playingWord: WordSegment?,
 ) {
-    val background by getPlayingBackground(audioState)
+  val background by getPlayingBackground(playingWord != null)
+  val colorScheme = MaterialTheme.colorScheme
 
-    val text = remember {
-        buildAnnotatedString {
-            for (word in verse.words) {
-                append(word.text)
-                if (word.charType != CharType.End) append(" ")
-            }
-        }
+  val text = remember(playingWord) {
+    buildAnnotatedString {
+      for (word in verse.words) {
+        val color =
+          if (playingWord != null && playingWord.position == word.position) colorScheme.primary else colorScheme.onSurface
+        withStyle(SpanStyle(color = color)) { append(word.text) }
+        if (word.charType != CharType.End) append(" ")
+      }
     }
+  }
 
-    Text(
-        text = text,
-        style = MaterialTheme.typography.quran,
-        modifier = modifier
-            .drawBehind { drawRect(background) }
-            .padding(start = 24.dp, top = 24.dp, end = 24.dp)
-            .fillMaxWidth()
-    )
+  Text(text = text,
+    style = MaterialTheme.typography.quran,
+    modifier = modifier
+      .drawBehind { drawRect(background) }
+      .padding(start = 24.dp, top = 24.dp, end = 24.dp)
+      .fillMaxWidth())
 }
 
 @Composable
 fun TranslationItemView(
-    modifier: Modifier = Modifier,
-    translation: org.alquran.hafs.model.VerseTranslation,
-    audioState: AudioState,
+  modifier: Modifier = Modifier,
+  authorName: String,
+  translation: VerseTranslation,
+  isPlaying: Boolean,
 ) {
-    val colorScheme = MaterialTheme.colorScheme
+  val colorScheme = MaterialTheme.colorScheme
 
-    val background by getPlayingBackground(audioState)
+  val background by getPlayingBackground(isPlaying)
 
-    val style = MaterialTheme.typography.translation
+  val style = MaterialTheme.typography.translation
 
-    val text = remember(translation) {
-        buildAnnotatedString {
-            val html = fromHtml(translation.text, FROM_HTML_MODE_COMPACT)
-            append(html.toAnnotatedString(colorScheme, style))
-        }
+  val text = remember(translation) {
+    buildAnnotatedString {
+      val html = fromHtml(translation.text, FROM_HTML_MODE_COMPACT)
+      append(html.toAnnotatedString(colorScheme, style))
     }
+  }
 
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .drawBehind { drawRect(background) }
-            .padding(top = 18.dp, start = 24.dp, end = 24.dp),
-        verticalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        Text(
-            text = "— " + translation.authorName,
-            style = MaterialTheme.typography.labelSmall.copy(
-                fontWeight = FontWeight.Normal,
-                color = LocalContentColor.current.copy(alpha = 0.7f)
-            ),
-        )
+  Column(modifier = modifier
+    .fillMaxWidth()
+    .drawBehind { drawRect(background) }
+    .padding(top = 18.dp, start = 24.dp, end = 24.dp),
+    verticalArrangement = Arrangement.spacedBy(8.dp)) {
+    Text(
+      text = "— $authorName",
+      style = MaterialTheme.typography.labelSmall.copy(
+        fontWeight = FontWeight.Normal, color = LocalContentColor.current.copy(alpha = 0.7f)
+      ),
+    )
 
-        SelectionContainer {
-            Text(text = text, style = style)
-        }
+    SelectionContainer {
+      Text(text = text, style = style)
     }
+  }
 }
 
 private val IconSize = 20.dp
 
 @Composable
 fun VerseToolbarView(
-    modifier: Modifier = Modifier,
-    verseKey: VerseKey,
-    isBookmarked: Boolean,
-    audioState: AudioState,
-    onBookmarkChange: () -> Unit,
-    onPlay: () -> Unit,
-    onMoreClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  verseKey: VerseKey,
+  isBookmarked: Boolean,
+  isPlaying: Boolean,
+  onBookmarkChange: () -> Unit,
+  onPlay: () -> Unit,
+  onMoreClick: () -> Unit,
 ) {
-    CompositionLocalProvider(
-        LocalContentColor provides MaterialTheme.colorScheme.secondary
-    ) {
-        val background by getPlayingBackground(audioState)
-        Row(
-            modifier = modifier
-                .fillMaxWidth()
-                .drawBehind { drawRect(background) }
-                .padding(bottom = 12.dp, top = 12.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
+  CompositionLocalProvider(
+    LocalContentColor provides MaterialTheme.colorScheme.secondary
+  ) {
+    val background by getPlayingBackground(isPlaying)
+    Row(modifier = modifier
+      .fillMaxWidth()
+      .drawBehind { drawRect(background) }
+      .padding(bottom = 12.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
 
-            Text(
-                text = verseKey.toString(),
-                modifier = Modifier
-                    .padding(start = 24.dp, end = 8.dp)
-                    .background(
-                        MaterialTheme.colorScheme.onSurfaceVariant.copy(0.13f),
-                        MaterialTheme.shapes.small
-                    )
-                    .padding(8.dp, 4.dp)
-                    .align(Alignment.CenterVertically)
-            )
+      Text(
+        text = verseKey.toString(),
+        modifier = Modifier
+          .padding(start = 24.dp, end = 8.dp)
+          .background(
+            MaterialTheme.colorScheme.onSurfaceVariant.copy(0.13f), MaterialTheme.shapes.small
+          )
+          .padding(8.dp, 4.dp)
+          .align(Alignment.CenterVertically)
+      )
 
-            BookmarkButton(
-                isBookmarked = isBookmarked,
-                onClick = { onBookmarkChange() },
-            )
+      BookmarkButton(
+        isBookmarked = isBookmarked,
+        onClick = { onBookmarkChange() },
+      )
 
-            PlayButton(
-                audioState = audioState,
-                onPlay = onPlay
-            )
+      PlayButton(
+        isPlaying = isPlaying,
+        onPlay = onPlay
+      )
 
-            Spacer(modifier = Modifier.weight(1f))
+      Spacer(modifier = Modifier.weight(1f))
 
-            IconButton(
-                onClick = onMoreClick,
-                modifier = Modifier.padding(horizontal = 8.dp),
-            ) {
-                Icon(
-                    painter = painterResource(id = R.drawable.ic_more_vert),
-                    contentDescription = null,
-                    tint = MaterialTheme.colorScheme.primary,
-                    modifier = Modifier.size(IconSize),
-                )
-            }
-        }
+      IconButton(
+        onClick = onMoreClick,
+        modifier = Modifier.padding(horizontal = 8.dp),
+      ) {
+        Icon(
+          painter = painterResource(id = R.drawable.ic_more_vert),
+          contentDescription = null,
+          tint = MaterialTheme.colorScheme.primary,
+          modifier = Modifier.size(IconSize),
+        )
+      }
     }
+  }
 }
 
 @Composable
 private fun getPlayingBackground(
-    audioState: AudioState,
-    colorScheme: ColorScheme = MaterialTheme.colorScheme
-) = animateColorAsState(
-    when (audioState) {
-        AudioState.PLAYING -> colorScheme.surfaceColorAtElevation(2.dp)
-        else -> colorScheme.surface
-    },
+  isPlaying: Boolean, colorScheme: ColorScheme = MaterialTheme.colorScheme
+): State<Color> = animateColorAsState(
+  when {
+    isPlaying -> colorScheme.surfaceColorAtElevation(2.dp)
+    else -> colorScheme.surface
+  },
 )
 
 @OptIn(ExperimentalAnimationGraphicsApi::class)
 @Composable
 private fun PlayButton(
-    modifier: Modifier = Modifier,
-    audioState: AudioState,
-    onPlay: () -> Unit,
+  modifier: Modifier = Modifier,
+  isPlaying: Boolean,
+  onPlay: () -> Unit,
 ) {
 
-    when (audioState) {
-        AudioState.LOADING -> CircularProgressIndicator(
-            modifier = modifier.size(IconSize),
-            strokeWidth = 2.5.dp
-        )
+  val icon = AnimatedImageVector.animatedVectorResource(R.drawable.ic_play_pause)
 
-        else -> {
-            val icon = AnimatedImageVector.animatedVectorResource(R.drawable.ic_play_pause)
-
-            IconButton(onClick = onPlay) {
-                Icon(
-                    painter = rememberAnimatedVectorPainter(icon, audioState == AudioState.PLAYING),
-                    contentDescription = null,
-                    modifier = Modifier.size(IconSize),
-                )
-            }
-        }
-    }
+  IconButton(onClick = onPlay, modifier = modifier) {
+    Icon(
+      painter = rememberAnimatedVectorPainter(icon, isPlaying),
+      contentDescription = null,
+      modifier = Modifier.size(IconSize),
+    )
+  }
 }
 
 @Composable
 private fun BookmarkButton(
-    modifier: Modifier = Modifier,
-    isBookmarked: Boolean, onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  isBookmarked: Boolean, onClick: () -> Unit,
 ) {
 
-    val interactionSource = remember { MutableInteractionSource() }
+  val interactionSource = remember { MutableInteractionSource() }
 
-    var pressed by remember { mutableStateOf(false) }
-    val translation = updateTransition(targetState = pressed, label = "bookmark icon transition")
+  var pressed by remember { mutableStateOf(false) }
+  val translation = updateTransition(targetState = pressed, label = "bookmark icon transition")
 
-    val iconScale by translation.animateFloat(label = "icon scale transition",
-        transitionSpec = { spring(Spring.DampingRatioMediumBouncy) }) { isPressed ->
-        if (isPressed) 2f else 1f
+  val iconScale by translation.animateFloat(
+    label = "icon scale transition",
+    transitionSpec = { spring(Spring.DampingRatioMediumBouncy) }) { isPressed ->
+    if (isPressed) 2f else 1f
+  }
+
+  LaunchedEffect(interactionSource) {
+    interactionSource.interactions.collect { interaction ->
+      pressed = interaction is PressInteraction.Press
     }
+  }
 
-    LaunchedEffect(interactionSource) {
-        interactionSource.interactions.collect { interaction ->
-            pressed = interaction is PressInteraction.Press
-        }
-    }
-
-    IconButton(modifier = modifier, onClick = onClick, interactionSource = interactionSource) {
-        val drawableId =
-            if (isBookmarked) R.drawable.ic_baseline_bookmark else R.drawable.ic_bookmark
-        Icon(
-            painterResource(id = drawableId),
-            contentDescription = null,
-            modifier = Modifier
-                .size(IconSize)
-                .scale(iconScale),
-        )
-    }
+  IconButton(modifier = modifier, onClick = onClick, interactionSource = interactionSource) {
+    val drawableId = if (isBookmarked) R.drawable.ic_baseline_bookmark else R.drawable.ic_bookmark
+    Icon(
+      painterResource(id = drawableId),
+      contentDescription = null,
+      modifier = Modifier
+        .size(IconSize)
+        .scale(iconScale),
+    )
+  }
 }
 
 //@Preview(showBackground = true)

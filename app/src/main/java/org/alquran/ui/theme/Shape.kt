@@ -9,7 +9,7 @@ val shapes = Shapes(
 )
 
 val Shapes.bottomSheet
-    get() = extraLarge.copy(
-        bottomEnd = CornerSize(0),
-        bottomStart = CornerSize(0)
-    )
+  get() = extraLarge.copy(
+    bottomEnd = CornerSize(0),
+    bottomStart = CornerSize(0)
+  )

@@ -15,6 +15,7 @@ message TranslationEdition {
   string slug = 5;
   LanguageDirection direction = 6;
   bool downloaded = 7;
+  int32 order = 8;
 }
 
 enum LanguageDirection {

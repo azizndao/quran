@@ -1,12 +1,12 @@
-package org.muslimapp.domain.quran.uistate
+package org.alquran.ui.uistate
 
-import org.quram.common.model.SurahMapping
-import org.quram.common.model.SuraWithTranslation
+import arg.quran.models.SuraWithTranslation
+import arg.quran.models.SurahMapping
 
 
 data class SurahListUiState(
-    val loading: Boolean = true,
-    val recentSurah: SuraWithTranslation? = null,
-    val juzs: List<SurahMapping> = emptyList(),
-    val exception: Exception? = null,
+  val loading: Boolean = true,
+  val recentSurah: SuraWithTranslation? = null,
+  val juzs: List<SurahMapping> = emptyList(),
+  val exception: Exception? = null,
 )

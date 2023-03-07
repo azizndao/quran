@@ -12,30 +12,30 @@ import org.quran.datastore.DisplayMode
 
 @Composable
 fun DisplayModeButton(
-    displayMode: DisplayMode?,
-    enabled: Boolean = true,
-    onClick: (DisplayMode) -> Unit,
+  displayMode: DisplayMode?,
+  enabled: Boolean = true,
+  onClick: (DisplayMode) -> Unit,
 ) {
-    IconButton(
-        enabled = enabled,
-        onClick = { onClick(if (displayMode == DisplayMode.QURAN) DisplayMode.QURAN_TRANSLATION else DisplayMode.QURAN) }
-    ) {
-        AnimatedContent(
-            targetState = displayMode,
-            transitionSpec = {
-                fadeIn() + slideIn {
-                    IntOffset(0, it.height)
-                } with fadeOut() + slideOut { IntOffset(0, -it.height) }
-            }
-        ) { target ->
-            when (target) {
-                DisplayMode.QURAN_TRANSLATION -> Icon(
-                    painterResource(R.drawable.ic_language),
-                    null
-                )
+  IconButton(
+    enabled = enabled,
+    onClick = { onClick(if (displayMode == DisplayMode.QURAN) DisplayMode.QURAN_TRANSLATION else DisplayMode.QURAN) }
+  ) {
+    AnimatedContent(
+      targetState = displayMode,
+      transitionSpec = {
+        fadeIn() + slideIn {
+          IntOffset(0, it.height)
+        } with fadeOut() + slideOut { IntOffset(0, -it.height) }
+      }
+    ) { target ->
+      when (target) {
+        DisplayMode.QURAN_TRANSLATION -> Icon(
+          painterResource(R.drawable.ic_language),
+          null
+        )
 
-                else -> Icon(painterResource(R.drawable.ic_menu_book), null)
-            }
-        }
+        else -> Icon(painterResource(R.drawable.ic_menu_book), null)
+      }
     }
+  }
 }

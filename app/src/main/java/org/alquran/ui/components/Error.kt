@@ -1,16 +1,7 @@
 package org.alquran.ui.components
 
-import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.material3.Button
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Surface
-import androidx.compose.material3.Text
+import androidx.compose.foundation.layout.*
+import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -24,49 +15,49 @@ import org.alquran.ui.theme.QuranTheme
 
 @Composable
 fun NetworkUnreachableView(
-    modifier: Modifier = Modifier,
-    onRetry: () -> Unit
+  modifier: Modifier = Modifier,
+  onRetry: () -> Unit
 ) {
-    Column(
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(24.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
+  Column(
+    modifier = modifier
+      .fillMaxWidth()
+      .padding(24.dp),
+    verticalArrangement = Arrangement.spacedBy(16.dp),
+    horizontalAlignment = Alignment.CenterHorizontally
+  ) {
+
+    Icon(
+      painter = painterResource(id = R.drawable.ic_round_error_outline_24),
+      contentDescription = stringResource(id = R.string.network_error),
+      modifier = Modifier.size(42.dp),
+      tint = MaterialTheme.colorScheme.error,
+    )
+
+    Text(
+      text = stringResource(id = R.string.network_error),
+      style = MaterialTheme.typography.headlineMedium,
+      textAlign = TextAlign.Center
+    )
+
+    Button(
+      onClick = onRetry,
+      contentPadding = PaddingValues(vertical = 8.dp, horizontal = 42.dp)
     ) {
-
-        Icon(
-            painter = painterResource(id = R.drawable.ic_round_error_outline_24),
-            contentDescription = stringResource(id = R.string.network_error),
-            modifier = Modifier.size(42.dp),
-            tint = MaterialTheme.colorScheme.error,
-        )
-
-        Text(
-            text = stringResource(id = R.string.network_error),
-            style = MaterialTheme.typography.headlineMedium,
-            textAlign = TextAlign.Center
-        )
-
-        Button(
-            onClick = onRetry,
-            contentPadding = PaddingValues(vertical = 8.dp, horizontal = 42.dp)
-        ) {
-            Text(text = stringResource(id = R.string.retry))
-        }
+      Text(text = stringResource(id = R.string.retry))
     }
+  }
 }
 
 @Preview
 @Composable
 fun NetworkUnreachablePreview() {
-    QuranTheme {
-        Surface {
-            NetworkUnreachableView {
+  QuranTheme {
+    Surface {
+      NetworkUnreachableView {
 
-            }
-        }
+      }
     }
+  }
 }
 
 @Composable

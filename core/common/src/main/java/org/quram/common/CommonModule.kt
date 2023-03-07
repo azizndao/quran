@@ -7,23 +7,19 @@ import org.koin.dsl.module
 import org.quram.common.datasources.MadaniV1DataSource
 import org.quram.common.datasources.QuranDataSource
 import org.quram.common.repositories.SurahRepository
-import org.quram.common.utils.QuranDisplayData
-import org.quram.common.utils.QuranInfo
-import org.quram.common.utils.QuranPageInfo
-import org.quram.common.utils.QuranPageInfoImpl
-import org.quram.common.utils.Rub3DisplayUseCase
+import org.quram.common.utils.*
 
 val CommonModule = module {
 
-    factoryOf(::MadaniV1DataSource) bind QuranDataSource::class
+  factoryOf(::MadaniV1DataSource) bind QuranDataSource::class
 
-    factoryOf(::QuranPageInfoImpl) bind QuranPageInfo::class
+  factoryOf(::QuranPageInfoImpl) bind QuranPageInfo::class
 
-    factoryOf(::QuranDisplayData)
+  factoryOf(::QuranDisplayData)
 
-    factoryOf(::Rub3DisplayUseCase)
+  factoryOf(::Rub3DisplayUseCase)
 
-    singleOf(::QuranInfo)
+  singleOf(::QuranInfo)
 
-    factoryOf(::SurahRepository)
+  factoryOf(::SurahRepository)
 }

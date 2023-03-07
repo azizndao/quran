@@ -14,13 +14,13 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomSheetDragHandler(modifier: Modifier = Modifier) {
-    Box(modifier = modifier.fillMaxWidth()) {
-        Box(
-            modifier = Modifier
-                .align(Alignment.Center)
-                .padding(top = 12.dp, bottom = 24.dp)
-                .size(width = 32.dp, height = 4.dp)
-                .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(0.4f), CircleShape),
-        )
-    }
+  Box(modifier = modifier.fillMaxWidth()) {
+    Box(
+      modifier = Modifier
+        .align(Alignment.Center)
+        .padding(top = 12.dp, bottom = 24.dp)
+        .size(width = 32.dp, height = 4.dp)
+        .background(MaterialTheme.colorScheme.onSurfaceVariant.copy(0.4f), CircleShape),
+    )
+  }
 }

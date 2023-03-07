@@ -5,9 +5,9 @@ import java.util.*
 
 class CalendarConvertor {
 
-    @TypeConverter
-    fun decode(value: Long?) = value?.let { Calendar.getInstance().apply { timeInMillis = it } }
+  @TypeConverter
+  fun decode(value: Long?) = value?.let { Calendar.getInstance().apply { timeInMillis = it } }
 
-    @TypeConverter
-    fun encode(value: Calendar?): Long? = value?.timeInMillis
+  @TypeConverter
+  fun encode(value: Calendar?): Long? = value?.timeInMillis
 }

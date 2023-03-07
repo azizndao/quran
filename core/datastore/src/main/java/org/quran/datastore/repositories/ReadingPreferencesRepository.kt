@@ -5,14 +5,14 @@ import kotlinx.coroutines.flow.map
 import org.quran.datastore.ReadingPositionPreferences
 
 class ReadingPreferencesRepository(
-    private val dataStore: DataStore<ReadingPositionPreferences>,
+  private val dataStore: DataStore<ReadingPositionPreferences>,
 ) {
 
 //    fun getSura() = dataStore.data.map { it.sura }
 
-    fun getAyah() = dataStore.data.map { it.ayah }
+  fun getAyah() = dataStore.data.map { it.ayah }
 
-    fun getPage() = dataStore.data.map { it.page }
+  fun getPage() = dataStore.data.map { it.page }
 
 //    fun getPosition() = dataStore.data
 

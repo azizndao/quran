@@ -174,7 +174,7 @@
     <string name="suffle">Shuffle</string>
 
     <plurals name="search_results">
-        <item quantity="zero">On Match</item>
+        <item quantity="zero">No Match</item>
         <item quantity="one">One match</item>
         <item quantity="other">%d matches</item>
     </plurals>

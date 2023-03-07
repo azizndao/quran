@@ -10,11 +10,11 @@ import org.quran.bookmarks.databases.convertors.VerseKeyConvertor
 import org.quran.bookmarks.model.Bookmark
 
 @Database(
-    version = 1,
-    entities = [Bookmark::class]
+  version = 1,
+  entities = [Bookmark::class]
 )
 @TypeConverters(BookmarkTagConvertor::class, CalendarConvertor::class, VerseKeyConvertor::class)
 internal abstract class BookmarksDatabase : RoomDatabase() {
 
-    abstract val bookmarkDao: BookmarkDao
+  abstract val bookmarkDao: BookmarkDao
 }

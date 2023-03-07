@@ -26,33 +26,33 @@ import java.util.concurrent.Executors
 
 val PlaybackModule = module {
 
-    singleOf(::PlaybackConnection)
+  singleOf(::PlaybackConnection)
 
-    factoryOf(::TimingRepository)
+  factoryOf(::RecitationRepository)
 
-    factoryOf(::RecitationRepository)
+  factoryOf(::TimingRepository)
 
-    factoryOf(::RecitationsDataSource)
+  factoryOf(::RecitationsDataSource)
 
-    single {
-        DownloadManager(
-            get(),
-            get(),
-            get(),
-            get<HttpDataSource.Factory>(),
-            Executors.newFixedThreadPool(6)
-        )
-    }
+  single {
+    DownloadManager(
+      get(),
+      get(),
+      get(),
+      get<HttpDataSource.Factory>(),
+      Executors.newFixedThreadPool(6)
+    )
+  }
 
-    single { StandaloneDatabaseProvider(get()) } bind DatabaseProvider::class
+  single { StandaloneDatabaseProvider(get()) } bind DatabaseProvider::class
 
-    single {
-        val downloadContentDirectory = File(
-            get<Context>().getExternalFilesDir(null) ?: get<Context>().filesDir,
-            Environment.DIRECTORY_MUSIC
-        )
-        SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), get<DatabaseProvider>())
-    } bind Cache::class
+  single {
+    val downloadContentDirectory = File(
+      get<Context>().getExternalFilesDir(null) ?: get<Context>().filesDir,
+      Environment.DIRECTORY_MUSIC
+    )
+    SimpleCache(downloadContentDirectory, NoOpCacheEvictor(), get<DatabaseProvider>())
+  } bind Cache::class
 
-    single { OkHttpDataSource.Factory(OkHttpClient()) } bind HttpDataSource.Factory::class
+  single { OkHttpDataSource.Factory(OkHttpClient()) } bind HttpDataSource.Factory::class
 }

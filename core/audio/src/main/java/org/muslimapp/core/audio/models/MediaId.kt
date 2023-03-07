@@ -8,10 +8,10 @@ import kotlinx.serialization.json.Json
 @Serializable
 data class MediaId(val reciter: String, val sura: Int, val ayah: Int) {
 
-    override fun toString() = Json.encodeToString(this)
+  override fun toString() = Json.encodeToString(this)
 
-    companion object {
-        fun fromString(value: String): MediaId = Json.decodeFromString(value)
-    }
+  companion object {
+    fun fromString(value: String): MediaId = Json.decodeFromString(value)
+  }
 }
 

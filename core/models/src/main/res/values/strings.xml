@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="murattal">Murattal</string>
+    <string name="murattal_description">Murattal is at a slower pace, used for study and practice</string>
+    <string name="mujawwad">Mujawwad</string>
+    <string name="mujawwad_description">Mujawwad is a melodic style of Holy Quran recitation</string>
+    <string name="muallim">Muallim</string>
+    <string name="muallim_description">Muallim is teaching style recitation of Holy Quran</string>
+</resources>

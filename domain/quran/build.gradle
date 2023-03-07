@@ -26,14 +26,15 @@ android {
 
 dependencies {
     api project(":core:common")
-    api project(':core:quran')
+    api project(':core:verses')
     api project(":core:translation")
     api project(":core:network")
     api project(":core:bookmarks")
     api project(":core:datastore")
 
     implementation "io.insert-koin:koin-android:$koin_android_version"
-    api "io.insert-koin:koin-androidx-workmanager:$koin_android_version"
+    implementation "io.insert-koin:koin-androidx-workmanager:$koin_android_version"
 
-    api "androidx.work:work-runtime-ktx:$work_version"
+    implementation "androidx.work:work-runtime-ktx:$work_version"
+    implementation project(path: ':core:models')
 }

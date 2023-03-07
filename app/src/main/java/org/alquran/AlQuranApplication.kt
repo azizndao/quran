@@ -24,32 +24,32 @@ import timber.log.Timber
 
 class AlQuranApplication : Application(), KoinComponent {
 
-    override fun onCreate() {
-        super.onCreate()
+  override fun onCreate() {
+    super.onCreate()
 
-        Timber.plant(Timber.DebugTree())
+    Timber.plant(Timber.DebugTree())
 
-        startKoin {
-            androidLogger()
-            androidContext(this@AlQuranApplication)
-            workManagerFactory()
+    startKoin {
+      androidLogger()
+      androidContext(this@AlQuranApplication)
+      workManagerFactory()
 
-            modules(
-                DataStoreModule,
-                TranslationModule,
-                NetworkModule,
-                PlaybackModule,
-                CommonModule,
-                UiModule,
-                HafsModule,
-                UseCaseModule,
-                WorkerModule,
-                QuranDomainModule,
-                BookmarkModule,
-            )
-        }
-
-        WorkManager.getInstance(this)
-            .enqueue(OneTimeWorkRequestBuilder<SyncWorker>().build())
+      modules(
+        DataStoreModule,
+        TranslationModule,
+        NetworkModule,
+        PlaybackModule,
+        CommonModule,
+        UiModule,
+        HafsModule,
+        UseCaseModule,
+        WorkerModule,
+        QuranDomainModule,
+        BookmarkModule,
+      )
     }
+
+    WorkManager.getInstance(this)
+      .enqueue(OneTimeWorkRequestBuilder<SyncWorker>().build())
+  }
 }

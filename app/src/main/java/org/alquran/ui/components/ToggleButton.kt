@@ -54,52 +54,52 @@ import androidx.compose.ui.unit.dp
  */
 @Composable
 fun NiaToggleButton(
-    checked: Boolean,
-    onCheckedChange: (Boolean) -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    icon: @Composable () -> Unit,
-    checkedIcon: @Composable () -> Unit = icon,
-    size: Dp = NiaToggleButtonDefaults.ToggleButtonSize,
-    iconSize: Dp = NiaToggleButtonDefaults.ToggleButtonIconSize,
-    backgroundColor: Color = Color.Transparent,
-    checkedBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
-    iconColor: Color = contentColorFor(backgroundColor),
-    checkedIconColor: Color = contentColorFor(checkedBackgroundColor)
+  checked: Boolean,
+  onCheckedChange: (Boolean) -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  icon: @Composable () -> Unit,
+  checkedIcon: @Composable () -> Unit = icon,
+  size: Dp = NiaToggleButtonDefaults.ToggleButtonSize,
+  iconSize: Dp = NiaToggleButtonDefaults.ToggleButtonIconSize,
+  backgroundColor: Color = Color.Transparent,
+  checkedBackgroundColor: Color = MaterialTheme.colorScheme.primaryContainer,
+  iconColor: Color = contentColorFor(backgroundColor),
+  checkedIconColor: Color = contentColorFor(checkedBackgroundColor)
 ) {
-    val radius = with(LocalDensity.current) { (size / 2).toPx() }
-    IconButton(
-        onClick = { onCheckedChange(!checked) },
-        modifier = modifier
-            .size(size)
-            .toggleable(value = checked, enabled = enabled, role = Role.Button, onValueChange = {})
-            .drawBehind {
-                drawCircle(
-                    color = if (checked) checkedBackgroundColor else backgroundColor,
-                    radius = radius
-                )
-            },
-        enabled = enabled,
-        content = {
-            Box(
-                modifier = Modifier.sizeIn(
-                    maxWidth = iconSize,
-                    maxHeight = iconSize
-                )
-            ) {
-                val contentColor = if (checked) checkedIconColor else iconColor
-                CompositionLocalProvider(LocalContentColor provides contentColor) {
-                    if (checked) checkedIcon() else icon()
-                }
-            }
+  val radius = with(LocalDensity.current) { (size / 2).toPx() }
+  IconButton(
+    onClick = { onCheckedChange(!checked) },
+    modifier = modifier
+      .size(size)
+      .toggleable(value = checked, enabled = enabled, role = Role.Button, onValueChange = {})
+      .drawBehind {
+        drawCircle(
+          color = if (checked) checkedBackgroundColor else backgroundColor,
+          radius = radius
+        )
+      },
+    enabled = enabled,
+    content = {
+      Box(
+        modifier = Modifier.sizeIn(
+          maxWidth = iconSize,
+          maxHeight = iconSize
+        )
+      ) {
+        val contentColor = if (checked) checkedIconColor else iconColor
+        CompositionLocalProvider(LocalContentColor provides contentColor) {
+          if (checked) checkedIcon() else icon()
         }
-    )
+      }
+    }
+  )
 }
 
 /**
  * Now in Android toggle button default values.
  */
 object NiaToggleButtonDefaults {
-    val ToggleButtonSize = 40.dp
-    val ToggleButtonIconSize = 18.dp
+  val ToggleButtonSize = 40.dp
+  val ToggleButtonIconSize = 18.dp
 }

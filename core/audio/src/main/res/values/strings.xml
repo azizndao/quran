@@ -5,4 +5,13 @@
     <string name="download_notification_channel_desc">This channel is used to download in progress</string>
     <string name="cancel">Cancel</string>
     <string name="waiting_downloads">Waiting downloads</string>
+    <string name="adbul_basit">AbdulBaset AbdulSamad</string>
+    <string name="alafasy">Mishari Rashid al-`Afasy</string>
+    <string name="sudais">Abdur-Rahman as-Sudais</string>
+    <string name="shaatri">Abu Bakr al-Shatri</string>
+    <string name="hani_rifai">Hani ar-Rifai</string>
+    <string name="hasary">Mahmoud Khalil Al-Husary</string>
+    <string name="minshawi">Mohamed Siddiq al-Minshawi</string>
+    <string name="saud_ash_shuraym">Sa`ud ash-Shuraym</string>
+    <string name="abdul_muhsin_alqasim">Mohamed al-Tablawi</string>
 </resources>

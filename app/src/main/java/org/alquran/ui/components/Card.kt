@@ -11,44 +11,44 @@ import androidx.compose.ui.graphics.Shape
 
 @Composable
 fun SurfaceCard(
-    modifier: Modifier = Modifier,
-    shape: Shape = CardDefaults.shape,
-    colors: CardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    elevation: CardElevation = CardDefaults.cardElevation(),
-    border: BorderStroke? = null,
-    content: @Composable ColumnScope.() -> Unit
+  modifier: Modifier = Modifier,
+  shape: Shape = CardDefaults.shape,
+  colors: CardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+  elevation: CardElevation = CardDefaults.cardElevation(),
+  border: BorderStroke? = null,
+  content: @Composable ColumnScope.() -> Unit
 ) {
-    Card(
-        modifier = modifier,
-        shape = shape,
-        colors = colors,
-        elevation = elevation,
-        border = border,
-        content = content
-    )
+  Card(
+    modifier = modifier,
+    shape = shape,
+    colors = colors,
+    elevation = elevation,
+    border = border,
+    content = content
+  )
 }
 
 @Composable
 fun SurfaceCard(
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    enabled: Boolean = true,
-    shape: Shape = CardDefaults.shape,
-    colors: CardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
-    elevation: CardElevation = CardDefaults.cardElevation(),
-    border: BorderStroke? = null,
-    interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
-    content: @Composable ColumnScope.() -> Unit
+  onClick: () -> Unit,
+  modifier: Modifier = Modifier,
+  enabled: Boolean = true,
+  shape: Shape = CardDefaults.shape,
+  colors: CardColors = CardDefaults.cardColors(containerColor = MaterialTheme.colorScheme.surface),
+  elevation: CardElevation = CardDefaults.cardElevation(),
+  border: BorderStroke? = null,
+  interactionSource: MutableInteractionSource = remember { MutableInteractionSource() },
+  content: @Composable ColumnScope.() -> Unit
 ) {
-    Card(
-        onClick = onClick,
-        modifier = modifier,
-        enabled = enabled,
-        shape = shape,
-        colors = colors,
-        elevation = elevation,
-        border = border,
-        interactionSource = interactionSource,
-        content = content
-    )
+  Card(
+    onClick = onClick,
+    modifier = modifier,
+    enabled = enabled,
+    shape = shape,
+    colors = colors,
+    elevation = elevation,
+    border = border,
+    interactionSource = interactionSource,
+    content = content
+  )
 }

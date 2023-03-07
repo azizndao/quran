@@ -1,60 +1,59 @@
 package org.muslimapp.core.audio.repositories
 
 import android.content.Context
-import io.ktor.client.HttpClient
-import io.ktor.client.call.body
-import io.ktor.client.request.get
+import arg.quran.models.audio.AyaTiming
+import arg.quran.models.audio.aya
+import arg.quran.models.audio.sura
 import org.muslimapp.core.audio.databases.TimingDatabase
-import org.alquran.audio.models.AyahTiming
-import org.quram.common.utils.UriProvider
+import org.muslimapp.core.audio.datasources.QariDataSource
+import org.quran.network.audio.AudioApiService
+import timber.log.Timber
 
 class TimingRepository(
-    private val context: Context,
-    private val httpClient: HttpClient,
+  private val context: Context,
+  private val audioApiService: AudioApiService,
 ) {
-    private var timings: List<AyahTiming> = emptyList()
 
+  private var timings: List<AyaTiming> = emptyList()
 
-    suspend fun getPosition(reciter: String, sura: Int, startAyah: Int): Long {
-        if (timings.isEmpty() || timings.first().sura != sura) {
-            timings = getSurahTimings(reciter, sura)
-        }
-
-        if (startAyah == 1) return 0L
-        return timings.find { it.ayah == startAyah }?.time ?: 0L
+  suspend fun getPosition(reciter: String, sura: Int, startAyah: Int): Long {
+    if (timings.isEmpty() || timings.first().sura != sura) {
+      timings = getSuraTimings(reciter, sura)
     }
 
-    suspend fun getSurahTimings(reciterId: String, surah: Int): List<AyahTiming> {
-        val timingDao = TimingDatabase.getInstance(context, reciterId).timingDao
+    if (startAyah == 1) return 0L
+    return timings.find { it.aya == startAyah }?.duration ?: 0L
+  }
 
-        return timingDao
-            .getTimingBySura(surah)
-            .ifEmpty {
-                downloadTimingData(reciterId)
-                timingDao.getTimingBySura(surah)
-            }
+  suspend fun getSuraTimings(slug: String, surah: Int): List<AyaTiming> {
+    val timingDao = TimingDatabase.getInstance(context, slug).timingDao
+
+    return timingDao.getTimingBySura(surah).ifEmpty {
+      downloadTimingData(slug)
+      timingDao.getTimingBySura(surah)
+    }
+  }
+
+  suspend fun downloadTimingData(slug: String) {
+    Timber.d("Downloading timing data for $slug")
+    val qari = QariDataSource.find { it.slug == slug }!!
+    val timings = audioApiService.getTimings(qari.id)
+    val database = TimingDatabase.getInstance(context, slug)
+    database.timingDao.insertTimings(timings)
+  }
+
+  suspend fun getTiming(reciterId: String, sura: Int, position: Long): AyaTiming? {
+
+    if (timings.isEmpty() || timings.first().sura != sura) {
+      timings = getSuraTimings(reciterId, sura)
     }
 
-    suspend fun downloadTimingData(reciterId: String) {
-        val response = httpClient.get(UriProvider.getTimingData(reciterId))
-        val timings = response.body<List<AyahTiming>>()
-        val database = TimingDatabase.getInstance(context, reciterId)
-        database.timingDao.insertTimings(timings)
+    val timing = if (position <= timings.first().duration) {
+      timings.first()
+    } else {
+      timings.find { timing -> timing.segments.any { position in it.startDuration..it.endDuration } }
     }
 
-    suspend fun getTiming(reciterId: String, sura: Int, currentPosition: Long): AyahTiming? {
-
-        if (timings.isEmpty() || timings.first().sura != sura) {
-            timings = getSurahTimings(reciterId, sura)
-        }
-
-        val timing = if (currentPosition <= timings.first().time) {
-            timings.first()
-        } else {
-            timings.lastOrNull { timing -> timing.time <= currentPosition }
-        }
-
-        return timing
-    }
-
+    return timing
+  }
 }

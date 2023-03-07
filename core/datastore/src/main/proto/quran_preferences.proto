@@ -10,8 +10,6 @@ message QuranPreferences {
   FontScale quran_font_scale = 3;
   FontScale translation_font_scale = 4;
 
-  repeated string selected_translations = 5;
-
   DisplayMode display_mode = 6;
 }
 

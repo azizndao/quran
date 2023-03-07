@@ -10,13 +10,13 @@ import org.koin.dsl.module
 
 val UiModule = module {
 
-    viewModelOf(::HomeViewModel)
+  viewModelOf(::HomeViewModel)
 
-    viewModelOf(::PlaybackSheetViewModel)
+  viewModelOf(::PlaybackSheetViewModel)
 
-    viewModelOf(::QuranPagerViewModel)
+  viewModelOf(::QuranPagerViewModel)
 
-    viewModelOf(::RecitationsViewModel)
+  viewModelOf(::RecitationsViewModel)
 
-    viewModelOf(::RecitersViewModel)
+  viewModelOf(::RecitersViewModel)
 }

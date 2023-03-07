@@ -11,24 +11,24 @@ import kotlinx.coroutines.withContext
 
 
 operator fun <T> DataStore<Preferences>.get(key: Preferences.Key<T>): Flow<T?> {
-    return data.map { prefs -> prefs[key] }.distinctUntilChanged()
+  return data.map { prefs -> prefs[key] }.distinctUntilChanged()
 }
 
 operator fun <T> DataStore<Preferences>.get(
-    key: Preferences.Key<T>,
-    default: T,
+  key: Preferences.Key<T>,
+  default: T,
 ): Flow<T> {
-    return data.map { prefs -> prefs[key] ?: default }.distinctUntilChanged()
+  return data.map { prefs -> prefs[key] ?: default }.distinctUntilChanged()
 }
 
 suspend fun <T> DataStore<Preferences>.set(key: Preferences.Key<T>, value: T?) {
-    withContext(Dispatchers.IO) {
-        edit { prefs ->
-            if (value == null) {
-                prefs.remove(key)
-            } else {
-                prefs[key] = value
-            }
-        }
+  withContext(Dispatchers.IO) {
+    edit { prefs ->
+      if (value == null) {
+        prefs.remove(key)
+      } else {
+        prefs[key] = value
+      }
     }
+  }
 }

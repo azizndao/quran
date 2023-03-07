@@ -18,25 +18,25 @@ import org.alquran.ui.theme.QuranTheme
 @Composable
 fun JuzHeader(juz: Int, page: Int, modifier: Modifier = Modifier) {
 
-    Row(
-        horizontalArrangement = Arrangement.SpaceBetween,
-        modifier = modifier
-            .fillMaxWidth()
-            .padding(horizontal = 16.dp, vertical = 12.dp)
-    ) {
+  Row(
+    horizontalArrangement = Arrangement.SpaceBetween,
+    modifier = modifier
+      .fillMaxWidth()
+      .padding(horizontal = 16.dp, vertical = 12.dp)
+  ) {
 
-        Text(
-            stringResource(id = R.string.juz_item, juz),
-            style = MaterialTheme.typography.labelLarge,
-            color = MaterialTheme.colorScheme.primary
-        )
+    Text(
+      stringResource(id = R.string.juz_item, juz),
+      style = MaterialTheme.typography.labelLarge,
+      color = MaterialTheme.colorScheme.primary
+    )
 
-        Text(
-            page.toString(),
-            style = MaterialTheme.typography.labelSmall,
-            color = MaterialTheme.colorScheme.primary
-        )
-    }
+    Text(
+      page.toString(),
+      style = MaterialTheme.typography.labelSmall,
+      color = MaterialTheme.colorScheme.primary
+    )
+  }
 }
 
 
@@ -44,7 +44,7 @@ fun JuzHeader(juz: Int, page: Int, modifier: Modifier = Modifier) {
 @Preview
 @Composable
 fun HuzHeaderPreview() {
-    QuranTheme {
-        JuzHeader(juz = 2, 22)
-    }
+  QuranTheme {
+    JuzHeader(juz = 2, 22)
+  }
 }

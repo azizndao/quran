@@ -5,24 +5,24 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import arg.quran.models.audio.Qari
 import kotlinx.coroutines.launch
-import org.alquran.audio.models.Reciter
 import org.muslimapp.core.audio.repositories.RecitationRepository
 
 internal class RecitersViewModel(
-    private val reciterRepository: RecitationRepository,
+  private val reciterRepository: RecitationRepository,
 ) : ViewModel() {
 
-    var uiState by mutableStateOf(emptyList<Reciter>())
-        private set
+  var uiState by mutableStateOf(emptyList<Qari>())
+    private set
 
-    init {
-        refresh()
-    }
+  init {
+    refresh()
+  }
 
-    private fun refresh() {
-        viewModelScope.launch {
-            uiState = reciterRepository.getAllReciters()
-        }
+  private fun refresh() {
+    viewModelScope.launch {
+      uiState = reciterRepository.getAllReciters()
     }
+  }
 }

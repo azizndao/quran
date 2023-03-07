@@ -7,9 +7,9 @@ import org.quran.bookmarks.databases.BookmarksDatabase
 import org.quran.bookmarks.repository.BookmarkRepository
 
 val BookmarkModule = module {
-    single {
-        Room.databaseBuilder(get(), BookmarksDatabase::class.java, "quran.bookmarks.db").build()
-    }
+  single {
+    Room.databaseBuilder(get(), BookmarksDatabase::class.java, "quran.bookmarks.db").build()
+  }
 
-    factoryOf(::BookmarkRepository)
+  factoryOf(::BookmarkRepository)
 }

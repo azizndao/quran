@@ -18,44 +18,44 @@ import org.alquran.R
 
 @Composable
 fun AyaMenuSheet(
-    modifier: Modifier = Modifier,
-    sheetState: SheetState = rememberSheetState(),
-    coroutineScope: CoroutineScope = rememberCoroutineScope(),
-    onDismissRequest: () -> Unit,
+  modifier: Modifier = Modifier,
+  sheetState: SheetState = rememberSheetState(),
+  coroutineScope: CoroutineScope = rememberCoroutineScope(),
+  onDismissRequest: () -> Unit,
 ) {
-    ModalBottomSheet(
-        modifier = modifier,
-        onDismissRequest = {
-            coroutineScope.launch {
-                sheetState.hide()
-                onDismissRequest()
-            }
-        }
-    ) {
-        ListItem(
-            leadingContent = { Icon(painterResource(id = R.drawable.ic_play_arrow), null) },
-            headlineText = { Text(stringResource(id = R.string.play)) },
-            modifier = Modifier.clickable {  }
-        )
-        ListItem(
-            leadingContent = { Icon(painterResource(id = R.drawable.ic_repeat), null) },
-            headlineText = { Text(stringResource(id = R.string.repeat_ayah)) },
-            modifier = Modifier.clickable {  }
-        )
-        ListItem(
-            leadingContent = { Icon(painterResource(id = R.drawable.ic_edit), null) },
-            headlineText = { Text(stringResource(id = R.string.add_note)) },
-            modifier = Modifier.clickable {  }
-        )
-        ListItem(
-            leadingContent = { Icon(painterResource(id = R.drawable.ic_bookmark), null) },
-            headlineText = { Text(stringResource(id = R.string.add_bookmark)) },
-            modifier = Modifier.clickable {  }
-        )
-        ListItem(
-            leadingContent = { Icon(painterResource(id = R.drawable.ic_share), null) },
-            headlineText = { Text(stringResource(id = R.string.share)) },
-            modifier = Modifier.clickable {  }
-        )
+  ModalBottomSheet(
+    modifier = modifier,
+    onDismissRequest = {
+      coroutineScope.launch {
+        sheetState.hide()
+        onDismissRequest()
+      }
     }
+  ) {
+    ListItem(
+      leadingContent = { Icon(painterResource(id = R.drawable.ic_play_arrow), null) },
+      headlineText = { Text(stringResource(id = R.string.play)) },
+      modifier = Modifier.clickable { }
+    )
+    ListItem(
+      leadingContent = { Icon(painterResource(id = R.drawable.ic_repeat), null) },
+      headlineText = { Text(stringResource(id = R.string.repeat_ayah)) },
+      modifier = Modifier.clickable { }
+    )
+    ListItem(
+      leadingContent = { Icon(painterResource(id = R.drawable.ic_edit), null) },
+      headlineText = { Text(stringResource(id = R.string.add_note)) },
+      modifier = Modifier.clickable { }
+    )
+    ListItem(
+      leadingContent = { Icon(painterResource(id = R.drawable.ic_bookmark), null) },
+      headlineText = { Text(stringResource(id = R.string.add_bookmark)) },
+      modifier = Modifier.clickable { }
+    )
+    ListItem(
+      leadingContent = { Icon(painterResource(id = R.drawable.ic_share), null) },
+      headlineText = { Text(stringResource(id = R.string.share)) },
+      modifier = Modifier.clickable { }
+    )
+  }
 }
