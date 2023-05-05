@@ -1,4 +1,4 @@
-package org.muslimapp.feature.quran.views
+package org.alquran.views
 
 import androidx.compose.animation.Crossfade
 import androidx.compose.foundation.layout.Box
@@ -15,7 +15,7 @@ fun CircularProgressLoader(
   modifier: Modifier = Modifier,
   content: @Composable () -> Unit
 ) {
-  Crossfade(loading, modifier = modifier.fillMaxSize()) {
+  Crossfade(loading, modifier = modifier.fillMaxSize(), label = "Crossfade") {
     if (it) {
       Box(
         modifier = modifier

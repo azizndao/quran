@@ -14,6 +14,7 @@ import kotlinx.coroutines.launch
 import org.alquran.R
 import org.muslimapp.core.audio.PlaybackConnection
 import org.muslimapp.core.audio.models.MediaId
+import org.muslimapp.core.audio.repositories.QariRepository
 import org.muslimapp.core.audio.repositories.RecitationRepository
 import org.quram.common.repositories.SurahRepository
 import timber.log.Timber
@@ -24,6 +25,7 @@ class RecitationsViewModel(
   surahRepository: SurahRepository,
   private val playbackConnection: PlaybackConnection,
   private val recitationRepository: RecitationRepository,
+  private val qariRepository: QariRepository,
 ) : ViewModel() {
 
 //    private val reciterId: String = recitationsArgs(savedStateHandle)
@@ -62,7 +64,7 @@ class RecitationsViewModel(
       dataFlow.collect { recitations ->
         uiState = RecitationsUiState(
           loading = false,
-          reciter = recitationRepository.getReciter(reciterId),
+          reciter = qariRepository.getQari(reciterId),
           recitations = recitations
         )
       }

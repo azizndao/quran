@@ -1,6 +1,10 @@
 package org.alquran.ui.screen.pager.components
 
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.derivedStateOf
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
@@ -26,13 +30,16 @@ fun ProviderQuranTextStyle(
         Font("v1/fonts/ttf/p${page}.ttf", assetManager = context.assets)
       )
 
+      val fontSize = when (fontScale) {
+        FontScale.UNRECOGNIZED, FontScale.NORMAL -> 24.sp
+        FontScale.SMALL -> 20.sp
+        FontScale.LARGE -> 26.sp
+      }
+
       oldStyle.copy(
         fontFamily = fontFamily,
-        fontSize = when (fontScale) {
-          FontScale.UNRECOGNIZED, FontScale.NORMAL -> 24f
-          FontScale.SMALL -> 20f
-          FontScale.LARGE -> 26f
-        }.sp
+        fontSize = fontSize,
+        lineHeight = fontSize * 1.7
       )
     }
   }

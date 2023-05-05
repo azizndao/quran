@@ -7,24 +7,35 @@ import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
-import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
+import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import org.alquran.audio.models.AudioState
 import org.alquran.ui.uistate.PagerUiState
 import org.alquran.ui.uistate.QuranPageItem
+import org.alquran.ui.uistate.Selection
 import org.alquran.usecases.GetMushafPage
 import org.alquran.usecases.GetTranslationPage
 import org.muslimapp.core.audio.PlaybackConnection
-import org.quram.common.utils.QuranInfo
+import org.quram.common.core.QuranInfo
+import org.quran.bookmarks.model.Bookmark
+import org.quran.bookmarks.repository.BookmarkRepository
 import org.quran.datastore.DisplayMode
 import org.quran.datastore.repositories.AudioPreferencesRepository
 import org.quran.datastore.repositories.QuranPreferencesRepository
 import org.quran.datastore.serializers.DEFAULT_QURAN_FONT_SIZE
 import org.quran.datastore.serializers.DEFAULT_TRANSLATION_FONT_SIZE
+import timber.log.Timber
 
 internal class QuranPagerViewModel(
   savedStateHandle: SavedStateHandle,
@@ -34,6 +45,7 @@ internal class QuranPagerViewModel(
   private val audioSettings: AudioPreferencesRepository,
   private val getTranslationPage: GetTranslationPage,
   private val getMushafPage: GetMushafPage,
+  private val bookmarkRepository: BookmarkRepository,
 ) : ViewModel() {
 
   private val args = quranPagerDestinationArgs(savedStateHandle)
@@ -48,11 +60,18 @@ internal class QuranPagerViewModel(
     }
   }.distinctUntilChanged()
 
+  private val fullscreenFlow = MutableStateFlow(false)
+  private val _selection = MutableStateFlow<Selection>(
+    if (args.verseKey != null) Selection.InitialVerse(args.verseKey) else Selection.None
+  )
+
 
   val uiState = combine(
     quranPreferences.getAllPreferences(),
-    playingPage
-  ) { preferences, page ->
+    playingPage,
+    fullscreenFlow,
+    _selection,
+  ) { preferences, page, fullscreen, selectedAyah ->
     PagerUiState(
       initialPage = args.page,
       playingPage = page,
@@ -60,6 +79,12 @@ internal class QuranPagerViewModel(
       quranFontScale = preferences.quranFontScale,
       translationFontScale = preferences.translationFontScale,
       version = preferences.fontVersion,
+      onDisplayModeChange = ::onDisplayMode,
+      onAyahEvent = ::onAyahEvent,
+      onFullscreen = { fullscreenFlow.value = it },
+      isFullscreen = fullscreen,
+      selection = selectedAyah,
+      setSelection = { _selection.value = it }
     )
   }.distinctUntilChanged()
     .stateIn(
@@ -71,26 +96,40 @@ internal class QuranPagerViewModel(
         DisplayMode.UNRECOGNIZED,
         quranFontScale = DEFAULT_QURAN_FONT_SIZE,
         translationFontScale = DEFAULT_TRANSLATION_FONT_SIZE,
-        version = 1
+        version = 1,
+        onDisplayModeChange = ::onDisplayMode,
+        onAyahEvent = ::onAyahEvent,
+        onFullscreen = { fullscreenFlow.value = it },
+        selection = _selection.value,
+        setSelection = { _selection.value = it }
       )
     )
-
-
-  private var _selection = MutableStateFlow(args.verseKey)
 
   init {
     viewModelScope.launch {
       delay(5000)
-      _selection.value = null
+      if (_selection.value is Selection.InitialVerse) {
+        _selection.value = Selection.None
+      }
     }
   }
 
   @Composable
   fun pageFactory(mode: DisplayMode, page: Int, version: Int): QuranPageItem? {
     val itemFlow = remember(mode, page) {
+
       when (mode) {
-        DisplayMode.QURAN_TRANSLATION -> getTranslationPage(page, _selection.value, version)
-        DisplayMode.QURAN -> getMushafPage(page, version)
+        DisplayMode.QURAN_TRANSLATION -> {
+          val selectedVerse = when (val s = _selection.value) {
+            is Selection.InitialVerse -> s.key
+            is Selection.Highlight -> s.key
+            else -> null
+          }
+          getTranslationPage(page, selectedVerse, version)
+            .catch { Timber.e(it) }
+        }
+
+        DisplayMode.QURAN -> getMushafPage(page, version, _selection)
         DisplayMode.UNRECOGNIZED -> flowOf(null)
       }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope,
@@ -104,62 +143,34 @@ internal class QuranPagerViewModel(
     return itemState
   }
 
-  fun onAyahEvent(event: AyahEvent) {
+  private fun onAyahEvent(event: AyahEvent) {
     viewModelScope.launch(Dispatchers.IO) {
       when (event) {
         is AyahEvent.ToggleBookmark -> if (event.isBookmark) {
-//                    bookmarkRepository.removeBookmark(event.verseKey)
+          bookmarkRepository.removeBookmark(event.verseKey)
         } else {
-//                    bookmarkRepository.addBookmark(event.verseKey)
+          bookmarkRepository.addBookmark(Bookmark(key = event.verseKey, name = "Bookmarks"))
         }
 
-        is AyahEvent.UpdateSelection -> _selection.update { selectionList ->
-          val verseKey = VerseKey(event.sura, event.ayah)
-          if (verseKey == selectionList) null else verseKey
-        }
+        is AyahEvent.UpdateSelection -> {}
 
-        is AyahEvent.Play -> withContext(Dispatchers.Main) {
-          playbackConnection.onPlaySurah(
-            sura = event.verseKey.sura,
-            reciterId = audioSettings.getCurrentReciter().first(),
-            startAya = event.verseKey.aya
-          )
-        }
+        is AyahEvent.Play -> playbackConnection.onPlaySurah(
+          sura = event.verseKey.sura,
+          reciterId = audioSettings.getCurrentReciter().first(),
+          startAya = event.verseKey.aya
+        )
 
-        is AyahEvent.AyahLongPressed -> _selection.update {
-          if (it == event.verseKey) {
-            null
-          } else {
-            event.verseKey
-          }
-        }
+        is AyahEvent.AyahLongPressed -> {}
 
-        is AyahEvent.AyahPressed -> {
-          val selected = event
-            .verseKey?.let { isSelected(it.sura, event.verseKey.aya) } ?: false
-
-          if (selected) {
-            _selection.update { null }
-          }
-        }
+        is AyahEvent.AyahPressed -> {}
       }
     }
   }
 
-  fun onDisplayMode(value: DisplayMode) {
+  private fun onDisplayMode(value: DisplayMode) {
     viewModelScope.launch(Dispatchers.IO) {
       quranPreferences.setDisplayMode(value)
     }
   }
-
-  //    @OptIn(DelicateCoroutinesApi::class)
-  override fun onCleared() {
-//        if (!playbackConnection.isPlaying.value) {
-//            GlobalScope.launch { quranPosition.setPosition(args.page) }
-//        }
-    super.onCleared()
-  }
-
-  private fun isSelected(sura: Int, ayah: Int) =
-    _selection.value?.aya == ayah && _selection.value?.sura == sura
 }
+

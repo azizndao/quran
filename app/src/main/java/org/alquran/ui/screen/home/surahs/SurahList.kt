@@ -1,11 +1,26 @@
 package org.alquran.ui.screen.home.surahs
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.add
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.navigationBars
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
-import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.itemsIndexed
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -13,6 +28,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.RectangleShape
 import androidx.compose.ui.platform.testTag
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
@@ -26,12 +43,11 @@ import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.flow.StateFlow
 import org.alquran.R
 import org.alquran.ui.components.LineSeparator
-import org.alquran.ui.theme.QuranFontFamilies
 import org.alquran.ui.uistate.SurahListUiState
-import org.muslimapp.feature.quran.ui.LocalInsetsPadding
-import org.muslimapp.feature.quran.views.CircularProgressLoader
-import org.muslimapp.feature.quran.views.JuzHeader
-import org.muslimapp.feature.quran.views.SectionTitle
+import org.alquran.views.CircularProgressLoader
+import org.alquran.views.JuzHeader
+import org.alquran.views.SectionTitle
+import org.quran.ui.theme.QuranFontFamilies
 
 @Composable
 fun SurahList(
@@ -57,13 +73,21 @@ private fun SurahList(
   uiState: SurahListUiState,
   onNavigate: (Int, VerseKey?) -> Unit,
 ) {
+  val topShape = MaterialTheme.shapes.large.copy(
+    bottomEnd = CornerSize(0),
+    bottomStart = CornerSize(0)
+  )
+  val bottomShape = MaterialTheme.shapes.large.copy(
+    topEnd = CornerSize(0),
+    topStart = CornerSize(0)
+  )
   LazyColumn(
     modifier = modifier.testTag("quran:surahList"),
-    contentPadding = LocalInsetsPadding.current.add(
-      WindowInsets(top = 16.dp, bottom = 16.dp, right = 12.dp, left = 12.dp)
-    ).asPaddingValues(),
+    contentPadding = WindowInsets.navigationBars
+      .add(WindowInsets(top = 16.dp, bottom = 16.dp, right = 12.dp, left = 12.dp))
+      .asPaddingValues(),
     state = state,
-    verticalArrangement = Arrangement.spacedBy(16.dp),
+//    verticalArrangement = Arrangement.spacedBy(16.dp),
   ) {
 
     uiState.recentSurah?.let { recentSura ->
@@ -81,27 +105,40 @@ private fun SurahList(
       }
     }
 
-    items(uiState.juzs, key = { it.juz }, contentType = { "juz" }) { juz ->
-      Surface(shape = MaterialTheme.shapes.large) {
-        Column {
-          JuzHeader(
-            juz.juz,
-            juz.page,
-            modifier = Modifier.clickable { onNavigate(juz.page, null) },
-          )
+    for (juz in uiState.juzs) {
+      item(key = juz.juz, contentType = "header") {
+        JuzHeader(
+          juz.juz,
+          juz.page,
+          modifier = Modifier
+            .clip(if (juz.surahs.isEmpty()) MaterialTheme.shapes.large else topShape)
+            .clickable { onNavigate(juz.page, null) }
+            .background(MaterialTheme.colorScheme.surface),
+        )
+      }
 
-          juz.surahs.forEachIndexed { index, surah ->
-            if (index != 0) LineSeparator(startIndent = 70.dp)
-            SurahItem(
-              modifier = Modifier.clickable {
-                surah.let {
-                  onNavigate(it.firstPage, VerseKey(it.number, 1))
-                }
-              },
-              surah = surah,
-            )
-          }
-        }
+      itemsIndexed(
+        juz.surahs,
+        key = { _, s -> s.nameSimple },
+        contentType = { _, _ -> "surah" },
+      ) { index, surah ->
+        if (index != 0) LineSeparator(
+          modifier = Modifier
+            .background(MaterialTheme.colorScheme.surface)
+            .padding(start = 70.dp)
+            .background(MaterialTheme.colorScheme.surfaceVariant)
+        )
+        val shape = if (index < juz.surahs.size - 1) RectangleShape else bottomShape
+        SurahItem(
+          modifier = Modifier
+            .clip(shape)
+            .background(MaterialTheme.colorScheme.surface)
+            .clickable { onNavigate(surah.firstPage, VerseKey(surah.number, 1)) },
+          surah = surah,
+        )
+      }
+      item {
+        Spacer(modifier = Modifier.height(16.dp))
       }
     }
   }

@@ -1,6 +1,7 @@
 package org.quram.common.utils
 
 import arg.quran.models.quran.VerseKey
+import org.quram.common.core.QuranInfo
 
 
 class SuraAyahIterator(

@@ -1,44 +1,42 @@
 package org.quran.translation.repositories
 
 import androidx.work.Operation
+import arg.quran.models.quran.Verse
 import arg.quran.models.quran.VerseKey
-import arg.quran.models.quran.VerseTranslation
 import kotlinx.coroutines.flow.Flow
-import org.quran.datastore.TranslationEdition
+import org.quran.datastore.LocaleTranslation
+import org.quran.translation.models.TranslatedEdition
 
 interface TranslationRepository {
 
-  fun getAvailableTranslations(): Flow<List<TranslationEdition>>
+  fun getAvailableTranslations(): Flow<List<LocaleTranslation>>
 
-  suspend fun getTranslation(slug: String): TranslationEdition?
+  suspend fun getTranslation(slug: String): LocaleTranslation?
 
   suspend fun downloadTranslations()
 
-  suspend fun downloadQuranTranslation(translation: TranslationEdition): Operation
+  suspend fun downloadQuranTranslation(translation: LocaleTranslation): Operation
 
-  fun getQuranTranslations(
+  fun getVerses(
     slug: String,
     page: Int,
-  ): Flow<List<VerseTranslation>>
+  ): Flow<TranslatedEdition?>
 
-  fun getQuranTranslations(
-    editions: List<TranslationEdition>,
-    page: Int,
-  ): Flow<List<TranslationAndVerses>>
+  fun getSelectedEditions(page: Int): Flow<List<TranslatedEdition>>
 
-  fun getQuranTranslations(
-    edition: TranslationEdition,
+  fun getVerses(
+    edition: LocaleTranslation,
     page: Int,
-  ): Flow<List<VerseTranslation>>
+  ): Flow<TranslatedEdition?>
 
   suspend fun getQuranTranslation(
-    translation: TranslationEdition,
+    translation: LocaleTranslation,
     key: VerseKey,
-  ): VerseTranslation?
+  ): Verse?
 
-  suspend fun getAyahTranslation(key: VerseKey): VerseTranslation?
+  suspend fun getAyahTranslation(key: VerseKey): Verse?
 
-  suspend fun getAyahTranslation(key: VerseKey, slug: String): VerseTranslation?
+  suspend fun getAyahTranslation(key: VerseKey, slug: String): Verse?
 
-  fun getSelectedTranslations(): Flow<List<TranslationEdition>>
+  fun getSelectedTranslations(): Flow<List<LocaleTranslation>>
 }

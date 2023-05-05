@@ -5,14 +5,16 @@ import android.content.Context
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import arg.quran.models.Sura
-import arg.quran.models.quran.VerseWord
+import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import org.alquran.R
-import org.alquran.hafs.repository.VerseRepository
 import org.alquran.ui.uistate.MushafPage
 import org.alquran.ui.uistate.QuranPageItem
+import org.alquran.ui.uistate.Selection
 import org.alquran.ui.uistate.toUiState
+import org.alquran.verses.repository.VerseRepository
+import org.muslimapp.core.audio.PlaybackConnection
 import org.quram.common.repositories.SurahRepository
 import org.quram.common.utils.QuranDisplayData
 import org.quram.common.utils.UriProvider
@@ -25,11 +27,13 @@ class GetMushafPage(
   private val pageHeaderUseCase: PageHeaderUseCase,
   private val context: Context,
   private val quranDisplayData: QuranDisplayData,
+  private val playbackConnection: PlaybackConnection,
 ) {
 
   operator fun invoke(
     page: Int,
     version: Int,
+    selection: MutableStateFlow<Selection>
   ): Flow<MushafPage> {
 
     var pageHeader: QuranPageItem.Header? = null
@@ -39,9 +43,17 @@ class GetMushafPage(
     val keys = quranDisplayData.getAyahKeysOnPage(page)
 
     return combine(
-      verseRepository.getVerses(page, version),
+      verseRepository.getVersesWordsByPage(page),
       bookmarkRepository.getBookmarksWithKeys(keys),
-    ) { verses, bookmarks ->
+      playbackConnection.playingAyahFlow,
+      selection
+    ) { pageWords, bookmarks, verseKey, selected ->
+      val selectedAya = when (selected) {
+        is Selection.InitialVerse -> selected.key
+        is Selection.Highlight -> selected.key
+        else -> null
+      }
+
       if (suras == null) {
         suras = surahRepository.getSurahsInPage(page)
       }
@@ -50,52 +62,47 @@ class GetMushafPage(
         pageHeader = pageHeaderUseCase(page)
       }
 
-      val data: MutableList<MushafPage.Line>
+      val bookmarkMap = mutableMapOf<VerseKey, Boolean>()
 
-      val lineMap =
-        verses.fold(mutableListOf<VerseWord>()) { words, verse ->
-          words.addAll(verse.words)
-          words
-        }.groupBy { it.line }
+      val data = buildList {
+        val listMap = pageWords.groupBy { it.line }.toSortedMap()
+        listMap.forEach { (lineNumber, lineWords) ->
+          val words = lineWords.sortedBy { it.key }
+          val firstWord = words.first()
+          val (sura, aya) = firstWord.key
 
-      data = lineMap.entries.fold(mutableListOf()) { lines, (lineNumber, words) ->
-
-        val firstWord = words.first()
-        val (sura, aya) = firstWord.key
-
-        if (firstWord.position == 1 && aya == 1) {
-          if (firstWord.line >= 3 || firstWord.key.sura == 1) {
-            lines.add(MushafPage.ChapterLine(lines.size + 1, sura))
+          if (firstWord.position == 1 && aya == 1) {
+            if (firstWord.line >= 3 || firstWord.key.sura == 1 || firstWord.key.sura == 9) {
+              add(MushafPage.ChapterLine(size + 1, sura))
+            }
+            if (sura != 1 && sura != 9 && firstWord.line >= 2) {
+              add(MushafPage.Basmallah(size + 1))
+            }
           }
-          if (sura != 1 && sura != 9 && firstWord.line >= 2) {
-            lines.add(MushafPage.Basmallah(lines.size + 1))
-          }
+
+          add(
+            MushafPage.TextLine(
+              line = lineNumber,
+              words = words.map {
+
+                if (it.key !in bookmarkMap) {
+                  bookmarkMap[it.key] = bookmarks.any { bookmark -> it.key == bookmark.key }
+                }
+
+                it.toUiState(
+                  playing = it.key == verseKey,
+                  selected = selectedAya == it.key,
+                  bookmarked = bookmarkMap[it.key]!!,
+                )
+              },
+            ),
+          )
         }
 
-        lines.add(
-          MushafPage.TextLine(
-            line = lineNumber,
-            words = words.map {
-              it.toUiState(
-                playing = false,
-                selected = false,
-              )
-            },
-          ),
-        )
-
-        lines
-      }
-
-      if (data.size == 14) {
-        val lastLine = data.last()
-        if (lastLine is MushafPage.TextLine) {
-          data.add(
-            MushafPage.ChapterLine(
-              data.size + 1,
-              lastLine.words.last().key.sura + 1
-            )
-          )
+        if (size == 14) {
+          val lastLine = last() as MushafPage.TextLine
+          val line = MushafPage.ChapterLine(size + 1, lastLine.words[0].key.sura + 1)
+          add(line)
         }
       }
 
@@ -103,11 +110,7 @@ class GetMushafPage(
         header = pageHeader!!,
         page = page,
         lines = data,
-        fontFamily = FontFamily(
-          if (page == 46) Font(R.font.p46) else Font(
-            UriProvider.getFontFile(context, page, version)
-          )
-        )
+        fontFamily = FontFamily(Font(UriProvider.getFontFile(context, page, version)))
       )
     }
   }

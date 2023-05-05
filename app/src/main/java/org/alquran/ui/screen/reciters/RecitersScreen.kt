@@ -15,6 +15,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
@@ -22,16 +23,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import arg.quran.models.audio.Qari
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import coil.compose.AsyncImage
 import org.alquran.R
-import org.alquran.ui.components.MuslimsTopAppBarDefaults
-import org.alquran.ui.components.SearchButton
+import org.quran.ui.components.MuslimsTopAppBarDefaults
+import org.quran.ui.components.SearchButton
 import org.alquran.ui.navigation.directionToReciterRecitation
-import org.alquran.ui.theme.QuranTheme
+import org.quran.ui.theme.QuranTheme
 import org.alquran.utils.QariListPreviewParameterProvider
 import org.alquran.utils.QariPreviewParameterProvider
-import org.alquran.utils.extensions.add
+import org.quran.ui.utils.extensions.add
 
 @Composable
 internal fun RecitersScreen(
@@ -91,7 +91,6 @@ fun ReciterListScreenPreview(
 }
 
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun ReciterItem(reciter: Qari, modifier: Modifier = Modifier) {
 
@@ -104,8 +103,8 @@ private fun ReciterItem(reciter: Qari, modifier: Modifier = Modifier) {
 
       val colorScheme = MaterialTheme.colorScheme
 
-      val qariName = stringResource(id = reciter.nameId)
-      GlideImage(
+      val qariName = stringResource(id = reciter.nameResource)
+      AsyncImage(
         model = reciter.image,
         contentDescription = qariName,
         contentScale = ContentScale.Crop,
@@ -113,11 +112,10 @@ private fun ReciterItem(reciter: Qari, modifier: Modifier = Modifier) {
           .fillMaxWidth()
           .aspectRatio(1f)
           .background(colorScheme.onSurfaceVariant),
-      ) {
-        it.placeholder(R.drawable.ic_reciter).error(R.drawable.ic_reciter)
-          .signature { reciter.image }
-      }
-
+        placeholder = painterResource(id = R.drawable.ic_reciter),
+        error = painterResource(id = R.drawable.ic_reciter),
+      )
+      
       Column(
         modifier = Modifier
           .padding(horizontal = 8.dp)

@@ -1,9 +1,8 @@
 package org.alquran.ui.uistate
 
 import arg.quran.models.quran.CharType
+import arg.quran.models.quran.QuranWord
 import arg.quran.models.quran.VerseKey
-import arg.quran.models.quran.VerseWord
-import arg.quran.models.quran.WordTranslation
 
 data class WordUiState(
   val id: Int,
@@ -13,22 +12,19 @@ data class WordUiState(
   val charType: CharType,
   val line: Int,
   val text: String,
-  val translation: WordTranslation,
-  val transliteration: WordTranslation,
   val playing: Boolean,
-  val selected: Boolean
+  val selected: Boolean,
+  val bookmarked: Boolean
 )
 
-fun VerseWord.toUiState(playing: Boolean, selected: Boolean) = WordUiState(
+fun QuranWord.toUiState(playing: Boolean, selected: Boolean, bookmarked: Boolean) = WordUiState(
   id = id,
   position = position,
   key = key,
-  audioURL = audioURL,
-  charType = charType,
+  charType = type,
   line = line,
-  text = codeV1!!,
-  translation = translation,
-  transliteration = transliteration,
+  text = text,
   playing = playing,
-  selected = selected
+  selected = selected,
+  bookmarked = bookmarked,
 )

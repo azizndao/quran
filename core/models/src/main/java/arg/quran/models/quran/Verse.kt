@@ -1,41 +1,35 @@
 package arg.quran.models.quran
 
-import androidx.room.Embedded
-import androidx.room.Entity
-import androidx.room.Index
-import androidx.room.PrimaryKey
-import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
 
 @Serializable
-@Entity(tableName = "verses", indices = [Index("page")])
-data class Verse(
-  @PrimaryKey
-  val id: Int,
+abstract class Verse {
 
-  @SerialName("verse_key")
-  @Embedded val key: VerseKey,
+  abstract val sura: Int
+  abstract val ayah: Int
+  abstract val text: String
 
-  @SerialName("hizb_number")
-  val hizb: Int,
+  override fun toString(): String {
+    return "Verse(sura=$sura, ayah=$ayah, text=$text)"
+  }
 
-  @SerialName("rub_el_hizb_number")
-  val rubElHizb: Int,
+  override fun equals(other: Any?): Boolean {
+    if (this === other) return true
+    if (javaClass != other?.javaClass) return false
 
-  @SerialName("ruku_number")
-  val ruku: Int,
+    other as Verse
 
-  @SerialName("manzil_number")
-  val manzil: Int,
+    if (sura != other.sura) return false
+    if (ayah != other.ayah) return false
+    if (text != other.text) return false
 
-  @SerialName("sajdah_number")
-  val sajdah: Int? = null,
+    return true
+  }
 
-  @SerialName("v1_page")
-  val v1Page: Int? = null,
-
-  @SerialName("page_number")
-  val page: Int? = null,
-
-  val words: List<VerseWord> = emptyList(),
-)
+  override fun hashCode(): Int {
+    var result = sura
+    result = 31 * result + ayah
+    result = 31 * result + text.hashCode()
+    return result
+  }
+}

@@ -5,7 +5,12 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
-import org.quran.datastore.*
+import org.quran.datastore.DisplayMode
+import org.quran.datastore.FontScale
+import org.quran.datastore.LocaleTranslation
+import org.quran.datastore.QuranPreferences
+import org.quran.datastore.TranslationList
+import org.quran.datastore.copy
 
 class QuranPreferencesRepository internal constructor(
   private val dataStore: DataStore<QuranPreferences>,
@@ -48,15 +53,15 @@ class QuranPreferencesRepository internal constructor(
     dataStore.updateData { it.toBuilder().setQuranFontScale(scale).build() }
   }
 
-  suspend fun getTranslationEdition(slug: String) = translationDataStore.data.map { preferences ->
-    preferences.editionsList.find { it.slug == slug }
+  suspend fun getLocaleTranslation(slug: String) = translationDataStore.data.map { preferences ->
+    preferences.localesList.find { it.slug == slug }
   }.first()
 
   suspend fun enableTranslation(slug: String) {
     translationDataStore.updateData {
       val builder = it.toBuilder()
       var index = 0
-      val editions = builder.editionsList.map { edition ->
+      val editions = builder.localesList.map { edition ->
         if (edition.slug == slug) {
           edition.copy { order = index }
         } else {
@@ -66,8 +71,8 @@ class QuranPreferencesRepository internal constructor(
       }
 
       builder
-        .clearEditions()
-        .addAllEditions(editions)
+        .clearLocales()
+        .addAllLocales(editions)
         .build()
     }
   }
@@ -75,20 +80,20 @@ class QuranPreferencesRepository internal constructor(
   suspend fun disableTranslation(slug: String) {
     translationDataStore.updateData {
       val builder = it.toBuilder()
-      val editions = builder.editionsList.map { edition ->
+      val editions = builder.localesList.map { edition ->
         if (edition.slug == slug) edition.copy { order = -1 } else edition
       }
-      builder.clearEditions()
-        .addAllEditions(editions)
+      builder.clearLocales()
+        .addAllLocales(editions)
       builder.build()
     }
   }
 
-  fun getAvailableTranslations() = translationDataStore.data.map { it.editionsList }
+  fun getAvailableTranslations() = translationDataStore.data.map { it.localesList }
 
   suspend fun downloadTranslation(id: Int) {
     translationDataStore.updateData { preferences ->
-      val translation = preferences.editionsList.map {
+      val translation = preferences.localesList.map {
         if (it.id == id) {
           enableTranslation(it.slug)
           it.copy { downloaded = true }
@@ -97,38 +102,38 @@ class QuranPreferencesRepository internal constructor(
         }
       }
       preferences.toBuilder()
-        .clearEditions()
-        .addAllEditions(translation)
+        .clearLocales()
+        .addAllLocales(translation)
         .build()
     }
   }
 
   suspend fun deleteTranslation(id: Int) {
     translationDataStore.updateData { preferences ->
-      val translation = preferences.editionsList.filter {
+      val translation = preferences.localesList.filter {
         val translation = it.id == id
         if (translation) disableTranslation(it.slug)
         !translation
       }
 
       preferences.toBuilder()
-        .clearEditions()
-        .addAllEditions(translation)
+        .clearLocales()
+        .addAllLocales(translation)
         .build()
     }
   }
 
-  suspend fun setAvailableTranslations(translations: List<TranslationEdition>) {
+  suspend fun setAvailableTranslations(translations: List<LocaleTranslation>) {
     translationDataStore.updateData { preferences ->
       preferences.toBuilder()
-        .clearEditions()
-        .addAllEditions(translations)
+        .clearLocales()
+        .addAllLocales(translations)
         .build()
     }
   }
 
-  fun getSelectedTranslations(): Flow<List<TranslationEdition>> =
+  fun getSelectedTranslations(): Flow<List<LocaleTranslation>> =
     translationDataStore.data.map { pref ->
-      pref.editionsList.filter { it.order != -1 }
+      pref.localesList.filter { it.order >= 0 }
     }
 }

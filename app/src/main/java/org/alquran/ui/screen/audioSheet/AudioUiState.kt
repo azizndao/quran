@@ -12,6 +12,7 @@ data class AudioUiState(
   val audioState: AudioState = AudioState.PAUSED,
   val currentReciterId: String = "",
   @Player.RepeatMode val repeatMode: Int = Player.REPEAT_MODE_OFF,
+  val onAudioEvent: (AudioEvent) -> Unit = {}
 )
 
 data class PlaylistUiState(

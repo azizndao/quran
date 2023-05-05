@@ -1,11 +1,24 @@
 package org.alquran.ui.screen.pager.components
 
 import androidx.compose.foundation.Image
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.requiredWidthIn
+import androidx.compose.foundation.layout.wrapContentHeight
+import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
+import androidx.compose.material3.contentColorFor
+import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
@@ -13,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.paint
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.TextStyle
@@ -20,14 +34,13 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import arg.quran.models.audio.WordSegment
 import arg.quran.models.quran.CharType
 import org.alquran.R
 import org.alquran.ui.screen.pager.AyahEvent
-import org.alquran.ui.screen.pager.rememberPlayingWordInLine
 import org.alquran.ui.theme.LocalQuranTextStyle
 import org.alquran.ui.theme.surahNames
 import org.alquran.ui.uistate.MushafPage
+import org.quran.ui.components.LongClickableText
 
 @Composable
 fun MushafPageView(
@@ -36,12 +49,11 @@ fun MushafPageView(
   onAyahEvent: (AyahEvent) -> Unit
 ) {
 
-  BoxWithConstraints(
-    modifier = modifier
-      .fillMaxSize()
-  ) {
+  BoxWithConstraints(modifier = modifier.fillMaxSize()) {
 
-    val lineHeight = maxHeight / 17
+    val lineHeight = with(LocalDensity.current) {
+      LocalQuranTextStyle.current.lineHeight.toDp()
+    }
 
     Column(
       modifier = Modifier
@@ -82,17 +94,19 @@ fun MushafPageView(
               .fillMaxWidth()
           )
 
-          is MushafPage.TextLine -> MushafTextLine(
-            line = line,
-            modifier = Modifier
-              .height(lineHeight)
-              .fillMaxWidth(),
-            playingWord = rememberPlayingWordInLine(line)
-          )
+          is MushafPage.TextLine -> {
+            MushafTextLine(
+              line = line,
+              modifier = Modifier
+                .height(lineHeight)
+                .fillMaxWidth(),
+              onAyahEvent = onAyahEvent,
+            )
+          }
         }
       }
 
-      if (page.page <= 2) Spacer(modifier = Modifier.weight(1f))
+      Spacer(modifier = Modifier.weight(1f))
 
       Text(
         page.page.toString(),
@@ -115,11 +129,10 @@ fun MushafChapterLine(
   Box(
     modifier = modifier
       .fillMaxWidth()
-      .padding(horizontal = 8.dp)
       .paint(
         painterResource(id = R.drawable.ic_surah_border),
         contentScale = ContentScale.Fit,
-        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.primary)
+        colorFilter = ColorFilter.tint(MaterialTheme.colorScheme.secondary)
       )
   ) {
 
@@ -127,7 +140,9 @@ fun MushafChapterLine(
       text = "${line.sura.toString().padStart(3, '0')} surah",
       textAlign = TextAlign.Center,
       style = MaterialTheme.typography.surahNames,
-      modifier = Modifier.align(Alignment.Center),
+      modifier = Modifier
+        .requiredWidthIn()
+        .align(Alignment.Center),
     )
   }
 }
@@ -138,22 +153,25 @@ fun MushafTextLine(
   modifier: Modifier = Modifier,
   style: TextStyle = LocalQuranTextStyle.current,
   colorScheme: ColorScheme = MaterialTheme.colorScheme,
-  playingWord: WordSegment?,
+  onAyahEvent: (AyahEvent) -> Unit,
 ) {
 
   val text = remember(line) {
     buildAnnotatedString {
-      line.words.forEachIndexed { index, word ->
-        val color =
-          if (playingWord != null && playingWord.position == word.position && playingWord.aya == word.key.aya) {
-            colorScheme.primary
-          } else {
-            colorScheme.onSurface
-          }
+      line.words.forEach { word ->
+        val color = when {
+          word.playing -> colorScheme.primaryContainer
+          word.selected -> colorScheme.surfaceVariant
+          word.bookmarked -> colorScheme.surfaceColorAtElevation(3.dp)
+          else -> colorScheme.surface
+        }
 
-        withStyle(SpanStyle(color = color)) {
-
-          if (index > 0) append(" ")
+        withStyle(
+          SpanStyle(
+            background = color,
+            color = colorScheme.contentColorFor(backgroundColor = color)
+          )
+        ) {
 
           when (word.charType) {
 
@@ -168,11 +186,19 @@ fun MushafTextLine(
     }
   }
 
-  Text(
+  LongClickableText(
     text = text,
     style = style.copy(textAlign = TextAlign.Justify),
     modifier = modifier
       .fillMaxWidth()
       .wrapContentWidth(),
+    onClick = { offset ->
+      val key = if (offset >= line.words.size) line.words.last().key else line.words[offset].key
+      onAyahEvent(AyahEvent.AyahPressed(key))
+    },
+    onLongClick = { offset ->
+      val word = if (offset >= line.words.size) line.words.last() else line.words[offset]
+      onAyahEvent(AyahEvent.AyahLongPressed(word.key, word.bookmarked))
+    },
   )
 }

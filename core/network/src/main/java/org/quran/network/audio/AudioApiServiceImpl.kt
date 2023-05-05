@@ -1,63 +1,47 @@
 package org.quran.network.audio
 
-import arg.quran.models.audio.AudioFile
-import arg.quran.models.audio.AyaTiming
-import arg.quran.models.audio.WordSegment
 import io.ktor.client.*
 import io.ktor.client.call.*
 import io.ktor.client.request.*
-import org.quran.network.audio.models.ApiAyaTiming
-import org.quran.network.audio.models.AudioFilesResponse
+import io.ktor.http.*
+import io.ktor.utils.io.*
+import io.ktor.utils.io.core.*
+import org.quram.common.source.PageProvider
+import org.quram.common.utils.ZipUtils
+import timber.log.Timber
+import java.io.File
 
 internal class AudioApiServiceImpl(
   private val httpClient: HttpClient,
+  private val pageProvider: PageProvider,
 ) : AudioApiService {
 
-  private val baseUrl = "https://api.quran.com/api/v4"
 
-  override suspend fun getAudioFiles(reciterId: Int, language: String): List<AudioFile> {
-    val response = httpClient.get("$baseUrl/chapter_recitations/$reciterId") {
-      parameter("language", language)
-    }
-    return response.body<AudioFilesResponse<AudioFile>>().audioFiles
-  }
+  override suspend fun getTimingsDatabase(slug: String): File {
+    val baseUrl = pageProvider.getAudioDatabasesBaseUrl()
+    val desDirectory = File(pageProvider.getDatabaseDirectoryName())
+    if (!desDirectory.exists()) desDirectory.mkdirs()
 
-  override suspend fun getTimings(reciterId: Int, language: String): List<AyaTiming> {
-    val response = httpClient.get("$baseUrl/quran/recitations/$reciterId") {
-      parameter("language", language)
-      parameter("fields", "segments,duration")
-    }
-    return response.body<AudioFilesResponse<ApiAyaTiming>>()
-      .audioFiles
-      .groupBy { it.key.sura }
-      .flatMap { (sura, ayat) ->
+    return httpClient.prepareGet("$baseUrl$slug.zip").execute { httpResponse ->
+      val channel: ByteReadChannel = httpResponse.body()
 
-        var duration = 0L
+      val zipFile = File(desDirectory, "$slug.zip")
+      zipFile.deleteOnExit()
 
-        ayat.map { aya ->
-          val segments = aya.segments.map { segment ->
-            WordSegment(
-              position = segment[1].toInt(),
-              sura = sura,
-              aya = aya.key.aya,
-              startDuration = duration + segment[2],
-              endDuration = duration + segment[3]
-            )
-          }
-
-          duration += aya.duration * 1000
-
-          if (aya.segments.last()[3] > duration) {
-            duration = segments.last().endDuration
-          }
-
-          AyaTiming(
-            url = aya.url,
-            verseKey = aya.key,
-            duration = duration,
-            segments = segments
-          )
+      while (!channel.isClosedForRead) {
+        val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+        while (!packet.isEmpty) {
+          val bytes = packet.readBytes()
+          zipFile.appendBytes(bytes)
+          Timber.d("Received ${zipFile.length()} bytes from ${httpResponse.contentLength()}")
         }
       }
+      Timber.d("A file saved to ${zipFile.path}")
+      ZipUtils.unzipFile(zipFile.path, desDirectory.path, 0) { obj, pro, to ->
+        Timber.d("$obj: Unzipping database processed = $pro/$to")
+      }
+      zipFile.delete()
+      File(desDirectory, "$slug.db")
+    }
   }
 }

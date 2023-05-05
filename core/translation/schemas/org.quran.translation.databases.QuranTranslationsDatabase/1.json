@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "c729f5a9a1c6e9fecd19ad422ee62bfa",
+    "identityHash": "1f4effa018b84633127a61f897ad8ea8",
     "entities": [
       {
         "ftsVersion": "FTS4",
@@ -18,24 +18,24 @@
         },
         "contentSyncTriggers": [],
         "tableName": "verses",
-        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`key` TEXT NOT NULL, `text` TEXT NOT NULL, `page` INTEGER NOT NULL)",
+        "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`sura` INTEGER NOT NULL, `ayah` INTEGER NOT NULL, `text` TEXT NOT NULL)",
         "fields": [
           {
-            "fieldPath": "key",
-            "columnName": "key",
-            "affinity": "TEXT",
+            "fieldPath": "sura",
+            "columnName": "sura",
+            "affinity": "INTEGER",
+            "notNull": true
+          },
+          {
+            "fieldPath": "ayah",
+            "columnName": "ayah",
+            "affinity": "INTEGER",
             "notNull": true
           },
           {
             "fieldPath": "text",
             "columnName": "text",
             "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "page",
-            "columnName": "page",
-            "affinity": "INTEGER",
             "notNull": true
           }
         ],
@@ -52,7 +52,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, 'c729f5a9a1c6e9fecd19ad422ee62bfa')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1f4effa018b84633127a61f897ad8ea8')"
     ]
   }
 }

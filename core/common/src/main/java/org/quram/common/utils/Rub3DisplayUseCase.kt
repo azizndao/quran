@@ -2,6 +2,7 @@ package org.quram.common.utils
 
 import android.content.Context
 import org.quram.common.R
+import org.quram.common.core.QuranInfo
 import org.quram.common.utils.QuranUtils.getLocalizedNumber
 
 class Rub3DisplayUseCase internal constructor(

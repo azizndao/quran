@@ -1,6 +1,11 @@
 package org.alquran.ui.screen.pager.components
 
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
@@ -19,10 +24,8 @@ import androidx.compose.ui.unit.dp
 import org.alquran.R
 import org.alquran.ui.components.LineSeparator
 import org.alquran.ui.screen.pager.AyahEvent
-import org.alquran.ui.screen.pager.rememberPlayingWord
 import org.alquran.ui.uistate.QuranPageItem
 import org.alquran.ui.uistate.TranslationPage
-import org.alquran.ui.uistate.verseKey
 import kotlin.math.min
 
 @Composable
@@ -42,7 +45,7 @@ fun TranslationPageItem(
 
   LaunchedEffect(page) {
     if (page.scrollIndex >= 0) {
-      val layoutInfo = listState.layoutInfo
+//      val layoutInfo = listState.layoutInfo
 //            val isCurrentItemFullyVisible = layoutInfo.visibleItemsInfo.any { item ->
 //                val endOffset = layoutInfo.viewportSize.height - layoutInfo.afterContentPadding
 //                val itemEndOffset = item.offset + item.size
@@ -54,8 +57,6 @@ fun TranslationPageItem(
     }
   }
 
-  val playingWord = rememberPlayingWord()
-
   LazyColumn(
     modifier = modifier.fillMaxSize(),
     contentPadding = contentPadding,
@@ -66,7 +67,7 @@ fun TranslationPageItem(
     item(key = "header") {
       PageHeaderView(
         header = page.header,
-        modifier = Modifier.animateItemPlacement()
+        modifier = Modifier.padding(12.dp)
       )
     }
 
@@ -79,39 +80,24 @@ fun TranslationPageItem(
         is TranslationPage.Surah -> SurahHeader(
           surahName = item.name,
           suraNumber = item.number,
-          modifier = Modifier.animateItemPlacement()
         )
 
-        is TranslationPage.Verse -> VerseItemView(
-          modifier = Modifier.animateItemPlacement(),
-          verse = item,
-          playingWord = playingWord?.takeIf { it.sura == item.verseKey.sura && it.aya == item.verseKey.aya }
-        )
+        is TranslationPage.Verse -> VerseItemView(verse = item)
 
-        is TranslationPage.Translation -> TranslationItemView(
-          modifier = Modifier.animateItemPlacement(),
-          translation = item.translation,
-          isPlaying = playingWord?.let { it.sura == item.verseKey.sura && it.aya == item.verseKey.aya }
-            ?: false,
-          authorName = item.authorName
-        )
+        is TranslationPage.Translation -> TranslationItemView(translation = item)
 
         is TranslationPage.AyahToolbar -> VerseToolbarView(
-          modifier = Modifier.animateItemPlacement(),
           verseKey = item.verseKey,
-          isPlaying = playingWord?.let { it.sura == item.verseKey.sura && it.aya == item.verseKey.aya }
-            ?: false,
           isBookmarked = item.isBookmarked,
           onBookmarkChange = {
             onAyahEvent(AyahEvent.ToggleBookmark(item.verseKey, item.isBookmarked))
           },
-          onMoreClick = { onAyahEvent(AyahEvent.AyahLongPressed(item.verseKey)) },
-          onPlay = { onAyahEvent(AyahEvent.Play(item.verseKey)) }
+          onMoreClick = { onAyahEvent(AyahEvent.AyahLongPressed(item.verseKey, item.isBookmarked)) },
+          onPlay = { onAyahEvent(AyahEvent.Play(item.verseKey)) },
+          isPlaying = item.isPlaying
         )
 
-        is TranslationPage.Divider -> LineSeparator(
-          modifier = Modifier.animateItemPlacement()
-        )
+        is TranslationPage.Divider -> LineSeparator(modifier = Modifier.padding(horizontal = 16.dp))
       }
     }
 
@@ -119,8 +105,7 @@ fun TranslationPageItem(
       Text(
         page.page.toString(),
         modifier = Modifier
-          .fillMaxWidth()
-          .animateItemPlacement(),
+          .fillMaxWidth(),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.labelLarge
       )

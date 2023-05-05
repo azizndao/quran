@@ -2,6 +2,7 @@ package org.quran.bookmarks.model
 
 import kotlinx.serialization.Serializable
 
+@Serializable
 sealed class BookmarkTag {
 
   @Serializable

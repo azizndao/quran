@@ -1,59 +1,65 @@
 package org.muslimapp.core.audio.repositories
 
 import android.content.Context
-import arg.quran.models.audio.AyaTiming
-import arg.quran.models.audio.aya
-import arg.quran.models.audio.sura
-import org.muslimapp.core.audio.databases.TimingDatabase
-import org.muslimapp.core.audio.datasources.QariDataSource
+import android.database.Cursor
+import android.database.SQLException
+import android.util.SparseIntArray
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
+import org.muslimapp.core.audio.databases.SuraTimingDatabaseHandler
+import org.muslimapp.core.audio.databases.SuraTimingDatabaseHandler.Companion.getDatabaseHandler
+import org.quram.common.source.MadaniPageProvider
 import org.quran.network.audio.AudioApiService
 import timber.log.Timber
+import java.io.File
 
 class TimingRepository(
   private val context: Context,
   private val audioApiService: AudioApiService,
+  private val pageProvider: MadaniPageProvider,
 ) {
 
-  private var timings: List<AyaTiming> = emptyList()
-
-  suspend fun getPosition(reciter: String, sura: Int, startAyah: Int): Long {
-    if (timings.isEmpty() || timings.first().sura != sura) {
-      timings = getSuraTimings(reciter, sura)
-    }
-
-    if (startAyah == 1) return 0L
-    return timings.find { it.aya == startAyah }?.duration ?: 0L
+  suspend fun getPosition(reciter: String, sura: Int, ayah: Int): Long {
+    return getOrDownloadDatabaseHandler(reciter).getAyahTiming(sura, ayah)?.use { cursor ->
+      if (cursor.moveToFirst()) {
+        cursor.getLong(2)
+      } else {
+        null
+      }
+    } ?: 0L
   }
 
-  suspend fun getSuraTimings(slug: String, surah: Int): List<AyaTiming> {
-    val timingDao = TimingDatabase.getInstance(context, slug).timingDao
-
-    return timingDao.getTimingBySura(surah).ifEmpty {
-      downloadTimingData(slug)
-      timingDao.getTimingBySura(surah)
-    }
+  private suspend fun getOrDownloadDatabaseHandler(slug: String): SuraTimingDatabaseHandler {
+    val databaseBaseUrl = pageProvider.getDatabaseDirectoryName()
+    val dbFile = File("$databaseBaseUrl/$slug.db")
+    if (!dbFile.exists()) audioApiService.getTimingsDatabase(slug)
+    return getDatabaseHandler(dbFile.path)
   }
 
-  suspend fun downloadTimingData(slug: String) {
-    Timber.d("Downloading timing data for $slug")
-    val qari = QariDataSource.find { it.slug == slug }!!
-    val timings = audioApiService.getTimings(qari.id)
-    val database = TimingDatabase.getInstance(context, slug)
-    database.timingDao.insertTimings(timings)
-  }
+  suspend fun getGaplessData(slug: String, sura: Int) = withContext(Dispatchers.IO) {
+    val db = getOrDownloadDatabaseHandler(slug)
 
-  suspend fun getTiming(reciterId: String, sura: Int, position: Long): AyaTiming? {
+    val map = SparseIntArray()
 
-    if (timings.isEmpty() || timings.first().sura != sura) {
-      timings = getSuraTimings(reciterId, sura)
+    var cursor: Cursor? = null
+    try {
+      cursor = db.getAyahTimings(sura)
+      Timber.d("got cursor of data")
+      if (cursor != null && cursor.moveToFirst()) {
+        do {
+          val ayah = cursor.getInt(1)
+          val time = cursor.getInt(2)
+          map.put(ayah, time)
+        } while (cursor.moveToNext())
+      }
+    } catch (se: SQLException) {
+      // don't crash the app if the database is corrupt
+      Timber.e(se)
+      context.deleteDatabase(slug)
+    } finally {
+      cursor?.close()
     }
 
-    val timing = if (position <= timings.first().duration) {
-      timings.first()
-    } else {
-      timings.find { timing -> timing.segments.any { position in it.startDuration..it.endDuration } }
-    }
-
-    return timing
+    map
   }
 }

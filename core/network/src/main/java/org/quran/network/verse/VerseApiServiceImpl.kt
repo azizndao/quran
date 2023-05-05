@@ -49,6 +49,27 @@ internal class VerseApiServiceImpl(
     return response.body<PaginatedResponse<Verse>>().verses
   }
 
+  override suspend fun downloadQuranDatabase(destination: String) {
+//    try {
+//      httpClient.prepareGet("https://raw.githubusercontent.com/azizndao/quran_data/dev/quran.v1.tar.xz")
+//        .execute { httpResponse ->
+//          val channel: ByteReadChannel = httpResponse.body()
+//          while (!channel.isClosedForRead) {
+//            val packet = channel.readRemaining(DEFAULT_BUFFER_SIZE.toLong())
+//            while (!packet.isEmpty) {
+//              val bytes = packet.readBytes()
+//              file.appendBytes(bytes)
+//            }
+//          }
+//        }
+//      Timber.tag("VerseApiServiceImpl").d("A file saved to ${file.path}")
+//    } catch (e: Exception) {
+//      Timber.tag("VerseApiServiceImpl").e(e)
+//      file.deleteOnExit()
+//      throw e
+//    }
+  }
+
   override suspend fun downloadFont(page: Int, version: Int, file: File) {
     try {
       httpClient.prepareGet("https://quran.com/fonts/quran/hafs/v$version/ttf/p$page.ttf")

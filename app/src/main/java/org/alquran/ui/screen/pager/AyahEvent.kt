@@ -10,7 +10,7 @@ sealed class AyahEvent {
 
   class UpdateSelection(val sura: Int, val ayah: Int, val selected: Boolean) : AyahEvent()
 
-  class AyahLongPressed(val verseKey: VerseKey) : AyahEvent()
+  class AyahLongPressed(val verseKey: VerseKey, val bookmarked: Boolean) : AyahEvent()
 
   class AyahPressed(val verseKey: VerseKey?) : AyahEvent()
 }

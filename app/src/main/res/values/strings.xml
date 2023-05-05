@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">Al Quran</string>
+    <string name="app_name">Quran</string>
     <string name="juzs">Juz\'</string>
     <string name="surats">Surats</string>
     <string name="favorites">Favorites</string>
@@ -187,4 +187,5 @@
     <string name="stop_downloading_surah">Stop download surah</string>
     <string name="start_downloading">Start downloading</string>
     <string name="popular_sura">Popular chapters</string>
+    <string name="remove_bookmark">Remove bookmark</string>
 </resources>

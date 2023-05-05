@@ -4,8 +4,8 @@ import android.content.Context
 import arg.quran.models.SuraWithTranslation
 import arg.quran.models.SurahMapping
 import org.quram.common.R
-import org.quram.common.datasources.QuranDataSource
 import org.quram.common.datasources.SurahsDataSources
+import org.quram.common.source.QuranDataSource
 
 class SurahRepository(
   private val context: Context,

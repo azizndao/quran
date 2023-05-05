@@ -8,7 +8,7 @@ import org.quran.datastore.RecentPlayback
 import java.io.InputStream
 import java.io.OutputStream
 
-const val DEFAULT_RECITER = "mishari_al_afasy.murattal"
+const val DEFAULT_RECITER = "mishari_alafasy"
 
 internal class AudioPreferencesSerializer : Serializer<AudioPreferences> {
   override val defaultValue: AudioPreferences = AudioPreferences.newBuilder()

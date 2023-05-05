@@ -5,6 +5,7 @@ import android.text.TextUtils
 import androidx.annotation.StringRes
 import arg.quran.models.quran.VerseKey
 import org.quram.common.R
+import org.quram.common.core.QuranInfo
 import timber.log.Timber
 
 class QuranDisplayData internal constructor(
@@ -54,9 +55,7 @@ class QuranDisplayData internal constructor(
       val translation = resources.getStringArray(R.array.sura_translations)[sura - 1]
       if (!TextUtils.isEmpty(translation)) {
         // Some sura names may not have translation
-        builder.append(" (")
-        builder.append(translation)
-        builder.append(")")
+        builder.append(" (").append(translation).append(")")
       }
     }
 
@@ -95,7 +94,7 @@ class QuranDisplayData internal constructor(
     @StringRes resource: Int,
   ): String {
     val suraName = getSuraName(sura, wantPrefix = false, wantTranslation = false)
-    return resources.getString(resource, suraName, ayah)
+    return resources.getString(resource, suraName, sura, ayah)
   }
 
   fun getSuraAyahStringForSharing(sura: Int, ayah: Int): String {
@@ -177,7 +176,7 @@ class QuranDisplayData internal constructor(
       R.string.quran_ayah_details,
       getSuraName(sura, true),
       QuranUtils.getLocalizedNumber(ayah),
-      QuranUtils.getLocalizedNumber(quranInfo.getJuzFromSurahAyah(sura, ayah, juz))
+      QuranUtils.getLocalizedNumber(quranInfo.getJuzFromSuraAyah(sura, ayah, juz))
     )
   }
 

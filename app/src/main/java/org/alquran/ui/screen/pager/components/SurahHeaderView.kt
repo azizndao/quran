@@ -21,7 +21,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.alquran.R
-import org.alquran.ui.theme.QuranTheme
+import org.quran.ui.theme.QuranTheme
 import org.alquran.ui.uistate.TranslationPage
 
 

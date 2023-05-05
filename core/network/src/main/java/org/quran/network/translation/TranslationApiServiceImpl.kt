@@ -1,11 +1,12 @@
 package org.quran.network.translation
 
 import arg.quran.models.Language
-import arg.quran.models.quran.VerseTranslation
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
-import org.quran.network.translation.models.*
+import arg.quran.models.quran.Verse
+import io.ktor.client.HttpClient
+import io.ktor.client.call.body
+import io.ktor.client.request.get
+import io.ktor.client.request.parameter
+import org.quran.network.translation.models.ApiTranslation
 import org.quran.network.translation.models.LanguagesResponse
 import org.quran.network.translation.models.QuranTranslationsResponse
 import org.quran.network.translation.models.TranslationsResponse
@@ -26,16 +27,9 @@ internal class TranslationApiServiceImpl(
     val languages = getAvailableLanguages(language)
     return httpClient.get("$baseUrl/resources/translations")
       .body<TranslationsResponse>().translations
-      .mapNotNull {
-        when (val lang =
-          languages.find { l -> l.name.lowercase() == it.language.lowercase() }) {
-          null -> null
-          else -> it.copy(language = lang.isoCode, direction = lang.direction)
-        }
-      }
   }
 
-  override suspend fun getAyahTranslations(translationId: Int): List<VerseTranslation> {
+  override suspend fun getVerses(translationId: Int): List<Verse> {
     Timber.d("Downloading translation id = $translationId")
     return httpClient.get("$baseUrl/quran/translations/$translationId") {
       parameter("fields", "page_number,verse_key,verse_number")

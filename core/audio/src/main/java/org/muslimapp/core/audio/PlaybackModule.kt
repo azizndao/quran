@@ -19,6 +19,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.muslimapp.core.audio.datasources.RecitationsDataSource
+import org.muslimapp.core.audio.repositories.QariRepository
 import org.muslimapp.core.audio.repositories.RecitationRepository
 import org.muslimapp.core.audio.repositories.TimingRepository
 import java.io.File
@@ -27,6 +28,8 @@ import java.util.concurrent.Executors
 val PlaybackModule = module {
 
   singleOf(::PlaybackConnection)
+
+  factoryOf(::QariRepository)
 
   factoryOf(::RecitationRepository)
 

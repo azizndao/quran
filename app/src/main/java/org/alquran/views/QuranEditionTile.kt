@@ -1,4 +1,4 @@
-package org.muslimapp.feature.quran.views
+package org.alquran.views
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Column
@@ -15,8 +15,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import org.alquran.R
-import org.alquran.ui.components.RadioButtonListItem
-import org.alquran.ui.theme.QuranTheme
+import org.quran.ui.components.RadioButtonListItem
+import org.quran.ui.theme.QuranTheme
 import org.quram.common.extensions.capital
 import org.quran.datastore.QuranEdition
 
@@ -32,8 +32,8 @@ fun QuranEditionTile(
   ListItem(
     modifier = modifier.clickable { showDialog = true },
     leadingContent = { Icon(painterResource(id = R.drawable.ic_code), null) },
-    headlineText = { Text(stringResource(id = R.string.script)) },
-    supportingText = { Text(selectedScript.name.capital()) },
+    headlineContent = { Text(stringResource(id = R.string.script)) },
+    supportingContent = { Text(selectedScript.name.capital()) },
     colors = colors,
   )
 

@@ -26,7 +26,7 @@ fun DisplayModeButton(
         fadeIn() + slideIn {
           IntOffset(0, it.height)
         } with fadeOut() + slideOut { IntOffset(0, -it.height) }
-      }
+      }, label = ""
     ) { target ->
       when (target) {
         DisplayMode.QURAN_TRANSLATION -> Icon(

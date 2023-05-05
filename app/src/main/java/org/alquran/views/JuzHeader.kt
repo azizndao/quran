@@ -1,4 +1,4 @@
-package org.muslimapp.feature.quran.views
+package org.alquran.views
 
 import android.content.res.Configuration
 import androidx.compose.foundation.layout.Arrangement
@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import org.alquran.R
-import org.alquran.ui.theme.QuranTheme
+import org.quran.ui.theme.QuranTheme
 
 @Composable
 fun JuzHeader(juz: Int, page: Int, modifier: Modifier = Modifier) {

@@ -4,10 +4,10 @@ option java_package = "org.quran.datastore";
 option java_multiple_files = true;
 
 message TranslationList {
-  repeated TranslationEdition editions = 1;
+  repeated LocaleTranslation locales = 1;
 }
 
-message TranslationEdition {
+message LocaleTranslation {
   int32 id = 1;
   string name = 2;
   string authorName = 3;

@@ -6,7 +6,7 @@ data class MushafPage(
   override val page: Int = 0,
   override val header: Header,
   override val fontFamily: FontFamily,
-  val lines: List<Line> = emptyList()
+  val lines: List<Line> = emptyList(),
 ) : QuranPageItem() {
 
   sealed class Line

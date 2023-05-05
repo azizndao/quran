@@ -6,6 +6,7 @@ import androidx.work.WorkerParameters
 import org.quram.common.utils.UriProvider
 import org.quran.datastore.serializers.DEFAULT_QURAN_FONT_VERSION
 import org.quran.domain.quran.R
+import org.quran.domain.quran.workers.base.DownloadWorker
 import org.quran.network.verse.VerseApiService
 
 class DownloadFontsWorker(

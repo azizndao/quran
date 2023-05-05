@@ -2,7 +2,7 @@ package org.alquran.ui.uistate
 
 import org.quran.datastore.DisplayMode
 import org.quran.datastore.QuranEdition
-import org.quran.datastore.TranslationEdition
+import org.quran.datastore.LocaleTranslation
 
 
 data class TextSettingsUiState(
@@ -12,9 +12,9 @@ data class TextSettingsUiState(
 
 data class TextSettings(
   val quran: QuranEdition,
-  val translation: TranslationEdition?,
+  val translation: LocaleTranslation?,
   val translationEnabled: Boolean,
-  val transliteration: TranslationEdition?,
+  val transliteration: LocaleTranslation?,
   val transliterationEnabled: Boolean,
   val displayMode: DisplayMode,
   val quranFontFamily: Int,

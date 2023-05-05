@@ -19,7 +19,7 @@
         </service>
 
         <service
-            android:name="org.alquran.audio.MediaDownloadService"
+            android:name="org.muslimapp.core.audio.MediaDownloadService"
             android:exported="false">
             <!-- This is needed for Scheduler -->
             <intent-filter>

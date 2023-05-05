@@ -17,7 +17,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.debounce
-import org.alquran.audio.MediaDownloadService
+import org.muslimapp.core.audio.MediaDownloadService
 import org.muslimapp.core.audio.models.MediaId
 import org.muslimapp.core.audio.repositories.TimingRepository
 import timber.log.Timber
@@ -48,7 +48,7 @@ internal class RecitationsDataSource(
     val mediaId = MediaId(sura = sura.number, reciter = qari.slug, ayah = 0).toString()
 
     val mediaUri =
-      Uri.parse("${qari.subfolder}/${sura.number.toString().padStart(3, '0')}.mp3")
+      Uri.parse("${qari.url}/${sura.number.toString().padStart(3, '0')}.mp3")
 
     val requestMetadata = MediaItem.RequestMetadata.Builder()
       .setMediaUri(mediaUri)

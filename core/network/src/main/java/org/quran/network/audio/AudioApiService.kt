@@ -1,11 +1,7 @@
 package org.quran.network.audio
 
-import arg.quran.models.audio.AudioFile
-import arg.quran.models.audio.AyaTiming
+import java.io.File
 
 interface AudioApiService {
-
-  suspend fun getAudioFiles(reciterId: Int, language: String = "en"): List<AudioFile>
-
-  suspend fun getTimings(reciterId: Int, language: String = "en"): List<AyaTiming>
+  suspend fun getTimingsDatabase(slug: String): File
 }

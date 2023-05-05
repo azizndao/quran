@@ -1,4 +1,4 @@
-package org.muslimapp.feature.quran.views
+package org.alquran.views
 
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyItemScope

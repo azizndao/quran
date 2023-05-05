@@ -12,16 +12,19 @@ dependencyResolutionManagement {
         mavenCentral()
     }
 }
-rootProject.name = "Al Quran"
+
+rootProject.name = "quran"
 include ':app'
 include ':core:datastore'
+include ':core:audio'
 include ':core:translation'
 include ':core:network'
 include ':core:common'
 include ':core:verses'
-include ':core:audio'
 include ':domain:quran'
 include ':core:bookmarks'
 include ':core:models'
 include ':core:hadeeths'
 include ':feature:hadeeths'
+include ':core:ui'
+include ':feature:quran:pager'

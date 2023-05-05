@@ -20,9 +20,9 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.StateFlow
 import org.alquran.R
 import org.muslimapp.feature.quran.ui.LocalInsetsPadding
-import org.muslimapp.feature.quran.views.CircularProgressLoader
-import org.muslimapp.feature.quran.views.SectionTitle
-import org.muslimapp.feature.quran.views.sectionItems
+import org.alquran.views.CircularProgressLoader
+import org.alquran.views.SectionTitle
+import org.alquran.views.sectionItems
 import org.quran.bookmarks.model.BookmarkTag
 import org.quran.datastore.QuranPosition
 
@@ -151,8 +151,8 @@ fun BookmarkedAyahItem(
         )
       }
     },
-    headlineText = { Text(bookmarkUiModel.nameSimple) },
-    supportingText = { Text(stringResource(id = R.string.page_x, bookmarkUiModel.page)) },
+    headlineContent = { Text(bookmarkUiModel.nameSimple) },
+    supportingContent = { Text(stringResource(id = R.string.page_x, bookmarkUiModel.page)) },
   )
 }
 

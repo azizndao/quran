@@ -3,7 +3,7 @@ package org.alquran.ui.screen.audioSheet
 import arg.quran.models.audio.Qari
 
 
-internal sealed class AudioEvent {
+sealed class AudioEvent {
   object SkipPrevious : AudioEvent()
 
   object SkipNext : AudioEvent()

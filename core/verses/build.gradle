@@ -6,7 +6,7 @@ plugins {
 }
 
 android {
-    namespace 'org.alquran.hafs'
+    namespace 'org.alquran.verses'
     compileSdk 33
 
     defaultConfig {

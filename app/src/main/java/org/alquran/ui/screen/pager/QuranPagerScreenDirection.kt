@@ -1,6 +1,5 @@
 package org.alquran.ui.screen.pager
 
-import androidx.compose.animation.core.Transition
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.unit.sp
@@ -11,6 +10,7 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import arg.quran.models.quran.VerseKey
+import org.alquran.ui.screen.audioSheet.PlaybackSheetViewModel
 import org.alquran.ui.theme.LocalQuranTextStyle
 import org.alquran.ui.theme.LocalSurahTextStyle
 import org.alquran.ui.theme.LocalTranslationTextStyle
@@ -34,10 +34,9 @@ fun quranPagerDestinationArgs(savedStateHandle: SavedStateHandle): QuranPagerArg
 
 
 internal fun NavGraphBuilder.quranPagerDestination(
+  audioViewModel: PlaybackSheetViewModel,
   navigate: (String) -> Unit,
   popBackStack: () -> Unit,
-  fullscreenTransition: Transition<Boolean>,
-  onFullscreen: (Boolean) -> Unit,
 ) {
   composable(
     route = ROUTE_QURAN_PAGER,
@@ -51,29 +50,16 @@ internal fun NavGraphBuilder.quranPagerDestination(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
 
     CompositionLocalProvider(
-      LocalQuranTextStyle provides LocalQuranTextStyle.current.copy(
-        fontSize = 28.sp
-      ),
-      LocalTranslationTextStyle provides LocalTranslationTextStyle.current.copy(
-        fontSize = 14.sp
-      ),
+      LocalQuranTextStyle provides LocalQuranTextStyle.current.copy(fontSize = 28.sp),
+      LocalTranslationTextStyle provides LocalTranslationTextStyle.current.copy(fontSize = 14.sp),
       LocalSurahTextStyle provides LocalSurahTextStyle.current.copy()
     ) {
       QuranPagerScreen(
         uiState = uiState,
         popBackStack = popBackStack,
-        onDisplayChange = viewModel::onDisplayMode,
-        onAyahEvent = viewModel::onAyahEvent,
-        pageProvider = { mode, pageNumber, verson ->
-          viewModel.pageFactory(
-            mode,
-            pageNumber,
-            verson
-          )
-        },
         navigate = navigate,
-        fullscreenTransition = fullscreenTransition,
-        onFullscreen = onFullscreen
+        pageProvider = { mode, page, version -> viewModel.pageFactory(mode, page, version) },
+        audioStateFlow = audioViewModel.audioStateFlow
       )
     }
   }

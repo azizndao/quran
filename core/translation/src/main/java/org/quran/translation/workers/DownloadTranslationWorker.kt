@@ -2,13 +2,11 @@ package org.quran.translation.workers
 
 import android.content.Context
 import androidx.work.*
-import arg.quran.models.quran.VerseTranslation
 import kotlinx.serialization.SerialName
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.decodeFromStream
 import org.quran.datastore.repositories.QuranPreferencesRepository
 import org.quran.network.translation.TranslationApiService
 import org.quran.translation.databases.QuranTranslationsDatabase.Companion.getTranslationDatabase
+import org.quran.translation.models.TranslatedVerse
 import java.util.*
 
 internal class DownloadTranslationWorker(
@@ -21,22 +19,17 @@ internal class DownloadTranslationWorker(
 
     val slug = inputData.getString(PARAMS_SLUG)!!
 
-    val translation = quranPreferences.getTranslationEdition(slug)
+    val translation = quranPreferences.getLocaleTranslation(slug)
 
-    val apiTranslations = translationApiService.getAyahTranslations(translation!!.id)
-
-    applicationContext.assets.open("page_mapping.json").use {
-      val metas: List<VerseMeta> = Json.decodeFromStream(it)
-      val translations = metas.zip(apiTranslations) { meta, translation ->
-        VerseTranslation(
-          id = meta.id,
-          key = translation.key,
-          page = meta.v1Page,
-          text = translation.text,
-        )
-      }
-      applicationContext.getTranslationDatabase(slug).ayahDao.insertAyahs(translations)
+    val apiTranslations = translationApiService.getVerses(translation!!.id).map { verse ->
+      TranslatedVerse(
+        sura = verse.sura,
+        ayah = verse.ayah,
+        text = verse.text
+      )
     }
+
+    applicationContext.getTranslationDatabase(slug).verses.insertAyahs(apiTranslations)
     return Result.failure()
   }
 
@@ -58,11 +51,4 @@ internal class DownloadTranslationWorker(
         .enqueueUniqueWork(slug, ExistingWorkPolicy.KEEP, request)
     }
   }
-
-  @kotlinx.serialization.Serializable
-  private data class VerseMeta(
-    val id: Int,
-    @SerialName("v1_page") val v1Page: Int,
-    @SerialName("v2_page") val v2Page: Int
-  )
 }

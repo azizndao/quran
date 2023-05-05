@@ -3,8 +3,8 @@ package org.alquran.usecases
 import arg.quran.models.HizbQuarter
 import arg.quran.models.QuarterMapping
 import arg.quran.models.quran.VerseKey
+import org.quram.common.core.QuranInfo
 import org.quram.common.repositories.SurahRepository
-import org.quram.common.utils.QuranInfo
 
 class GetListOfHizbUseCase(
   private val quranInfo: QuranInfo,

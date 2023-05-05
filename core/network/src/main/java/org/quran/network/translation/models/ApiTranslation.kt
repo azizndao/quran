@@ -1,9 +1,7 @@
 package org.quran.network.translation.models
 
-import arg.quran.models.Direction
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable
-
 
 @Serializable
 data class ApiTranslation(
@@ -14,11 +12,9 @@ data class ApiTranslation(
   val authorName: String,
 
   @SerialName("language_name")
-  val language: String,
+  val languageName: String,
 
   val slug: String?,
-
-  val direction: Direction? = null
 )
 
-val ApiTranslation.fallbackSlug get() = "quran.$language.$id.db"
+val ApiTranslation.fallbackSlug get() = "quran.$languageName.$id.db"

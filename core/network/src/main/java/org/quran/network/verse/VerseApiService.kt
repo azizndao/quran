@@ -5,6 +5,8 @@ import java.io.File
 
 interface VerseApiService {
 
+  suspend fun downloadQuranDatabase(destination: String)
+
   suspend fun downloadFont(page: Int, version: Int, file: File)
 
   suspend fun downloadVerseByPage(

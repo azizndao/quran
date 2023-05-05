@@ -6,19 +6,18 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import arg.quran.models.Sura
 import arg.quran.models.quran.VerseKey
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.flatMapMerge
-import org.alquran.audio.models.AudioState
-import org.alquran.hafs.repository.VerseRepository
+import kotlinx.coroutines.flow.flowOn
 import org.alquran.ui.uistate.QuranPageItem
 import org.alquran.ui.uistate.TranslationPage
-import org.alquran.ui.uistate.toUiState
+import org.alquran.verses.repository.VerseRepository
+import org.muslimapp.core.audio.PlaybackConnection
 import org.quram.common.repositories.SurahRepository
 import org.quram.common.utils.QuranDisplayData
 import org.quram.common.utils.UriProvider
 import org.quran.bookmarks.repository.BookmarkRepository
-import org.quran.translation.repositories.TranslationAndVerses
 import org.quran.translation.repositories.TranslationRepository
 
 class GetTranslationPage(
@@ -28,23 +27,11 @@ class GetTranslationPage(
   private val pageHeaderUseCase: PageHeaderUseCase,
   private val quranDisplayData: QuranDisplayData,
   private val context: Context,
-  private val translationRepository: TranslationRepository
+  private val translationRepository: TranslationRepository,
+  private val playbackConnection: PlaybackConnection,
 ) {
 
-  private fun getTranslation(page: Int): Flow<List<TranslationAndVerses>> {
-    return translationRepository.getSelectedTranslations().flatMapMerge { editions ->
-      translationRepository.getQuranTranslations(
-        editions,
-        page,
-      )
-    }
-  }
-
-  operator fun invoke(
-    page: Int,
-    selectedVerse: VerseKey?,
-    version: Int
-  ): Flow<TranslationPage> {
+  operator fun invoke(page: Int, selectedVerse: VerseKey?, version: Int): Flow<TranslationPage> {
     val keys = quranDisplayData.getAyahKeysOnPage(page)
 
     var pageHeader: QuranPageItem.Header? = null
@@ -54,10 +41,11 @@ class GetTranslationPage(
     var lastScrollIndex = -1
 
     return combine(
-      verseRepository.getVerses(page, version),
-      getTranslation(page),
+      verseRepository.getVerses(page),
+      translationRepository.getSelectedEditions(page),
       bookmarkRepository.getBookmarksWithKeys(keys),
-    ) { verses, translations, bookmarks ->
+      playbackConnection.playingAyahFlow,
+    ) { verses, translations, bookmarks, playingVerse ->
       if (suras == null) {
         suras = surahRepository.getSurahsInPage(page)
       }
@@ -69,35 +57,30 @@ class GetTranslationPage(
       val data = mutableListOf<TranslationPage.Row>()
 
       verses.forEachIndexed { index, verse ->
-        val verseKey = verse.key
+        val verseKey = VerseKey(verse.sura, verse.ayah)
         if (verseKey.aya == 1) {
           val surah = suras!!.find { it.number == verseKey.sura }!!
           data.add(TranslationPage.Surah(surah.number, surah.nameSimple))
         }
 
-        if (index > 0 && verse.key.aya != 1) data.add(
-          TranslationPage.Divider("d$index")
-        )
+        if (index > 0 && verse.ayah != 1) data.add(TranslationPage.Divider("d$index"))
 
+        val isPlaying = verseKey == playingVerse
 
         val highLighted = verseKey.aya == selectedVerse?.aya && verseKey.sura == selectedVerse.aya
 
-        val isBookmarked =
-          bookmarks.any { verseKey.aya == it.key.aya && it.key.sura == verseKey.sura }
+        val isBookmarked = bookmarks.any {
+          verseKey.aya == it.key.aya && it.key.sura == verseKey.sura
+        }
 
         data.add(
           TranslationPage.Verse(
-            words = verse.words.map {
-              it.toUiState(
-                playing = false,
-                selected = false,
-              )
-            },
-            audioState = AudioState.PAUSED,
+            isPlaying = isPlaying,
             isBookmarked = isBookmarked,
             highLighted = highLighted,
-            verseKey = verseKey,
-            id = verse.id
+            ayah = verse.ayah,
+            sura = verse.sura,
+            text = verse.text
           )
         )
 
@@ -106,11 +89,13 @@ class GetTranslationPage(
           if (translation != null) {
             data.add(
               TranslationPage.Translation(
-                translation = translation,
-                audioState = AudioState.PAUSED,
+                isPlaying = isPlaying,
                 isBookmarked = isBookmarked,
                 highLighted = highLighted,
                 authorName = edition.authorName,
+                text = translation.text,
+                sura = translation.sura,
+                ayah = translation.ayah
               )
             )
           }
@@ -119,7 +104,7 @@ class GetTranslationPage(
         data.add(
           TranslationPage.AyahToolbar(
             verseKey = verseKey,
-            audioState = AudioState.PAUSED,
+            isPlaying = isPlaying,
             isBookmarked = isBookmarked,
             highLighted = highLighted
           )
@@ -134,6 +119,6 @@ class GetTranslationPage(
         scrollIndex = -1,
         fontFamily = FontFamily(Font(UriProvider.getFontFile(context, page, version)))
       )
-    }
+    }.flowOn(Dispatchers.IO)
   }
 }

@@ -31,7 +31,7 @@ dependencies {
     implementation "androidx.datastore:datastore-core:$datastore_version"
     api "androidx.datastore:datastore-preferences:$datastore_version"
 
-    api 'com.google.protobuf:protobuf-kotlin-lite:3.21.12'
+    api 'com.google.protobuf:protobuf-kotlin-lite:3.22.3'
 
     implementation "io.insert-koin:koin-android:$koin_android_version"
 }

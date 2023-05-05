@@ -25,7 +25,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.scale
-import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalDensity
@@ -38,9 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import arg.quran.models.audio.Qari
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
-import com.bumptech.glide.integration.compose.GlideLazyListPreloader
+import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.StateFlow
 import org.alquran.R
 import org.alquran.audio.models.AudioState
@@ -48,7 +45,7 @@ import org.alquran.audio.models.NowPlaying
 import org.alquran.audio.models.progress
 import org.alquran.ui.components.BottomSheetDragHandler
 import org.alquran.ui.components.LineSeparator
-import org.alquran.utils.lerp
+import org.quran.ui.utils.lerp
 import kotlin.math.roundToLong
 
 
@@ -146,8 +143,6 @@ internal fun ExpandedAudioSheet(
   }
 }
 
-
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun SurahRecitationItem(
   modifier: Modifier = Modifier,
@@ -156,7 +151,8 @@ private fun SurahRecitationItem(
 ) {
 
   val backgroundColor by animateColorAsState(
-    if (uiState.isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant
+    if (uiState.isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceVariant,
+    label = "backgroundColor"
   )
 
   Surface(
@@ -176,12 +172,14 @@ private fun SurahRecitationItem(
           .background(MaterialTheme.colorScheme.secondaryContainer),
       ) {
 
-        GlideImage(
+        AsyncImage(
           model = uiState.artWork,
           contentDescription = uiState.reciterName,
           modifier = Modifier.fillMaxSize(),
-          contentScale = ContentScale.Crop
-        ) { it.placeholder(R.drawable.ic_reciter).error(R.drawable.ic_reciter) }
+          contentScale = ContentScale.Crop,
+          placeholder = painterResource(id = R.drawable.ic_reciter),
+          error = painterResource(id = R.drawable.ic_reciter),
+        )
 
         Text(
           text = uiState.sura.toString(),
@@ -234,7 +232,7 @@ internal fun ExpandedContent(
     ) {
       IconButton(onClick = onCollapse) {
         Icon(
-          painterResource(id = R.drawable.ic_arrow_down),
+          painterResource(id = org.quran.ui.R.drawable.ic_arrow_down),
           stringResource(id = R.string.more)
         )
       }
@@ -316,7 +314,7 @@ private fun CustomSlider(
     mutableStateOf(playing?.progress ?: 0f)
   }
 
-  org.alquran.ui.components.CustomSlider(
+  org.quran.ui.components.CustomSlider(
     value = position,
     onValueChange = setPosition,
     onValueChangeFinished = {
@@ -328,7 +326,6 @@ private fun CustomSlider(
   )
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun ReciterList(
   uiState: AudioUiState,
@@ -358,20 +355,9 @@ private fun ReciterList(
         ) { showReciter(qari) }
       }
     }
-
-    GlideLazyListPreloader(
-      state = state,
-      data = uiState.qaris,
-      size = Size(50f, 50f),
-      numberOfItemsToPreload = 15,
-      fixedVisibleItemCount = 2,
-    ) { item, requestBuilder ->
-      requestBuilder.load(item.image)
-    }
   }
 }
 
-@OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 private fun ReciterItem(
   modifier: Modifier = Modifier,
@@ -398,14 +384,14 @@ private fun ReciterItem(
           .selectable(selected, onClick = onClick)
       }
 
-      GlideImage(
+      AsyncImage(
         model = qari.image,
-        contentDescription = stringResource(id = qari.nameId),
+        contentDescription = stringResource(id = qari.nameResource),
         contentScale = ContentScale.Crop,
         modifier = imageModifier,
-      ) {
-        it.placeholder(R.drawable.ic_reciter).error(R.drawable.ic_reciter)
-      }
+        placeholder = painterResource(id = R.drawable.ic_reciter),
+        error = painterResource(id = R.drawable.ic_reciter),
+      )
       IconButton(
         onClick = onOptionClick,
         modifier = Modifier.align(Alignment.TopEnd)
@@ -419,7 +405,7 @@ private fun ReciterItem(
     }
 
     Text(
-      stringResource(id = qari.nameId),
+      stringResource(id = qari.nameResource),
       modifier = Modifier
         .align(Alignment.CenterHorizontally)
         .padding(8.dp),

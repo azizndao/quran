@@ -35,8 +35,9 @@ fun NavGraphBuilder.audioNavGraph(navigate: (String) -> Unit, popBackStack: () -
     ROUTE_RECITER_RECITATIONS,
     listOf(navArgument(PARAM_RECITER_ID) { type = NavType.StringType }),
   ) {
-    val viewModel =
-      getViewModel<RecitationsViewModel> { parametersOf(recitationsArgs(it.savedStateHandle)) }
+    val viewModel = getViewModel<RecitationsViewModel> {
+      parametersOf(recitationsArgs(it.savedStateHandle))
+    }
 
     RecitationsScreen(
       uiState = viewModel.uiState,

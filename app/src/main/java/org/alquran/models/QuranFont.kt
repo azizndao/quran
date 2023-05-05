@@ -3,7 +3,7 @@ package org.alquran.models
 import androidx.annotation.StringRes
 import androidx.compose.ui.text.font.FontFamily
 import org.alquran.R
-import org.alquran.ui.theme.QuranFontFamilies
+import org.quran.ui.theme.QuranFontFamilies
 
 
 enum class QuranFont(val fontFamily: FontFamily, @StringRes val nameId: Int) {

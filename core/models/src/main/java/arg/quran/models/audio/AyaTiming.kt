@@ -6,7 +6,7 @@ import androidx.room.PrimaryKey
 import arg.quran.models.quran.VerseKey
 import kotlinx.serialization.SerialName
 
-@Entity(tableName = "timings")
+@Entity(tableName = "timings", )
 data class AyaTiming(
   @PrimaryKey(autoGenerate = true) val id: Long = 0,
 

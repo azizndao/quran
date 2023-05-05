@@ -19,61 +19,43 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
-import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.core.text.HtmlCompat.fromHtml
-import arg.quran.models.audio.WordSegment
-import arg.quran.models.quran.CharType
 import arg.quran.models.quran.VerseKey
-import arg.quran.models.quran.VerseTranslation
 import org.alquran.R
 import org.alquran.ui.theme.quran
 import org.alquran.ui.theme.translation
 import org.alquran.ui.uistate.TranslationPage
-import org.alquran.utils.extensions.toAnnotatedString
+import org.quran.ui.utils.extensions.toAnnotatedString
 
 @Composable
 fun VerseItemView(
   modifier: Modifier = Modifier,
   verse: TranslationPage.Verse,
-  playingWord: WordSegment?,
 ) {
-  val background by getPlayingBackground(playingWord != null)
-  val colorScheme = MaterialTheme.colorScheme
+  val background by getPlayingBackground(verse.isPlaying)
 
-  val text = remember(playingWord) {
-    buildAnnotatedString {
-      for (word in verse.words) {
-        val color =
-          if (playingWord != null && playingWord.position == word.position) colorScheme.primary else colorScheme.onSurface
-        withStyle(SpanStyle(color = color)) { append(word.text) }
-        if (word.charType != CharType.End) append(" ")
-      }
-    }
-  }
-
-  Text(text = text,
+  Text(
+    text = verse.text,
     style = MaterialTheme.typography.quran,
     modifier = modifier
       .drawBehind { drawRect(background) }
       .padding(start = 24.dp, top = 24.dp, end = 24.dp)
-      .fillMaxWidth())
+      .fillMaxWidth()
+  )
 }
 
 @Composable
 fun TranslationItemView(
   modifier: Modifier = Modifier,
-  authorName: String,
-  translation: VerseTranslation,
-  isPlaying: Boolean,
+  translation: TranslationPage.Translation,
 ) {
   val colorScheme = MaterialTheme.colorScheme
 
-  val background by getPlayingBackground(isPlaying)
+  val background by getPlayingBackground(translation.isPlaying)
 
   val style = MaterialTheme.typography.translation
 
@@ -90,7 +72,7 @@ fun TranslationItemView(
     .padding(top = 18.dp, start = 24.dp, end = 24.dp),
     verticalArrangement = Arrangement.spacedBy(8.dp)) {
     Text(
-      text = "— $authorName",
+      text = "— ${translation.authorName}",
       style = MaterialTheme.typography.labelSmall.copy(
         fontWeight = FontWeight.Normal, color = LocalContentColor.current.copy(alpha = 0.7f)
       ),
@@ -118,6 +100,7 @@ fun VerseToolbarView(
     LocalContentColor provides MaterialTheme.colorScheme.secondary
   ) {
     val background by getPlayingBackground(isPlaying)
+
     Row(modifier = modifier
       .fillMaxWidth()
       .drawBehind { drawRect(background) }
@@ -169,6 +152,7 @@ private fun getPlayingBackground(
     isPlaying -> colorScheme.surfaceColorAtElevation(2.dp)
     else -> colorScheme.surface
   },
+  label = "getPlayingBackground",
 )
 
 @OptIn(ExperimentalAnimationGraphicsApi::class)
@@ -214,7 +198,11 @@ private fun BookmarkButton(
   }
 
   IconButton(modifier = modifier, onClick = onClick, interactionSource = interactionSource) {
-    val drawableId = if (isBookmarked) R.drawable.ic_baseline_bookmark else R.drawable.ic_bookmark
+    val drawableId = when {
+      isBookmarked -> R.drawable.bookmark_added
+      else -> R.drawable.bookmark_add
+    }
+
     Icon(
       painterResource(id = drawableId),
       contentDescription = null,

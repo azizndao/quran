@@ -6,7 +6,15 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.*
+import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.TabRowDefaults
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
+import androidx.compose.material3.TopAppBarDefaults
+import androidx.compose.material3.TopAppBarScrollBehavior
+import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
@@ -18,7 +26,6 @@ import androidx.compose.ui.unit.dp
 import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.launch
 import org.alquran.R
-import org.alquran.ui.components.MuslimsTopAppBarDefaults
 import org.alquran.ui.components.TabBar
 import org.alquran.ui.components.TabItem
 import org.alquran.ui.components.pagerTabIndicatorOffset
@@ -26,6 +33,8 @@ import org.alquran.ui.screen.home.bookmarks.ListBookmark
 import org.alquran.ui.screen.home.juzs.ListJuzs
 import org.alquran.ui.screen.home.surahs.SurahList
 import org.alquran.ui.screen.pager.directionToQuranPage
+import org.alquran.ui.screen.search.directionToQuranSearch
+import org.quran.ui.components.MuslimsTopAppBarDefaults
 
 
 val tabItems = listOf(R.string.surats, R.string.juzs, R.string.my_quran)
@@ -46,7 +55,7 @@ internal fun HomeScreen(
     AppBar(
       scrollBehavior = scrollBehavior,
       pagerState = pagerState,
-      search = { },
+      search = { navigate(directionToQuranSearch()) },
       navigateToMore = navigateToMore,
     )
     HorizontalPager(state = pagerState, pageCount = tabItems.size) { position ->

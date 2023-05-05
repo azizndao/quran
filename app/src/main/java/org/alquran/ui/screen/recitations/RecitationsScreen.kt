@@ -31,12 +31,11 @@ import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.Download
 import arg.quran.models.Sura
 import arg.quran.models.audio.Qari
-import com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi
-import com.bumptech.glide.integration.compose.GlideImage
+import coil.compose.AsyncImage
 import org.alquran.R
-import org.alquran.ui.components.BackButton
-import org.alquran.ui.theme.QuranTheme
 import org.alquran.utils.QariPreviewParameterProvider
+import org.quran.ui.components.BackButton
+import org.quran.ui.theme.QuranTheme
 
 @Composable
 fun RecitationsScreen(
@@ -148,7 +147,6 @@ fun ControlBarPreview() {
   }
 }
 
-@kotlin.OptIn(ExperimentalGlideComposeApi::class)
 @Composable
 fun ReciterBigCard(modifier: Modifier = Modifier, qari: Qari?) {
 
@@ -159,17 +157,19 @@ fun ReciterBigCard(modifier: Modifier = Modifier, qari: Qari?) {
     verticalAlignment = Alignment.CenterVertically,
   ) {
 
-    val qariName = qari?.nameId?.let { stringResource(id = it) }
-    GlideImage(
+    val qariName = qari?.nameResource?.let { stringResource(id = it) }
+    AsyncImage(
       model = qari?.image,
       contentScale = ContentScale.Crop,
       alignment = Alignment.TopStart,
       contentDescription = qariName,
+      placeholder = painterResource(id = R.drawable.ic_reciter),
+      error = painterResource(id = R.drawable.ic_reciter),
       modifier = Modifier
         .size(48.dp)
         .clip(CircleShape)
         .background(MaterialTheme.colorScheme.secondaryContainer)
-    ) { it.placeholder(R.drawable.ic_reciter).error(R.drawable.ic_reciter) }
+    )
 
     Text(
       text = qariName ?: "",
@@ -203,7 +203,8 @@ private fun SurahRecitationItem(
 ) {
 
   val backgroundColor by animateColorAsState(
-    if (recitation.isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface
+    if (recitation.isPlaying) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surface,
+    label = "backgroundColor"
   )
 
   Surface(

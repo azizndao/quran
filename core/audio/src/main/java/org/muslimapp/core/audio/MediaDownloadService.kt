@@ -1,4 +1,4 @@
-package org.alquran.audio
+package org.muslimapp.core.audio
 
 import android.annotation.SuppressLint
 import android.app.Notification

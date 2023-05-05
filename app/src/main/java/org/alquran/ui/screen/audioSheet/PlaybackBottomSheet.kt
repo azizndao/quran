@@ -17,7 +17,7 @@ import androidx.compose.ui.zIndex
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import arg.quran.models.audio.Qari
 import kotlinx.coroutines.launch
-import org.alquran.utils.lerp
+import org.quran.ui.utils.lerp
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -112,9 +112,8 @@ fun PlaybackBottomSheet(
               .zIndex(10f)
           )
 
-          CollapsedBottomBar(
+          AudioBottomBar(
             uiState = uiState,
-            onAudioEvent = viewModel::onAudioEvent,
             modifier = Modifier
               .zIndex(if (fraction < 1f) 11f else 0f)
               .graphicsLayer { alpha = collapseAlpha },
