@@ -1,42 +1,47 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'kotlinx-serialization'
-    id 'com.google.devtools.ksp' version "$kotlin_ksp_version"
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
+  id 'kotlinx-serialization'
+  alias libs.plugins.ksp
+}
+
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(11))
+  }
 }
 
 android {
-    namespace 'org.alquran.verses'
-    compileSdk 33
+  namespace 'org.alquran.verses'
+  compileSdk 33
 
-    defaultConfig {
-        minSdk 24
-        targetSdk 33
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-    }
+  defaultConfig {
+    minSdk 24
+    targetSdk 33
 
-    ksp {
-        arg("room.schemaLocation", "$projectDir/schemas")
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    consumerProguardFiles "consumer-rules.pro"
+  }
+
+  ksp {
+    arg("room.schemaLocation", "$projectDir/schemas")
+  }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
+  kotlinOptions {
+    jvmTarget = '11'
+  }
 }
 
 dependencies {
-    implementation(project(":core:common"))
-    implementation(project(":core:models"))
-    implementation(project(":core:network"))
-    implementation(project(":core:datastore"))
+  implementation(project(":core:common"))
+  implementation(project(":core:models"))
+  implementation(project(":core:network"))
+  implementation(project(":core:datastore"))
 
-    implementation "io.insert-koin:koin-android:$koin_android_version"
-
-    implementation "androidx.room:room-ktx:$room_version"
-    ksp "androidx.room:room-compiler:$room_version"
+  implementation libs.room.ktx
+  ksp libs.room.compiler
 }

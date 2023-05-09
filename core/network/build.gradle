@@ -1,40 +1,45 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'kotlinx-serialization'
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
 }
 
 android {
-    namespace 'org.quran.network'
-    compileSdk 33
+  namespace 'org.quran.network'
+  compileSdk 33
 
-    defaultConfig {
-        minSdk 24
-        targetSdk 33
+  java {
+    toolchain {
+      languageVersion.set(JavaLanguageVersion.of(11))
+    }
+  }
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+  defaultConfig {
+    minSdk 24
+
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    consumerProguardFiles "consumer-rules.pro"
+  }
+
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
+
+  kotlinOptions {
+    jvmTarget = '11'
+  }
 }
 
 dependencies {
-    implementation project(":core:common")
-    implementation project(":core:models")
+  implementation libs.timber
 
-    api 'io.ktor:ktor-client-core:2.3.0'
-    implementation 'io.ktor:ktor-client-okhttp:2.3.0'
-    implementation 'io.ktor:ktor-client-content-negotiation:2.3.0'
-    api 'io.ktor:ktor-serialization-kotlinx-json:2.3.0'
+  api libs.kotlinx.serialization
 
-    implementation "io.insert-koin:koin-android:$koin_android_version"
+  api libs.koin.android
+  api libs.koin.workmanager
 
-    // implementation 'com.squareup.retrofit2:retrofit:2.9.0'
-    // implementation("com.jakewharton.retrofit:retrofit2-kotlinx-serialization-converter:0.8.0")
+  api libs.androidx.work
+
+  api libs.retrofit
+  api libs.retrofit.kotlinx
 }

@@ -10,7 +10,6 @@ import androidx.navigation.NavType
 import androidx.navigation.compose.composable
 import androidx.navigation.navArgument
 import arg.quran.models.quran.VerseKey
-import org.alquran.ui.screen.audioSheet.PlaybackSheetViewModel
 import org.alquran.ui.theme.LocalQuranTextStyle
 import org.alquran.ui.theme.LocalSurahTextStyle
 import org.alquran.ui.theme.LocalTranslationTextStyle
@@ -32,9 +31,7 @@ fun quranPagerDestinationArgs(savedStateHandle: SavedStateHandle): QuranPagerArg
   )
 }
 
-
 internal fun NavGraphBuilder.quranPagerDestination(
-  audioViewModel: PlaybackSheetViewModel,
   navigate: (String) -> Unit,
   popBackStack: () -> Unit,
 ) {
@@ -47,7 +44,7 @@ internal fun NavGraphBuilder.quranPagerDestination(
   ) {
     val viewModel = getViewModel<QuranPagerViewModel>()
 
-    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val uiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
     CompositionLocalProvider(
       LocalQuranTextStyle provides LocalQuranTextStyle.current.copy(fontSize = 28.sp),
@@ -56,10 +53,10 @@ internal fun NavGraphBuilder.quranPagerDestination(
     ) {
       QuranPagerScreen(
         uiState = uiState,
+        audioStateFlow = viewModel.nowPlayingFlow,
         popBackStack = popBackStack,
         navigate = navigate,
         pageProvider = { mode, page, version -> viewModel.pageFactory(mode, page, version) },
-        audioStateFlow = audioViewModel.audioStateFlow
       )
     }
   }

@@ -2,42 +2,57 @@ package org.muslimapp.core.audio
 
 import android.content.ComponentName
 import android.content.Context
+import androidx.lifecycle.DefaultLifecycleObserver
+import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.MediaItem
-import androidx.media3.common.MediaMetadata
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
 import androidx.media3.session.SessionToken
 import arg.quran.models.audio.Qari
 import arg.quran.models.quran.VerseKey
 import com.google.common.util.concurrent.ListenableFuture
-import kotlinx.coroutines.*
-import kotlinx.coroutines.flow.*
-import org.alquran.audio.models.AudioState
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.cancel
+import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.combineTransform
+import kotlinx.coroutines.flow.distinctUntilChanged
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.transform
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import org.alquran.audio.models.NowPlaying
 import org.muslimapp.core.audio.models.MediaId
 import org.muslimapp.core.audio.repositories.RecitationRepository
 import org.muslimapp.core.audio.repositories.TimingRepository
-import org.muslimapp.core.audio.utils.aya
+import org.muslimapp.core.audio.utils.qari
+import org.quram.common.core.QuranInfo
 import org.quram.common.utils.QuranDisplayData
 import org.quran.datastore.repositories.AudioPreferencesRepository
 import java.util.concurrent.Executors
+import kotlin.math.abs
 
 class PlaybackConnection(
   private val context: Context,
   private val recitationRepository: RecitationRepository,
   private val audioSettings: AudioPreferencesRepository,
   private val timingRepository: TimingRepository,
-  private val displayData: QuranDisplayData,
-) {
+  private val quranInfo: QuranInfo,
+  private val quranDisplayData: QuranDisplayData,
+) : DefaultLifecycleObserver {
 
   private val job = SupervisorJob()
   private val coroutineScope = CoroutineScope(Dispatchers.Main + job)
 
   private val _isConnected = MutableStateFlow(false)
-  val isConnected = _isConnected.asStateFlow()
-
-  private val _playingState = MutableStateFlow(AudioState.PAUSED)
-  val playingState = _playingState.asStateFlow()
+//  val isConnected = _isConnected.asStateFlow()
 
   private val _repeatMode = MutableStateFlow(Player.REPEAT_MODE_OFF)
   val repeatMode = _repeatMode.asStateFlow()
@@ -45,28 +60,74 @@ class PlaybackConnection(
   private val _currentMediaItem = MutableStateFlow<MediaItem?>(null)
   val currentMediaItem: StateFlow<MediaItem?> get() = _currentMediaItem
 
-  val playingAyahFlow = MutableStateFlow<VerseKey?>(null)
+  private var gaplessSura = currentMediaItem
+    .map { it?.let { MediaId.fromString(it.mediaId) } }
+    .distinctUntilChanged()
+    .stateIn(coroutineScope, SharingStarted.WhileSubscribed(), null)
 
-  val nowPlaying = playingAyahFlow.combineTransform(_playingState) { verseKey, state ->
-    if (verseKey == null) return@combineTransform emit(null)
+  private var gaplessSuraData =
+    gaplessSura.map { it?.let { timingRepository.getGaplessData(it.reciter, it.sura) } }
+
+
+  val playingAyahFlow = gaplessSuraData.transform { data ->
+    data ?: return@transform emit(null)
+    while (true) {
+      val (_, sura, ayah) = gaplessSura.value ?: return@transform emit(null)
+
+      var updatedAyah = ayah
+      val pos = withContext(Dispatchers.Main) { mediaController.currentPosition }
+      var ayahTime = data[ayah]
+      val maxAyahs = quranInfo.getNumberOfAyahs(sura)
+      var iterAyah = ayah
+      if (ayahTime > pos) {
+        while (--iterAyah > 0) {
+          ayahTime = data[iterAyah]
+          if (ayahTime <= pos) {
+            updatedAyah = iterAyah
+            break
+          } else {
+            updatedAyah--
+          }
+        }
+      } else {
+        while (++iterAyah <= maxAyahs) {
+          ayahTime = data[iterAyah]
+          if (ayahTime > pos) {
+            updatedAyah = iterAyah - 1
+            break
+          } else {
+            updatedAyah++
+          }
+        }
+      }
+      if (updatedAyah != ayah) emit(VerseKey(sura, updatedAyah))
+      ayahTime = if (updatedAyah < quranInfo.getNumberOfAyahs(sura) - 1) {
+        data[updatedAyah + 1]
+      } else {
+        0
+      }
+      delay(abs(pos - ayahTime))
+    }
+  }.distinctUntilChanged()
+    .stateIn(coroutineScope, SharingStarted.Lazily, null)
+
+
+  val nowPlaying = playingAyahFlow.combineTransform(currentMediaItem) { key, mediaItem ->
+    if (key == null || mediaItem == null) return@combineTransform emit(null)
 
     while (true) {
-      val playlistMetadata = mediaController.playlistMetadata
-
-//      val mediaMetadata = currentMediaItem.mediaMetadata
-//      val mediaId = MediaId.fromString(currentMediaItem.mediaId)
-
       val playing = NowPlaying(
-        title = playlistMetadata.title.toString(),
-        reciterName = playlistMetadata.subtitle.toString(),
-        sura = verseKey.sura,
-        ayah = verseKey.aya,
-        reciter = "playlistMetadata.reciter",
-        artWork = playlistMetadata.artworkUri,
+        title = quranDisplayData.getSuraAyahString(key.sura, key.aya),
+        reciterName = mediaItem.mediaMetadata.artist.toString(),
+        sura = key.sura,
+        ayah = key.aya,
+        reciter = mediaItem.mediaMetadata.qari ?: "",
+        artWork = mediaItem.mediaMetadata.artworkUri,
         position = mediaController.currentPosition,
         bufferedPosition = mediaController.bufferedPosition,
         duration = mediaController.duration,
-        state = state,
+        isPlaying = withContext(Dispatchers.Main) { mediaController.isPlaying },
+        isLoading = withContext(Dispatchers.Main) { mediaController.isLoading }
       )
       emit(playing)
       delay(150)
@@ -77,7 +138,8 @@ class PlaybackConnection(
 
   private lateinit var mediaController: MediaController
 
-  fun connect() {
+
+  override fun onStart(owner: LifecycleOwner) {
     mediaControllerFuture = MediaController.Builder(
       context, SessionToken(context, ComponentName(context, PlaybackService::class.java))
     ).buildAsync()
@@ -90,26 +152,16 @@ class PlaybackConnection(
     }, Executors.newSingleThreadExecutor())
   }
 
-  fun release() {
+  override fun onStop(owner: LifecycleOwner) {
     coroutineScope.cancel()
     mediaControllerFuture?.let { MediaController.releaseFuture(it) }
   }
 
   inner class PlayerListener : Player.Listener {
 
-    override fun onPlaylistMetadataChanged(mediaMetadata: MediaMetadata) {
-      playingAyahFlow.value = mediaMetadata.aya
-    }
-
     override fun onEvents(player: Player, events: Player.Events) {
       if (events.contains(Player.EVENT_REPEAT_MODE_CHANGED)) {
         _repeatMode.value = player.repeatMode
-      }
-
-      _playingState.value = when {
-        player.isPlaying -> AudioState.PLAYING
-        mediaController.isLoading -> AudioState.LOADING
-        else -> AudioState.PAUSED
       }
     }
 
@@ -118,7 +170,11 @@ class PlaybackConnection(
     }
   }
 
-  fun onPlaySurah(sura: Int, ayah: Int) {
+  fun onPlaySurah(key: VerseKey) = onPlaySurah(key.sura, key.aya)
+
+  fun repeatAyah(key: VerseKey) = onPlaySurah(key.sura, key.aya)
+
+  private fun onPlaySurah(sura: Int, ayah: Int) {
     coroutineScope.launch {
       val reciter = audioSettings.getCurrentReciter().first()
       onPlaySurah(sura, reciter, ayah)
@@ -192,6 +248,4 @@ class PlaybackConnection(
       }
     }
   }
-
-  fun seekToPosition(position: Long) = coroutineScope.launch { mediaController.seekTo(position) }
 }

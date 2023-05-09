@@ -43,7 +43,7 @@ fun SurahHeader(
         contentDescription = null,
         modifier = Modifier
           .fillMaxWidth()
-          .height(40.dp)
+          .height(48.dp)
           .padding(top = 8.dp),
         contentScale = ContentScale.Inside,
         colorFilter = ColorFilter.tint(LocalContentColor.current)

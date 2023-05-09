@@ -188,4 +188,12 @@
     <string name="start_downloading">Start downloading</string>
     <string name="popular_sura">Popular chapters</string>
     <string name="remove_bookmark">Remove bookmark</string>
+    <string name="play_the_word">Play the word</string>
+    <string name="copy">Copy</string>
+    <string name="advanced_copy">Advanced copy</string>
+    <string name="share_text">Share text</string>
+    <string name="share_image">Share image</string>
+    <string name="tafsir">Tafsir</string>
+    <string name="select_at_least_one_translation">Select at least one translation</string>
+    <string name="selected_translations">Selected translations</string>
 </resources>

@@ -4,18 +4,20 @@ import android.content.Context
 import android.database.Cursor
 import android.database.SQLException
 import android.util.SparseIntArray
+import androidx.work.WorkManager
+import androidx.work.await
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import org.muslimapp.core.audio.databases.SuraTimingDatabaseHandler
 import org.muslimapp.core.audio.databases.SuraTimingDatabaseHandler.Companion.getDatabaseHandler
 import org.quram.common.source.MadaniPageProvider
-import org.quran.network.audio.AudioApiService
+import org.quran.network.workers.DownloadFileWorker
+import org.quran.network.workers.ExtractArchiveWorker
 import timber.log.Timber
 import java.io.File
 
 class TimingRepository(
   private val context: Context,
-  private val audioApiService: AudioApiService,
   private val pageProvider: MadaniPageProvider,
 ) {
 
@@ -32,8 +34,25 @@ class TimingRepository(
   private suspend fun getOrDownloadDatabaseHandler(slug: String): SuraTimingDatabaseHandler {
     val databaseBaseUrl = pageProvider.getDatabaseDirectoryName()
     val dbFile = File("$databaseBaseUrl/$slug.db")
-    if (!dbFile.exists()) audioApiService.getTimingsDatabase(slug)
+    if (!dbFile.exists()) {
+      downloadDatabase(slug)
+    }
     return getDatabaseHandler(dbFile.path)
+  }
+
+  private suspend fun downloadDatabase(slug: String) {
+    val workManager = WorkManager.getInstance(context)
+    val baseUrl = pageProvider.getAudioDatabasesBaseUrl()
+    val desDirectory = File(pageProvider.getDatabaseDirectoryName())
+    if (!desDirectory.exists()) desDirectory.mkdirs()
+    val url = "$baseUrl$slug.zip"
+    val zipFile = File(desDirectory, "$slug.zip")
+    zipFile.deleteOnExit()
+    val downloadWork = DownloadFileWorker.create(url, zipFile.path)
+    val extractArchiveWorker = ExtractArchiveWorker.create(zipFile.path, desDirectory.path)
+    workManager.beginWith(downloadWork)
+      .then(extractArchiveWorker)
+      .enqueue().result.await()
   }
 
   suspend fun getGaplessData(slug: String, sura: Int) = withContext(Dispatchers.IO) {

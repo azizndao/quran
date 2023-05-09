@@ -47,7 +47,7 @@ val PlaybackModule = module {
     )
   }
 
-  single { StandaloneDatabaseProvider(get()) } bind DatabaseProvider::class
+  singleOf(::StandaloneDatabaseProvider) bind DatabaseProvider::class
 
   single {
     val downloadContentDirectory = File(

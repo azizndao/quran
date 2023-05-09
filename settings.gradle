@@ -5,6 +5,7 @@ pluginManagement {
         gradlePluginPortal()
     }
 }
+
 dependencyResolutionManagement {
     repositoriesMode.set(RepositoriesMode.FAIL_ON_PROJECT_REPOS)
     repositories {
@@ -21,10 +22,7 @@ include ':core:translation'
 include ':core:network'
 include ':core:common'
 include ':core:verses'
-include ':domain:quran'
 include ':core:bookmarks'
 include ':core:models'
-include ':core:hadeeths'
-include ':feature:hadeeths'
 include ':core:ui'
 include ':feature:quran:pager'

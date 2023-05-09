@@ -7,41 +7,38 @@ import arg.quran.models.quran.Verse
 import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.catch
-import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.flatMapMerge
-import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
-import org.quram.common.core.QuranInfo
 import org.quran.datastore.LanguageDirection
 import org.quran.datastore.LocaleTranslation
 import org.quran.datastore.localeTranslation
 import org.quran.datastore.repositories.QuranPreferencesRepository
-import org.quran.network.translation.TranslationApiService
-import org.quran.network.translation.models.fallbackSlug
-import org.quran.translation.databases.QuranTranslationsDatabase.Companion.getTranslationDatabase
-import org.quran.translation.models.TranslatedEdition
+import org.quran.translation.api.TranslationApiService
+import org.quran.translation.api.models.fallbackSlug
+import org.quran.translation.local.QuranTranslationsDatabase.Companion.getTranslationDatabase
+import org.quran.translation.local.models.TranslatedEdition
 import org.quran.translation.workers.DownloadTranslationWorker
-import timber.log.Timber
 
 internal class TranslationRepositoryImpl(
-  private val translationApiService: TranslationApiService,
   private val context: Context,
+  private val translationApiService: TranslationApiService,
   private val quranPreferences: QuranPreferencesRepository,
-  private val quranInfo: QuranInfo,
 ) : TranslationRepository {
+  override fun getAllVerses(locale: LocaleTranslation): Flow<List<Verse>> {
+    return context.getTranslationDatabase(locale.slug).verses.getAyahsFlow()
+  }
 
-  private val _caches = quranPreferences.getSelectedTranslations().flatMapMerge { translations ->
-    if (translations.isEmpty()) return@flatMapMerge flowOf(emptyList())
-    val flowList = translations.sortedBy { it.order }.map { locale ->
-      context.getTranslationDatabase(locale.slug).verses.getAyahsFlow()
-        .map { verses -> TranslatedEdition(locale, verses) }
+  override suspend fun search(query: String): List<TranslatedEdition> {
+    val translations = getSelectedTranslations().first()
+    return translations.map { locale ->
+      TranslatedEdition(locale, search(locale, query))
     }
+  }
 
-    combine(flowList) { editions -> editions.filter { it.verses.isNotEmpty() } }
-  }.catch { Timber.e(it) }
+  override suspend fun search(locale: LocaleTranslation, query: String): List<Verse> {
+    return context.getTranslationDatabase(locale.slug).verses.search(query)
+  }
 
   override fun getAvailableTranslations(): Flow<List<LocaleTranslation>> {
     return quranPreferences.getAvailableTranslations().map { translations ->
@@ -55,25 +52,25 @@ internal class TranslationRepositoryImpl(
 
 
   override suspend fun downloadTranslations() {
-    val languages = translationApiService.getAvailableLanguages()
-    val translations = translationApiService
-      .getAvailableTranslations()
-      .mapNotNull { t ->
-        when (val language = languages.find { l -> l.name.lowercase() == t.languageName.lowercase() }) {
-          null -> null
-          else -> localeTranslation {
-            id = t.id
-            name = t.name
-            authorName = t.authorName
-            languageCode = language.isoCode
-            slug = t.slug?.ifEmpty { t.fallbackSlug } ?: t.fallbackSlug
-            direction = when (language.direction) {
-              Direction.LTR -> LanguageDirection.LTR
-              else -> LanguageDirection.RTL
-            }
+    val languages = translationApiService.getAvailableLanguages().languages
+    val response = translationApiService.getAvailableTranslations()
+    val translations = response.translations.mapNotNull { translation ->
+      when (val language =
+        languages.find { l -> l.name.lowercase() == translation.languageName.lowercase() }) {
+        null -> null
+        else -> localeTranslation {
+          id = translation.id
+          name = translation.name
+          authorName = translation.authorName
+          languageCode = language.isoCode
+          slug = translation.slug?.ifEmpty { translation.fallbackSlug } ?: translation.fallbackSlug
+          direction = when (language.direction) {
+            Direction.LTR -> LanguageDirection.LTR
+            else -> LanguageDirection.RTL
           }
         }
       }
+    }
     quranPreferences.setAvailableTranslations(translations)
   }
 
@@ -87,50 +84,23 @@ internal class TranslationRepositoryImpl(
     return context.getTranslationDatabase(slug).verses.getAyah(key.sura, key.aya)
   }
 
-  override suspend fun downloadQuranTranslation(translation: LocaleTranslation): Operation {
-    return DownloadTranslationWorker.enqueue(context, translation.slug)
+  override suspend fun downloadQuranTranslation(slug: String): Operation {
+//    val translation = getTranslation(slug) ?: return
+//    val response = translationApiService.getVerses(translation.id)
+//    val apiTranslations = response.translations.map { verse ->
+//      TranslatedVerse(sura = verse.sura, ayah = verse.ayah, text = verse.text)
+//    }
+//
+//    context.getTranslationDatabase(slug).verses.insertAyahs(apiTranslations)
+//    quranPreferences.downloadTranslation(slug)
+    return DownloadTranslationWorker.enqueue(context, slug)
   }
+
+  override fun getSelectedTranslationSlugs() = quranPreferences.getSelectedTranslationSlugs()
 
   override fun getSelectedTranslations(): Flow<List<LocaleTranslation>> {
     return quranPreferences.getSelectedTranslations()
   }
-
-  override fun getVerses(
-    slug: String,
-    page: Int,
-  ): Flow<TranslatedEdition?> = _caches.map { editions ->
-    val edition = editions.find { it.locale.slug == slug }
-    edition?.copy(verses = edition.verses.filter { true })
-  }
-
-  override fun getSelectedEditions(
-    page: Int,
-  ): Flow<List<TranslatedEdition>> {
-    val range = quranInfo.getVerseRangeForPage(page)
-    return _caches.map { caches ->
-      caches.map { (locale, verses) ->
-        val pageVerses = if (range.startSura == range.endingSura) {
-          verses
-            .filter { verse ->
-              verse.sura == range.endingSura &&
-                verse.ayah >= range.startAyah &&
-                verse.ayah <= range.endingAyah
-            }
-        } else
-          verses.filter { v ->
-            v.sura == range.startSura && v.ayah >= range.startAyah ||
-              v.sura == range.endingSura && v.ayah <= range.endingAyah ||
-              v.sura > range.startSura && v.sura < range.endingSura
-          }.take(range.versesInRange)
-        TranslatedEdition(locale, pageVerses)
-      }
-    }
-  }
-
-  override fun getVerses(
-    edition: LocaleTranslation,
-    page: Int,
-  ): Flow<TranslatedEdition?> = getVerses(edition.slug, page)
 
   override suspend fun getQuranTranslation(
     translation: LocaleTranslation,

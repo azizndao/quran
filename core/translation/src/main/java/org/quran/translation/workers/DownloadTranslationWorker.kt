@@ -1,27 +1,40 @@
 package org.quran.translation.workers
 
 import android.content.Context
-import androidx.work.*
-import kotlinx.serialization.SerialName
+import androidx.work.Constraints
+import androidx.work.CoroutineWorker
+import androidx.work.ExistingWorkPolicy
+import androidx.work.NetworkType
+import androidx.work.OneTimeWorkRequestBuilder
+import androidx.work.Operation
+import androidx.work.WorkManager
+import androidx.work.WorkerParameters
+import androidx.work.workDataOf
+import org.koin.core.component.KoinComponent
+import org.koin.core.component.inject
 import org.quran.datastore.repositories.QuranPreferencesRepository
-import org.quran.network.translation.TranslationApiService
-import org.quran.translation.databases.QuranTranslationsDatabase.Companion.getTranslationDatabase
-import org.quran.translation.models.TranslatedVerse
-import java.util.*
+import org.quran.translation.api.TranslationApiService
+import org.quran.translation.local.QuranTranslationsDatabase.Companion.getTranslationDatabase
+import org.quran.translation.local.models.TranslatedVerse
+import org.quran.translation.repositories.TranslationRepository
+import timber.log.Timber
+import java.io.IOException
 
-internal class DownloadTranslationWorker(
-  private val translationApiService: TranslationApiService,
-  private val quranPreferences: QuranPreferencesRepository,
+class DownloadTranslationWorker(
   context: Context,
   params: WorkerParameters
-) : CoroutineWorker(context, params) {
-  override suspend fun doWork(): Result {
+) : CoroutineWorker(context, params), KoinComponent {
+  private val apiService: TranslationApiService by inject()
+  private val quranPreferences: QuranPreferencesRepository by inject()
+  private val translationRepository: TranslationRepository by inject()
 
+  override suspend fun doWork() = try {
     val slug = inputData.getString(PARAMS_SLUG)!!
 
-    val translation = quranPreferences.getLocaleTranslation(slug)
+    val translation = translationRepository.getTranslation(slug)
 
-    val apiTranslations = translationApiService.getVerses(translation!!.id).map { verse ->
+    val response = apiService.getVerses(translation!!.id)
+    val apiTranslations = response.translations.map { verse ->
       TranslatedVerse(
         sura = verse.sura,
         ayah = verse.ayah,
@@ -30,7 +43,14 @@ internal class DownloadTranslationWorker(
     }
 
     applicationContext.getTranslationDatabase(slug).verses.insertAyahs(apiTranslations)
-    return Result.failure()
+    quranPreferences.downloadTranslation(translation.slug)
+    Result.success()
+  } catch (e: IOException) {
+    Timber.e(e)
+    Result.retry()
+  } catch (e: Exception) {
+    Timber.e(e)
+    Result.failure(workDataOf("error" to e))
   }
 
 

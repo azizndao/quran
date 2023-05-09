@@ -4,6 +4,7 @@ option java_package = "org.quran.datastore";
 option java_multiple_files = true;
 
 message TranslationList {
+  repeated string selectedTranslations = 2;
   repeated LocaleTranslation locales = 1;
 }
 
@@ -15,7 +16,6 @@ message LocaleTranslation {
   string slug = 5;
   LanguageDirection direction = 6;
   bool downloaded = 7;
-  int32 order = 8;
 }
 
 enum LanguageDirection {

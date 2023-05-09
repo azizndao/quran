@@ -9,9 +9,9 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
-import org.alquran.verses.databases.VersesDatabase
-import org.alquran.verses.models.QuranicVerse
-import org.alquran.verses.models.SearchableVerse
+import org.alquran.verses.local.VersesDatabase
+import org.alquran.verses.local.models.QuranicVerse
+import org.alquran.verses.local.models.SearchableVerse
 import org.quram.common.core.QuranInfo
 import timber.log.Timber
 import java.util.zip.ZipInputStream
@@ -79,4 +79,8 @@ class VerseRepository internal constructor(
   }
 
   fun getVersesWordsByPage(page: Int): Flow<List<QuranWord>> = database.words.getAllWords(page)
+
+  suspend fun search(query: String): List<Verse> {
+    return database.searchables.search(query)
+  }
 }

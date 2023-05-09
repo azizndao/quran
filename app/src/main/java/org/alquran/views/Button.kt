@@ -25,7 +25,7 @@ fun DisplayModeButton(
       transitionSpec = {
         fadeIn() + slideIn {
           IntOffset(0, it.height)
-        } with fadeOut() + slideOut { IntOffset(0, -it.height) }
+        } togetherWith fadeOut() + slideOut { IntOffset(0, -it.height) }
       }, label = ""
     ) { target ->
       when (target) {
@@ -34,7 +34,7 @@ fun DisplayModeButton(
           null
         )
 
-        else -> Icon(painterResource(R.drawable.ic_menu_book), null)
+        else -> Icon(painterResource(R.drawable.menu_book), null)
       }
     }
   }

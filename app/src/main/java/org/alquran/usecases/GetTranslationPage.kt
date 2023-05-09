@@ -6,19 +6,30 @@ import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
 import arg.quran.models.Sura
 import arg.quran.models.quran.VerseKey
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.flatMapMerge
+import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.stateIn
 import org.alquran.ui.uistate.QuranPageItem
 import org.alquran.ui.uistate.TranslationPage
 import org.alquran.verses.repository.VerseRepository
 import org.muslimapp.core.audio.PlaybackConnection
+import org.quram.common.core.QuranInfo
 import org.quram.common.repositories.SurahRepository
 import org.quram.common.utils.QuranDisplayData
 import org.quram.common.utils.UriProvider
 import org.quran.bookmarks.repository.BookmarkRepository
+import org.quran.translation.local.models.TranslatedEdition
 import org.quran.translation.repositories.TranslationRepository
+import timber.log.Timber
 
 class GetTranslationPage(
   private val verseRepository: VerseRepository,
@@ -29,7 +40,46 @@ class GetTranslationPage(
   private val context: Context,
   private val translationRepository: TranslationRepository,
   private val playbackConnection: PlaybackConnection,
+  private val quranInfo: QuranInfo,
 ) {
+
+  lateinit var coroutineScope: CoroutineScope
+
+  private val _caches by lazy {
+    translationRepository.getSelectedTranslations().flatMapMerge { translations ->
+      if (translations.isEmpty()) return@flatMapMerge flowOf(emptyList())
+      val flowList = translations.map { locale ->
+        translationRepository.getAllVerses(locale)
+          .map { verses -> TranslatedEdition(locale, verses) }
+      }
+
+      combine(flowList) { editions -> editions.filter { it.verses.isNotEmpty() } }
+    }.catch { Timber.e(it) }
+      .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
+  }
+
+  private fun getSelectedTranslationEditions(
+    page: Int,
+  ): Flow<List<TranslatedEdition>> {
+    val range = quranInfo.getVerseRangeForPage(page)
+    return _caches.map { caches ->
+      caches.map { (locale, verses) ->
+        val pageVerses = if (range.startSura == range.endingSura) {
+          verses.filter { verse ->
+            verse.sura == range.endingSura &&
+              verse.ayah >= range.startAyah &&
+              verse.ayah <= range.endingAyah
+          }
+        } else
+          verses.filter { verse ->
+            verse.sura == range.startSura && verse.ayah >= range.startAyah ||
+              verse.sura == range.endingSura && verse.ayah <= range.endingAyah ||
+              verse.sura > range.startSura && verse.sura < range.endingSura
+          }.take(range.versesInRange)
+        TranslatedEdition(locale, pageVerses)
+      }
+    }
+  }
 
   operator fun invoke(page: Int, selectedVerse: VerseKey?, version: Int): Flow<TranslationPage> {
     val keys = quranDisplayData.getAyahKeysOnPage(page)
@@ -42,10 +92,11 @@ class GetTranslationPage(
 
     return combine(
       verseRepository.getVerses(page),
-      translationRepository.getSelectedEditions(page),
+      getSelectedTranslationEditions(page).filter(List<TranslatedEdition>::isNotEmpty),
       bookmarkRepository.getBookmarksWithKeys(keys),
       playbackConnection.playingAyahFlow,
     ) { verses, translations, bookmarks, playingVerse ->
+
       if (suras == null) {
         suras = surahRepository.getSurahsInPage(page)
       }
@@ -73,40 +124,23 @@ class GetTranslationPage(
           verseKey.aya == it.key.aya && it.key.sura == verseKey.sura
         }
 
-        data.add(
-          TranslationPage.Verse(
-            isPlaying = isPlaying,
-            isBookmarked = isBookmarked,
-            highLighted = highLighted,
-            ayah = verse.ayah,
-            sura = verse.sura,
-            text = verse.text
-          )
-        )
-
-        translations.forEach { (edition, verseTranslations) ->
-          val translation = verseTranslations.getOrNull(index)
-          if (translation != null) {
-            data.add(
-              TranslationPage.Translation(
-                isPlaying = isPlaying,
-                isBookmarked = isBookmarked,
-                highLighted = highLighted,
-                authorName = edition.authorName,
-                text = translation.text,
-                sura = translation.sura,
-                ayah = translation.ayah
-              )
+        val translatedVerses = translations.mapNotNull { (edition, verseTranslations) ->
+          verseTranslations.getOrNull(index)?.let {
+            TranslationPage.TranslatedVerse(
+              authorName = edition.authorName,
+              text = it.text,
             )
           }
         }
 
         data.add(
-          TranslationPage.AyahToolbar(
-            verseKey = verseKey,
+          TranslationPage.Verse(
             isPlaying = isPlaying,
             isBookmarked = isBookmarked,
-            highLighted = highLighted
+            highLighted = highLighted,
+            suraAyah = VerseKey(verse.sura, verse.ayah),
+            text = verse.text,
+            translations = translatedVerses
           )
         )
       }

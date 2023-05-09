@@ -2,6 +2,7 @@ package org.hadeeths.models
 
 import androidx.room.Entity
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * The [TranslatedHadith] representation in the locale [org.hadeeths.HadithsDatabase],
@@ -43,7 +44,7 @@ internal data class ApiHadeeth(
   val reference: String? = null
 )
 
-@Serializable
+@kotlinx.serialization.Serializable
 data class WordsMeaning(
   val word: String,
   val meaning: String

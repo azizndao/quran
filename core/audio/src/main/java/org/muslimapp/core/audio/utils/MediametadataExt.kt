@@ -11,6 +11,7 @@ import org.muslimapp.core.audio.models.MediaId
 import org.quram.common.extensions.toUri
 
 const val AYAH_AYAH = "ayah"
+const val QARI = "qari"
 
 fun buildMediaItem(
   context: Context,
@@ -33,7 +34,7 @@ fun buildMediaItem(
     .setTrackNumber(surah)
     .setSubtitle(name)
     .setIsPlayable(true)
-    .setAyah(VerseKey(surah, ayah))
+    .setAyahExtras(VerseKey(surah, ayah), qari = qari.slug)
     .build()
 
   val requestMetadata = MediaItem.RequestMetadata.Builder()
@@ -48,9 +49,10 @@ fun buildMediaItem(
     .build()
 }
 
-fun MediaMetadata.Builder.setAyah(ayah: VerseKey): MediaMetadata.Builder {
-  return setExtras(bundleOf(AYAH_AYAH to ayah.toString()))
+fun MediaMetadata.Builder.setAyahExtras(ayah: VerseKey, qari: String?): MediaMetadata.Builder {
+  return setExtras(bundleOf(AYAH_AYAH to ayah.toString(), QARI to qari))
 }
 
 val MediaMetadata.aya get() = extras?.getString(AYAH_AYAH)?.let { VerseKey.fromString(it) }
+val MediaMetadata.qari get() = extras?.getString(QARI)
 

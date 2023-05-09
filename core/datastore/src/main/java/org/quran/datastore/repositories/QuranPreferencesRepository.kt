@@ -10,7 +10,6 @@ import org.quran.datastore.FontScale
 import org.quran.datastore.LocaleTranslation
 import org.quran.datastore.QuranPreferences
 import org.quran.datastore.TranslationList
-import org.quran.datastore.copy
 
 class QuranPreferencesRepository internal constructor(
   private val dataStore: DataStore<QuranPreferences>,
@@ -60,19 +59,11 @@ class QuranPreferencesRepository internal constructor(
   suspend fun enableTranslation(slug: String) {
     translationDataStore.updateData {
       val builder = it.toBuilder()
-      var index = 0
-      val editions = builder.localesList.map { edition ->
-        if (edition.slug == slug) {
-          edition.copy { order = index }
-        } else {
-          index += 1
-          edition
-        }
-      }
+      val editions = builder.selectedTranslationsList + slug
 
       builder
-        .clearLocales()
-        .addAllLocales(editions)
+        .clearSelectedTranslations()
+        .addAllSelectedTranslations(editions)
         .build()
     }
   }
@@ -80,25 +71,23 @@ class QuranPreferencesRepository internal constructor(
   suspend fun disableTranslation(slug: String) {
     translationDataStore.updateData {
       val builder = it.toBuilder()
-      val editions = builder.localesList.map { edition ->
-        if (edition.slug == slug) edition.copy { order = -1 } else edition
-      }
-      builder.clearLocales()
-        .addAllLocales(editions)
+      val editions = builder.selectedTranslationsList.filter { it != slug }
+      builder.clearSelectedTranslations()
+        .addAllSelectedTranslations(editions)
       builder.build()
     }
   }
 
   fun getAvailableTranslations() = translationDataStore.data.map { it.localesList }
 
-  suspend fun downloadTranslation(id: Int) {
+  suspend fun downloadTranslation(slug: String) {
     translationDataStore.updateData { preferences ->
-      val translation = preferences.localesList.map {
-        if (it.id == id) {
-          enableTranslation(it.slug)
-          it.copy { downloaded = true }
+      val translation = preferences.localesList.map { translation ->
+        if (translation.slug == slug) {
+          enableTranslation(translation.slug)
+          translation.toBuilder().setDownloaded(true).build()
         } else {
-          it
+          translation
         }
       }
       preferences.toBuilder()
@@ -108,10 +97,10 @@ class QuranPreferencesRepository internal constructor(
     }
   }
 
-  suspend fun deleteTranslation(id: Int) {
+  suspend fun deleteTranslation(slug: String) {
     translationDataStore.updateData { preferences ->
       val translation = preferences.localesList.filter {
-        val translation = it.id == id
+        val translation = it.slug == slug
         if (translation) disableTranslation(it.slug)
         !translation
       }
@@ -132,8 +121,12 @@ class QuranPreferencesRepository internal constructor(
     }
   }
 
+  fun getSelectedTranslationSlugs(): Flow<List<String>> {
+    return translationDataStore.data.map { it.selectedTranslationsList }
+  }
+
   fun getSelectedTranslations(): Flow<List<LocaleTranslation>> =
     translationDataStore.data.map { pref ->
-      pref.localesList.filter { it.order >= 0 }
+      pref.localesList.filter { it.slug in pref.selectedTranslationsList }
     }
 }

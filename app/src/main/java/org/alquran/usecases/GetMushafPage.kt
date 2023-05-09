@@ -9,9 +9,10 @@ import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.map
 import org.alquran.ui.uistate.MushafPage
 import org.alquran.ui.uistate.QuranPageItem
-import org.alquran.ui.uistate.Selection
+import org.alquran.ui.uistate.QuranSelection
 import org.alquran.ui.uistate.toUiState
 import org.alquran.verses.repository.VerseRepository
 import org.muslimapp.core.audio.PlaybackConnection
@@ -33,7 +34,7 @@ class GetMushafPage(
   operator fun invoke(
     page: Int,
     version: Int,
-    selection: MutableStateFlow<Selection>
+    selection: MutableStateFlow<QuranSelection>
   ): Flow<MushafPage> {
 
     var pageHeader: QuranPageItem.Header? = null
@@ -42,30 +43,28 @@ class GetMushafPage(
 
     val keys = quranDisplayData.getAyahKeysOnPage(page)
 
+    val selectionFlow = selection.map {
+      when (it) {
+        is QuranSelection.InitialVerse -> it.key
+        is QuranSelection.Highlight -> it.key
+        else -> null
+      }
+    }
+
     return combine(
       verseRepository.getVersesWordsByPage(page),
       bookmarkRepository.getBookmarksWithKeys(keys),
       playbackConnection.playingAyahFlow,
-      selection
-    ) { pageWords, bookmarks, verseKey, selected ->
-      val selectedAya = when (selected) {
-        is Selection.InitialVerse -> selected.key
-        is Selection.Highlight -> selected.key
-        else -> null
-      }
+      selectionFlow
+    ) { pageWords, bookmarks, verseKey, selectedAya ->
 
-      if (suras == null) {
-        suras = surahRepository.getSurahsInPage(page)
-      }
+      if (suras == null) suras = surahRepository.getSurahsInPage(page)
 
-      if (pageHeader == null) {
-        pageHeader = pageHeaderUseCase(page)
-      }
-
-      val bookmarkMap = mutableMapOf<VerseKey, Boolean>()
+      if (pageHeader == null) pageHeader = pageHeaderUseCase(page)
 
       val data = buildList {
         val listMap = pageWords.groupBy { it.line }.toSortedMap()
+        val bookmarkMap = mutableMapOf<VerseKey, Boolean>()
         listMap.forEach { (lineNumber, lineWords) ->
           val words = lineWords.sortedBy { it.key }
           val firstWord = words.first()

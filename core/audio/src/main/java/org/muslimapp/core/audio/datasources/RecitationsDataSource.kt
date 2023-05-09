@@ -9,9 +9,6 @@ import androidx.media3.exoplayer.offline.*
 import androidx.media3.exoplayer.scheduler.Requirements
 import arg.quran.models.Sura
 import arg.quran.models.audio.Qari
-import io.ktor.client.*
-import io.ktor.client.call.*
-import io.ktor.client.request.*
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
@@ -19,15 +16,12 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.debounce
 import org.muslimapp.core.audio.MediaDownloadService
 import org.muslimapp.core.audio.models.MediaId
-import org.muslimapp.core.audio.repositories.TimingRepository
 import timber.log.Timber
 
 @androidx.annotation.OptIn(UnstableApi::class)
 internal class RecitationsDataSource(
   private val downloadManager: DownloadManager,
   private val context: Context,
-  private val httpClient: HttpClient,
-  private val timingRepository: TimingRepository,
 ) {
 
   private val tag = this::class.simpleName!!

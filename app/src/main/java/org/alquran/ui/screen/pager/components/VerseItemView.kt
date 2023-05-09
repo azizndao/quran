@@ -6,10 +6,11 @@ import androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi
 import androidx.compose.animation.graphics.res.animatedVectorResource
 import androidx.compose.animation.graphics.res.rememberAnimatedVectorPainter
 import androidx.compose.animation.graphics.vector.AnimatedImageVector
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
@@ -26,10 +27,41 @@ import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.core.text.HtmlCompat.fromHtml
 import arg.quran.models.quran.VerseKey
 import org.alquran.R
+import org.alquran.ui.screen.pager.QuranEvent
 import org.alquran.ui.theme.quran
 import org.alquran.ui.theme.translation
 import org.alquran.ui.uistate.TranslationPage
 import org.quran.ui.utils.extensions.toAnnotatedString
+
+fun LazyListScope.verseWithTranslations(
+  verse: TranslationPage.Verse,
+  onAyahEvent: (QuranEvent) -> Unit
+) {
+  item(key = verse.key, contentType = "verse") {
+    VerseItemView(verse = verse)
+  }
+
+  items(verse.translations, contentType = { "translation" }) { translation ->
+    TranslationItemView(translation = translation, isPlaying = verse.isPlaying)
+  }
+
+  item(key = "toolbar-${verse.key}", contentType = "toolbar") {
+    VerseToolbarView(
+      verseKey = verse.suraAyah,
+      isBookmarked = verse.isBookmarked,
+      onBookmarkChange = {
+        onAyahEvent(QuranEvent.ToggleBookmark(verse.suraAyah, verse.isBookmarked))
+      },
+      onMoreClick = {
+        onAyahEvent(
+          QuranEvent.AyahLongPressed(verse.suraAyah, null, verse.isBookmarked)
+        )
+      },
+      onPlay = { onAyahEvent(QuranEvent.Play(verse.suraAyah)) },
+      isPlaying = verse.isPlaying
+    )
+  }
+}
 
 @Composable
 fun VerseItemView(
@@ -51,11 +83,12 @@ fun VerseItemView(
 @Composable
 fun TranslationItemView(
   modifier: Modifier = Modifier,
-  translation: TranslationPage.Translation,
+  translation: TranslationPage.TranslatedVerse,
+  isPlaying: Boolean
 ) {
   val colorScheme = MaterialTheme.colorScheme
 
-  val background by getPlayingBackground(translation.isPlaying)
+  val background by getPlayingBackground(isPlaying)
 
   val style = MaterialTheme.typography.translation
 
@@ -96,9 +129,7 @@ fun VerseToolbarView(
   onPlay: () -> Unit,
   onMoreClick: () -> Unit,
 ) {
-  CompositionLocalProvider(
-    LocalContentColor provides MaterialTheme.colorScheme.secondary
-  ) {
+  CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.secondary) {
     val background by getPlayingBackground(isPlaying)
 
     Row(modifier = modifier
@@ -108,12 +139,10 @@ fun VerseToolbarView(
 
       Text(
         text = verseKey.toString(),
+        style = MaterialTheme.typography.labelLarge,
         modifier = Modifier
-          .padding(start = 24.dp, end = 8.dp)
-          .background(
-            MaterialTheme.colorScheme.onSurfaceVariant.copy(0.13f), MaterialTheme.shapes.small
-          )
-          .padding(8.dp, 4.dp)
+          .padding(start = 24.dp, end = 16.dp)
+          .padding(vertical = 4.dp)
           .align(Alignment.CenterVertically)
       )
 

@@ -52,7 +52,7 @@ class RecitationRepository internal constructor(
       val mediaItem = buildMediaItem(
         context,
         reciter,
-        quranDisplayData.getSuraAyahString(sura, 1),
+        quranDisplayData.getSuraName(sura, true),
         sura
       )
       mediaItems.add(mediaItem)

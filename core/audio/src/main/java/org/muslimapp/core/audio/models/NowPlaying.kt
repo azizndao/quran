@@ -16,7 +16,8 @@ data class NowPlaying(
   val bufferedPosition: Long = C.TIME_UNSET,
   val duration: Long = C.TIME_UNSET,
   val durationStr: String = duration.toTime(),
-  val state: AudioState
+  val isPlaying: Boolean,
+  val isLoading: Boolean
 )
 
 val NowPlaying.progress: Float get() = if (position < 0) 0f else position.toFloat() / duration

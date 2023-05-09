@@ -25,7 +25,7 @@ internal interface BookmarkDao {
   suspend fun delete(key: VerseKey)
 
   @Query("SELECT * FROM bookmarks WHERE `key` = :key")
-  suspend fun getBookmark(key: VerseKey): Bookmark?
+  fun getBookmark(key: VerseKey): Flow<List<Bookmark>>
 
   @Query("SELECT * FROM bookmarks WHERE `key` in (:keys)")
   fun getByPage(keys: Set<VerseKey>): Flow<List<Bookmark>>

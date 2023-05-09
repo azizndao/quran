@@ -40,7 +40,6 @@ import arg.quran.models.audio.Qari
 import coil.compose.AsyncImage
 import kotlinx.coroutines.flow.StateFlow
 import org.alquran.R
-import org.alquran.audio.models.AudioState
 import org.alquran.audio.models.NowPlaying
 import org.alquran.audio.models.progress
 import org.alquran.ui.components.BottomSheetDragHandler
@@ -456,7 +455,7 @@ private fun PlayerControlBar(
       Icon(
         painter = rememberAnimatedVectorPainter(
           icon,
-          uiState.audioState == AudioState.PLAYING
+          uiState.playing?.isPlaying == true
         ),
         contentDescription = null,
         modifier = Modifier.scale(1.25f)

@@ -2,12 +2,18 @@ plugins {
     id 'com.android.library'
     id 'org.jetbrains.kotlin.android'
     id 'kotlinx-serialization'
-    id 'com.google.devtools.ksp' version "$kotlin_ksp_version"
+    alias libs.plugins.ksp
 }
 
 android {
     namespace 'org.quram.common'
     compileSdk 33
+
+    java {
+        toolchain {
+            languageVersion.set(JavaLanguageVersion.of(11))
+        }
+    }
 
     ksp {
         arg("room.schemaLocation", "$projectDir/schemas")
@@ -22,23 +28,24 @@ android {
     }
 
     compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
+        sourceCompatibility JavaVersion.VERSION_11
+        targetCompatibility JavaVersion.VERSION_11
     }
     kotlinOptions {
-        jvmTarget = '1.8'
+        jvmTarget = '11'
     }
 }
 
 dependencies {
     implementation project(":core:models")
 
-    api "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization"
+    api libs.kotlinx.serialization
 
-    api "io.insert-koin:koin-android:$koin_android_version"
-    api 'com.jakewharton.timber:timber:5.0.1'
+    api libs.koin.android
 
-    implementation "androidx.room:room-ktx:$room_version"
-    ksp "androidx.room:room-compiler:$room_version"
+    api libs.timber
+
+    implementation libs.room.ktx
+    ksp libs.room.compiler
 }
 

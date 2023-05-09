@@ -2,6 +2,7 @@ package org.hadeeths.models
 
 import androidx.room.Entity
 import kotlinx.serialization.SerialName
+import kotlinx.serialization.Serializable
 
 /**
  * [HadithCategory] can be root category in that case it won't have [parentId] or inner category

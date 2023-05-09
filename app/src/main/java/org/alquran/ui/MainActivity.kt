@@ -23,15 +23,15 @@ import com.google.accompanist.navigation.material.BottomSheetNavigator
 import com.google.accompanist.navigation.material.ModalBottomSheetLayout
 import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import org.alquran.ui.navigation.audioNavGraph
-import org.alquran.ui.screen.audioSheet.PlaybackSheetViewModel
 import org.alquran.ui.screen.home.ROUTE_QURAN_HOME
 import org.alquran.ui.screen.home.homeDestination
 import org.alquran.ui.screen.pager.quranPagerDestination
 import org.alquran.ui.screen.search.quranSearchDestination
+import org.alquran.ui.screen.translations.quranTranslationDestination
+import org.alquran.ui.screen.verseMenu.verseMenuDestination
 import org.alquran.ui.theme.bottomSheet
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
-import org.koin.androidx.compose.getViewModel
 import org.koin.androidx.scope.activityRetainedScope
 import org.koin.core.scope.Scope
 import org.muslimapp.core.audio.PlaybackConnection
@@ -47,7 +47,7 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
   override fun onCreate(savedInstanceState: Bundle?) {
     WindowCompat.setDecorFitsSystemWindows(window, false)
     super.onCreate(savedInstanceState)
-    playbackConnection.connect()
+    lifecycle.addObserver(playbackConnection)
     setContent {
       CompositionLocalProvider(
         LocalFontFamilyResolver provides createFontFamilyResolver(
@@ -70,8 +70,7 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
 @Composable
 fun QuranApp(
   bottomSheetNavigator: BottomSheetNavigator = rememberBottomSheetNavigator(),
-  navController: NavHostController = rememberNavController(bottomSheetNavigator),
-  playbackViewModel: PlaybackSheetViewModel = getViewModel()
+  navController: NavHostController = rememberNavController(bottomSheetNavigator)
 ) {
   ModalBottomSheetLayout(
     bottomSheetNavigator = bottomSheetNavigator,
@@ -83,6 +82,7 @@ fun QuranApp(
     CompositionLocalProvider(LocalInsetsPadding provides windowInsets) {
       NavHost(navController = navController, startDestination = ROUTE_QURAN_HOME) {
         homeDestination(navigate = navController::navigate) {}
+
         audioNavGraph(
           navigate = navController::navigate,
           popBackStack = navController::popBackStack
@@ -94,10 +94,16 @@ fun QuranApp(
         )
 
         quranPagerDestination(
-          playbackViewModel,
-          navController::navigate,
-          navController::popBackStack
+          navigate = navController::navigate,
+          popBackStack = navController::popBackStack
         )
+
+        verseMenuDestination(
+          navigate = navController::navigate,
+          popBackStack = navController::popBackStack,
+        )
+
+        quranTranslationDestination(popBackStack = navController::popBackStack)
       }
     }
   }

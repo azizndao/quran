@@ -29,15 +29,21 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import coil.compose.AsyncImage
 import org.alquran.R
-import org.alquran.audio.models.AudioState
+import org.alquran.audio.models.NowPlaying
 import org.alquran.audio.models.progress
+import org.alquran.ui.screen.pager.QuranEvent
 
 @Composable
 internal fun AudioBottomBar(
   modifier: Modifier = Modifier,
-  uiState: AudioUiState,
+  uiState: NowPlaying,
+  onEvent: (QuranEvent) -> Unit,
   onExpand: () -> Unit,
 ) {
+//  LaunchedEffect(key1 = uiState) {
+//    Timber.e(uiState.toString())
+//  }
+
   Column(
     modifier = modifier
       .background(MaterialTheme.colorScheme.background)
@@ -50,8 +56,8 @@ internal fun AudioBottomBar(
       verticalAlignment = Alignment.CenterVertically,
     ) {
       AsyncImage(
-        model = uiState.playing?.artWork,
-        contentDescription = uiState.playing?.title,
+        model = uiState.artWork,
+        contentDescription = uiState.title,
         contentScale = ContentScale.Crop,
         placeholder = painterResource(id = R.drawable.ic_reciter),
         error = painterResource(id = R.drawable.ic_reciter),
@@ -67,24 +73,24 @@ internal fun AudioBottomBar(
         modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center
       ) {
         Text(
-          text = uiState.playing?.title ?: "",
+          text = uiState.title,
           style = MaterialTheme.typography.titleSmall
         )
         Text(
-          text = uiState.playing?.reciterName ?: "",
+          text = uiState.reciterName,
           style = MaterialTheme.typography.bodyMedium
         )
       }
 
-      IconButton(onClick = { uiState.onAudioEvent(AudioEvent.SkipPrevious) }) {
+      IconButton(onClick = { onEvent(QuranEvent.SkipToPrevious) }) {
         Icon(painterResource(id = R.drawable.ic_skip_previous), null)
       }
 
-      PlayPauseButton(isPlaying = uiState.audioState == AudioState.PLAYING) {
-        uiState.onAudioEvent(AudioEvent.PlayOrPause)
+      PlayPauseButton(isPlaying = uiState.isPlaying) {
+        onEvent(QuranEvent.PlayOrPause)
       }
 
-      IconButton(onClick = { uiState.onAudioEvent(AudioEvent.SkipNext) }) {
+      IconButton(onClick = { onEvent(QuranEvent.SkipToNext) }) {
         Icon(painterResource(id = R.drawable.ic_skip_next), null)
       }
     }
@@ -93,8 +99,7 @@ internal fun AudioBottomBar(
       .height(1.5.dp)
       .fillMaxWidth()
 
-
-    if (uiState.audioState == AudioState.LOADING) {
+    if (!uiState.isPlaying && uiState.isLoading) {
       LinearProgressIndicator(
         modifier = progressModifier,
         trackColor = Color.Transparent,
@@ -102,7 +107,7 @@ internal fun AudioBottomBar(
     } else {
       LinearProgressIndicator(
         modifier = progressModifier,
-        progress = uiState.playing?.progress ?: 0f,
+        progress = uiState.progress,
         trackColor = Color.Transparent,
       )
     }

@@ -46,20 +46,22 @@ import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.coroutines.flow.StateFlow
 import org.alquran.R
+import org.alquran.audio.models.NowPlaying
 import org.alquran.ui.screen.audioSheet.AudioBottomBar
-import org.alquran.ui.screen.audioSheet.AudioUiState
-import org.alquran.ui.screen.pager.components.AyaMenuSheet
 import org.alquran.ui.screen.pager.components.MushafPageView
+import org.alquran.ui.screen.pager.components.NoTranslationView
 import org.alquran.ui.screen.pager.components.ProviderQuranTextStyle
 import org.alquran.ui.screen.pager.components.TranslationPageItem
 import org.alquran.ui.screen.search.directionToQuranSearch
+import org.alquran.ui.screen.translations.directionToQuranTranslations
+import org.alquran.ui.screen.verseMenu.directionToVerseMenu
 import org.alquran.ui.uistate.MushafPage
-import org.alquran.ui.uistate.PagerUiState
 import org.alquran.ui.uistate.QuranPageItem
-import org.alquran.ui.uistate.Selection
+import org.alquran.ui.uistate.QuranPagerUiState
 import org.alquran.ui.uistate.TranslationPage
 import org.alquran.views.DisplayModeButton
 import org.quran.datastore.DisplayMode
+import org.quran.translation.exception.NoTranslationException
 import org.quran.ui.components.BackButton
 import org.quran.ui.components.MuslimsTopAppBarDefaults
 import org.quran.ui.components.SearchButton
@@ -68,17 +70,13 @@ import kotlin.math.abs
 
 @Composable
 internal fun QuranPagerScreen(
-  uiState: PagerUiState,
-  audioStateFlow: StateFlow<AudioUiState>,
+  uiState: QuranPagerUiState,
+  audioStateFlow: StateFlow<NowPlaying?>,
   navigate: (String) -> Unit,
   popBackStack: () -> Unit,
   pageProvider: @Composable (DisplayMode, page: Int, version: Int) -> QuranPageItem?,
-  pagerState: PagerState = rememberPagerState(uiState.initialPage - 1)
+  pagerState: PagerState = rememberPagerState(uiState.page - 1)
 ) {
-
-  if (uiState.selection is Selection.Highlight) {
-    AyaMenuSheet(uiState) { uiState.setSelection(Selection.None) }
-  }
 
   Scaffold(
     topBar = {
@@ -88,92 +86,120 @@ internal fun QuranPagerScreen(
         enter = slideInVertically { -it },
         exit = slideOutVertically { -it },
       ) {
-        TopBar(page = currentPage,
+        TopBar(
+          page = currentPage,
           displayMode = uiState.displayMode,
           onPopBackStack = popBackStack,
           navigate = navigate,
-          onDisplayModeChange = { uiState.onDisplayModeChange(it) })
+          onDisplayModeChange = { uiState.onEvent(QuranEvent.ChangeDisplayMode(it)) },
+        )
       }
     },
     bottomBar = {
-      val state by audioStateFlow.collectAsStateWithLifecycle()
+      val nowPlaying by audioStateFlow.collectAsStateWithLifecycle()
+      val visible by remember(uiState, nowPlaying) {
+        derivedStateOf {
+          !uiState.isFullscreen && nowPlaying != null
+        }
+      }
+
       AnimatedVisibility(
-        visible = !uiState.isFullscreen,
+        visible = visible,
         enter = slideInVertically { it },
         exit = slideOutVertically { it },
       ) {
-        AudioBottomBar(uiState = state, onExpand = {})
+        AudioBottomBar(uiState = nowPlaying!!, onEvent = { uiState.onEvent(it) }) {}
       }
     },
   ) { innerPadding ->
 
-    LaunchedEffect(uiState) {
-      val currentIndex = pagerState.currentPage
-      if (uiState.playingPage != null && uiState.playingPage != currentIndex) {
-        val page = uiState.playingPage - 1
-        if (abs(page - currentIndex) == 1) {
-          pagerState.animateScrollToPage(page)
-        }
+    if (uiState.exception is NoTranslationException
+      && uiState.displayMode == DisplayMode.QURAN_TRANSLATION
+    ) {
+      NoTranslationView(navigate = navigate)
+    } else {
+      QuranPaged(
+        pagerState = pagerState,
+        uiState = uiState,
+        innerPadding = innerPadding,
+        navigate = navigate,
+        pageProvider = pageProvider
+      )
+    }
+  }
+}
+
+@Composable
+private fun QuranPaged(
+  pagerState: PagerState,
+  uiState: QuranPagerUiState,
+  innerPadding: PaddingValues,
+  navigate: (String) -> Unit,
+  pageProvider: @Composable (DisplayMode, page: Int, version: Int) -> QuranPageItem?
+) {
+  LaunchedEffect(uiState) {
+    val currentIndex = pagerState.currentPage
+    if (uiState.playingPage != null && uiState.playingPage != currentIndex) {
+      val page = uiState.playingPage - 1
+      if (abs(page - currentIndex) == 1) {
+        pagerState.animateScrollToPage(page)
       }
     }
+  }
 
-    HandleFullscreen(uiState.isFullscreen) { uiState.onFullscreen(it) }
+  HandleFullscreen(uiState.isFullscreen) { uiState.onEvent(QuranEvent.FullscreenChange(it)) }
 
-    val safeContentInsets = WindowInsets.displayCutout.asPaddingValues()
+  val safeContentInsets = WindowInsets.displayCutout.asPaddingValues()
 
-    val contentPadding = PaddingValues(
-      top = safeContentInsets.calculateTopPadding(),
-      bottom = 16.dp + safeContentInsets.calculateBottomPadding(),
-      start = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
-      end = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
-    )
+  val contentPadding = PaddingValues(
+    top = safeContentInsets.calculateTopPadding(),
+    bottom = 16.dp + safeContentInsets.calculateBottomPadding(),
+    start = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
+    end = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
+  )
 
-    val currentOnAyahEvent by rememberUpdatedState { event: AyahEvent ->
-      if (event is AyahEvent.AyahLongPressed) {
-        uiState.setSelection(Selection.Highlight(event.verseKey, event.bookmarked))
-      } else if (event is AyahEvent.AyahPressed) {
-        uiState.onFullscreen(!uiState.isFullscreen)
-      }
-      uiState.onAyahEvent(event)
+  val currentOnQuranEvent by rememberUpdatedState { event: QuranEvent ->
+    if (event is QuranEvent.AyahLongPressed) {
+      navigate(directionToVerseMenu(event.verseKey, event.word))
     }
+    uiState.onEvent(event)
+  }
 
-    HorizontalPager(
-      pageCount = 604,
-      state = pagerState,
-      reverseLayout = true,
-      beyondBoundsPageCount = 1,
-      pageSpacing = 1.dp,
-      key = { it },
-      modifier = Modifier
-        .background(MaterialTheme.colorScheme.surfaceVariant)
-        .clickable(
-          remember { MutableInteractionSource() },
-          null
-        ) { uiState.onFullscreen(!uiState.isFullscreen) },
-    ) { pageIndex ->
-      val page = pageProvider(uiState.displayMode, pageIndex + 1, uiState.version)
+  HorizontalPager(
+    pageCount = 604,
+    state = pagerState,
+    reverseLayout = true,
+    beyondBoundsPageCount = 1,
+    pageSpacing = 24.dp,
+    key = { it },
+    modifier = Modifier
+      .background(MaterialTheme.colorScheme.surfaceVariant)
+      .clickable(remember { MutableInteractionSource() }, indication = null) {
+        uiState.onEvent(QuranEvent.FullscreenChange(!uiState.isFullscreen))
+      },
+  ) { pageIndex ->
+    val page = pageProvider(uiState.displayMode, pageIndex + 1, uiState.version)
 
-      ProviderQuranTextStyle(page = pageIndex + 1, fontScale = uiState.quranFontScale) {
-        Surface(modifier = Modifier.fillMaxSize()) {
-          when (page) {
-            is MushafPage -> MushafPageView(
-              page = page,
-              onAyahEvent = currentOnAyahEvent,
-              modifier = Modifier.padding(contentPadding),
-            )
+    ProviderQuranTextStyle(page = pageIndex + 1, fontScale = uiState.quranFontScale) {
+      Surface(modifier = Modifier.fillMaxSize()) {
+        when (page) {
+          is MushafPage -> MushafPageView(
+            page = page,
+            onAyahEvent = currentOnQuranEvent,
+            modifier = Modifier.padding(contentPadding),
+          )
 
-            is TranslationPage -> TranslationPageItem(
-              page = page,
-              contentPadding = contentPadding,
-              onAyahEvent = currentOnAyahEvent,
-            )
+          is TranslationPage -> TranslationPageItem(
+            page = page,
+            contentPadding = contentPadding,
+            onAyahEvent = currentOnQuranEvent,
+          )
 
-            else -> CircularProgressIndicator(
-              modifier = Modifier
-                .fillMaxSize()
-                .wrapContentSize()
-            )
-          }
+          else -> CircularProgressIndicator(
+            modifier = Modifier
+              .fillMaxSize()
+              .wrapContentSize()
+          )
         }
       }
     }
@@ -227,7 +253,7 @@ private fun TopBar(
 
       DisplayModeButton(displayMode = displayMode) { onDisplayModeChange(it) }
 
-      IconButton(onClick = { }) {
+      IconButton(onClick = { navigate(directionToQuranTranslations()) }) {
         Icon(painterResource(id = R.drawable.ic_more_vert), null)
       }
     },

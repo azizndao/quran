@@ -2,7 +2,13 @@ plugins {
   id 'com.android.application'
   id 'org.jetbrains.kotlin.android'
   id 'kotlinx-serialization'
-  id 'com.google.devtools.ksp' version "$kotlin_ksp_version"
+  alias libs.plugins.ksp
+}
+
+java {
+  toolchain {
+    languageVersion.set(JavaLanguageVersion.of(11))
+  }
 }
 
 android {
@@ -34,11 +40,11 @@ android {
     }
   }
   compileOptions {
-    sourceCompatibility JavaVersion.VERSION_1_8
-    targetCompatibility JavaVersion.VERSION_1_8
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
   }
   kotlinOptions {
-    jvmTarget = "1.8"
+    jvmTarget = '11'
     freeCompilerArgs = freeCompilerArgs + [
         "-opt-in=kotlin.RequiresOptIn",
         // Enable experimental coroutines APIs, including Flow
@@ -62,7 +68,7 @@ android {
     compose true
   }
   composeOptions {
-    kotlinCompilerExtensionVersion compose_compiler_version
+    kotlinCompilerExtensionVersion libs.versions.composeCompilerVersion.get().toString()
   }
   packagingOptions {
     resources {
@@ -87,39 +93,27 @@ dependencies {
   implementation project(":core:audio")
   implementation project(':core:verses')
   implementation project(':core:bookmarks')
-  implementation project(":domain:quran")
+  implementation project(':feature:quran:pager')
+  implementation project(':core:models')
 
-  implementation 'com.google.accompanist:accompanist-navigation-material:0.31.1-alpha'
+  implementation libs.accompanist.navigation.material
 
-  implementation 'io.coil-kt:coil-compose:2.3.0'
+  implementation libs.coil.compose
 
-  implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization"
+  implementation libs.kotlinx.serialization
 
-  implementation "androidx.work:work-runtime-ktx:$work_version"
+  implementation libs.androidx.work
 
-  implementation "io.insert-koin:koin-android:$koin_android_version"
-  implementation "io.insert-koin:koin-androidx-compose:$koin_android_compose_version"
-  implementation "io.insert-koin:koin-androidx-workmanager:$koin_android_version"
+  implementation libs.koin.android
+  implementation libs.koin.compose
+  implementation libs.koin.workmanager
 
-  implementation "androidx.room:room-ktx:2.5.1"
-  implementation project(path: ':core:models')
-  ksp "androidx.room:room-compiler:2.5.1"
+  implementation libs.room.ktx
+  ksp libs.room.compiler
 
-  implementation 'androidx.core:core-ktx:1.10.0'
-  implementation "androidx.lifecycle:lifecycle-runtime-ktx:$lifecycle_version"
-  implementation "androidx.lifecycle:lifecycle-runtime-compose:$lifecycle_version"
-  implementation 'androidx.activity:activity-compose:1.7.1'
-  implementation 'androidx.compose.animation:animation-graphics:1.4.3'
-  implementation 'androidx.compose.ui:ui-text-google-fonts:1.4.3'
-  implementation 'androidx.compose.ui:ui:1.4.3'
-  implementation 'androidx.compose.ui:ui-graphics:1.4.3'
-  implementation 'androidx.compose.ui:ui-tooling-preview:1.4.3'
-  implementation 'androidx.compose.material3:material3:1.1.0-rc01'
-  implementation 'androidx.compose.material:material:1.4.3'
-  testImplementation 'junit:junit:4.13.2'
-  androidTestImplementation 'androidx.test.ext:junit:1.1.5'
-  androidTestImplementation 'androidx.test.espresso:espresso-core:3.5.1'
-  androidTestImplementation 'androidx.compose.ui:ui-test-junit4:1.4.3'
-  debugImplementation 'androidx.compose.ui:ui-tooling:1.4.3'
-  debugImplementation 'androidx.compose.ui:ui-test-manifest:1.4.3'
+  implementation libs.androidx.ktx
+  implementation libs.lifecycle.runtime.ktx
+  implementation libs.lifecycle.runtime.compose
+  implementation libs.activity.compose
+  testImplementation libs.junit
 }

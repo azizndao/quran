@@ -1,6 +1,7 @@
 package org.hadeeths.models
 
 import androidx.room.Entity
+import kotlinx.serialization.Serializable
 
 /**
  * The [TranslatedHadith] representation in the locale [org.hadeeths.HadithsDatabase],

@@ -1,6 +1,7 @@
 package org.hadeeths.models
 
 import androidx.room.*
+import kotlinx.serialization.Serializable
 
 /**
  * The portion of the hadeeth that will be show on the corresponding [HadithCategory] section.

@@ -18,7 +18,6 @@ import org.alquran.usecases.ListSurahUseCase
 import org.alquran.verses.repository.VerseRepository
 import org.quram.common.core.QuranInfo
 import org.quran.bookmarks.repository.BookmarkRepository
-import org.quran.domain.quran.workers.SetupDatabaseWorker
 
 internal class HomeViewModel(
   listSurahUseCase: ListSurahUseCase,

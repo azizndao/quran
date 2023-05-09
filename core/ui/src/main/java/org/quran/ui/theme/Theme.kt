@@ -39,19 +39,6 @@ fun QuranTheme(
   content: @Composable () -> Unit,
 ) {
 
-  if (!LocalInspectionMode.current) {
-    val view = LocalView.current
-    val window = (view.context as Activity).window
-    val insetsController = remember(view) { WindowCompat.getInsetsController(window, view) }
-
-    SideEffect {
-      insetsController.isAppearanceLightNavigationBars = !darkTheme
-      insetsController.isAppearanceLightStatusBars = !darkTheme
-      window.navigationBarColor = Color.Transparent.toArgb()
-      window.statusBarColor = Color.Transparent.toArgb()
-      window.isNavigationBarContrastEnforced = false
-    }
-  }
 
   var colorScheme = when {
     dynamicColor -> {
@@ -72,6 +59,19 @@ fun QuranTheme(
     background = colorScheme.surfaceColorAtElevation(colorScheme.tertiary, 1.5.dp)
   )
 
+  if (!LocalInspectionMode.current) {
+    val view = LocalView.current
+    val window = (view.context as Activity).window
+    val insetsController = remember(view) { WindowCompat.getInsetsController(window, view) }
+
+    SideEffect {
+      insetsController.isAppearanceLightNavigationBars = !darkTheme
+      insetsController.isAppearanceLightStatusBars = !darkTheme
+      window.statusBarColor = Color.Transparent.toArgb()
+      window.isNavigationBarContrastEnforced = false
+      window.navigationBarColor = colorScheme.surface.copy(alpha = 0.94f).toArgb()
+    }
+  }
 
   MaterialTheme(
     typography = AppTypography,

@@ -13,7 +13,6 @@ import org.muslimapp.core.audio.PlaybackModule
 import org.quram.common.CommonModule
 import org.quran.bookmarks.BookmarkModule
 import org.quran.datastore.di.DataStoreModule
-import org.quran.domain.quran.QuranDomainModule
 import org.quran.network.NetworkModule
 import org.quran.translation.TranslationModule
 import timber.log.Timber
@@ -26,9 +25,9 @@ class AlQuranApplication : Application(), KoinComponent {
       Timber.plant(Timber.DebugTree())
     }
     startKoin {
+      androidLogger()
       androidContext(this@AlQuranApplication)
       workManagerFactory()
-      androidLogger()
 
       modules(
         DataStoreModule,
@@ -39,7 +38,6 @@ class AlQuranApplication : Application(), KoinComponent {
         UiModule,
         VersesModule,
         UseCaseModule,
-        QuranDomainModule,
         BookmarkModule,
       )
     }

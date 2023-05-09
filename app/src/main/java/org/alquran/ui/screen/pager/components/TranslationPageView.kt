@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -23,7 +22,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.alquran.R
 import org.alquran.ui.components.LineSeparator
-import org.alquran.ui.screen.pager.AyahEvent
+import org.alquran.ui.screen.pager.QuranEvent
 import org.alquran.ui.uistate.QuranPageItem
 import org.alquran.ui.uistate.TranslationPage
 import kotlin.math.min
@@ -33,7 +32,7 @@ fun TranslationPageItem(
   page: TranslationPage,
   modifier: Modifier = Modifier,
   contentPadding: PaddingValues = PaddingValues(),
-  onAyahEvent: (AyahEvent) -> Unit,
+  onAyahEvent: (QuranEvent) -> Unit,
 ) {
 
   val scrollOffset = -with(LocalDensity.current) { 64.dp.roundToPx() }
@@ -45,15 +44,15 @@ fun TranslationPageItem(
 
   LaunchedEffect(page) {
     if (page.scrollIndex >= 0) {
-//      val layoutInfo = listState.layoutInfo
-//            val isCurrentItemFullyVisible = layoutInfo.visibleItemsInfo.any { item ->
-//                val endOffset = layoutInfo.viewportSize.height - layoutInfo.afterContentPadding
-//                val itemEndOffset = item.offset + item.size
-//                item.index == page.scrollIndex && itemEndOffset <= endOffset
-//            }
-//            if (!isCurrentItemFullyVisible) {
-      listState.animateScrollToItem(page.scrollIndex, scrollOffset)
-//            }
+      val layoutInfo = listState.layoutInfo
+      val isCurrentItemFullyVisible = layoutInfo.visibleItemsInfo.any { item ->
+        val endOffset = layoutInfo.viewportSize.height - layoutInfo.afterContentPadding
+        val itemEndOffset = item.offset + item.size
+        item.index == page.scrollIndex && itemEndOffset <= endOffset
+      }
+      if (!isCurrentItemFullyVisible) {
+        listState.animateScrollToItem(page.scrollIndex, scrollOffset)
+      }
     }
   }
 
@@ -71,33 +70,18 @@ fun TranslationPageItem(
       )
     }
 
-    items(
-      page.items,
-      key = { it.key },
-      contentType = { it::class.simpleName }
-    ) { item ->
-      when (item) {
-        is TranslationPage.Surah -> SurahHeader(
-          surahName = item.name,
-          suraNumber = item.number,
-        )
+    for (row in page.items) {
+      when (row) {
+        is TranslationPage.Surah -> item(key = row.key, contentType = "surah") {
+          SurahHeader(
+            surahName = row.name,
+            suraNumber = row.number,
+          )
+        }
 
-        is TranslationPage.Verse -> VerseItemView(verse = item)
+        is TranslationPage.Verse -> verseWithTranslations(row, onAyahEvent)
 
-        is TranslationPage.Translation -> TranslationItemView(translation = item)
-
-        is TranslationPage.AyahToolbar -> VerseToolbarView(
-          verseKey = item.verseKey,
-          isBookmarked = item.isBookmarked,
-          onBookmarkChange = {
-            onAyahEvent(AyahEvent.ToggleBookmark(item.verseKey, item.isBookmarked))
-          },
-          onMoreClick = { onAyahEvent(AyahEvent.AyahLongPressed(item.verseKey, item.isBookmarked)) },
-          onPlay = { onAyahEvent(AyahEvent.Play(item.verseKey)) },
-          isPlaying = item.isPlaying
-        )
-
-        is TranslationPage.Divider -> LineSeparator(modifier = Modifier.padding(horizontal = 16.dp))
+        is TranslationPage.Divider -> item { LineSeparator(modifier = Modifier.padding(horizontal = 16.dp)) }
       }
     }
 

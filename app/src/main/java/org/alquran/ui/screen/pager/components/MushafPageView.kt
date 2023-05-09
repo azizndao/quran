@@ -36,7 +36,7 @@ import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import arg.quran.models.quran.CharType
 import org.alquran.R
-import org.alquran.ui.screen.pager.AyahEvent
+import org.alquran.ui.screen.pager.QuranEvent
 import org.alquran.ui.theme.LocalQuranTextStyle
 import org.alquran.ui.theme.surahNames
 import org.alquran.ui.uistate.MushafPage
@@ -46,7 +46,7 @@ import org.quran.ui.components.LongClickableText
 fun MushafPageView(
   page: MushafPage,
   modifier: Modifier = Modifier,
-  onAyahEvent: (AyahEvent) -> Unit
+  onAyahEvent: (QuranEvent) -> Unit
 ) {
 
   BoxWithConstraints(modifier = modifier.fillMaxSize()) {
@@ -94,15 +94,13 @@ fun MushafPageView(
               .fillMaxWidth()
           )
 
-          is MushafPage.TextLine -> {
-            MushafTextLine(
-              line = line,
-              modifier = Modifier
-                .height(lineHeight)
-                .fillMaxWidth(),
-              onAyahEvent = onAyahEvent,
-            )
-          }
+          is MushafPage.TextLine -> MushafTextLine(
+            line = line,
+            modifier = Modifier
+              .height(lineHeight)
+              .fillMaxWidth(),
+            onAyahEvent = onAyahEvent,
+          )
         }
       }
 
@@ -153,7 +151,7 @@ fun MushafTextLine(
   modifier: Modifier = Modifier,
   style: TextStyle = LocalQuranTextStyle.current,
   colorScheme: ColorScheme = MaterialTheme.colorScheme,
-  onAyahEvent: (AyahEvent) -> Unit,
+  onAyahEvent: (QuranEvent) -> Unit,
 ) {
 
   val text = remember(line) {
@@ -192,13 +190,10 @@ fun MushafTextLine(
     modifier = modifier
       .fillMaxWidth()
       .wrapContentWidth(),
-    onClick = { offset ->
-      val key = if (offset >= line.words.size) line.words.last().key else line.words[offset].key
-      onAyahEvent(AyahEvent.AyahPressed(key))
-    },
+    onClick = { onAyahEvent(QuranEvent.AyahPressed) },
     onLongClick = { offset ->
       val word = if (offset >= line.words.size) line.words.last() else line.words[offset]
-      onAyahEvent(AyahEvent.AyahLongPressed(word.key, word.bookmarked))
+      onAyahEvent(QuranEvent.AyahLongPressed(word.key, word.position, word.bookmarked))
     },
   )
 }

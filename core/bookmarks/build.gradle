@@ -1,44 +1,43 @@
 plugins {
-    id 'com.android.library'
-    id 'org.jetbrains.kotlin.android'
-    id 'kotlinx-serialization'
-    id 'com.google.devtools.ksp' version "$kotlin_ksp_version"
+  id 'com.android.library'
+  id 'org.jetbrains.kotlin.android'
+  id 'kotlinx-serialization'
+  alias libs.plugins.ksp
 }
 
 android {
-    namespace 'org.quran.bookmarks'
-    compileSdk 33
+  namespace 'org.quran.bookmarks'
+  compileSdk 33
 
-    defaultConfig {
-        minSdk 24
-        targetSdk 33
+  java {
+    toolchain {
+      languageVersion.set(JavaLanguageVersion.of(11))
+    }
+  }
+  defaultConfig {
+    minSdk 24
+    targetSdk 33
 
-        testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
-        consumerProguardFiles "consumer-rules.pro"
-    }
+    testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+    consumerProguardFiles "consumer-rules.pro"
+  }
 
-    buildTypes {
-        release {
-            minifyEnabled false
-            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
-        }
-    }
-    compileOptions {
-        sourceCompatibility JavaVersion.VERSION_1_8
-        targetCompatibility JavaVersion.VERSION_1_8
-    }
-    kotlinOptions {
-        jvmTarget = '1.8'
-    }
+  compileOptions {
+    sourceCompatibility JavaVersion.VERSION_11
+    targetCompatibility JavaVersion.VERSION_11
+  }
+  kotlinOptions {
+    jvmTarget = '11'
+  }
 }
 
 dependencies {
-    implementation project(":core:models")
+  implementation project(":core:models")
 
-    implementation "io.insert-koin:koin-android:$koin_android_version"
+  implementation libs.koin.android
 
-    implementation "org.jetbrains.kotlinx:kotlinx-serialization-json:$kotlinx_serialization"
+  implementation libs.kotlinx.serialization
 
-    implementation "androidx.room:room-ktx:$room_version"
-    ksp "androidx.room:room-compiler:$room_version"
+  implementation libs.room.ktx
+  ksp libs.room.compiler
 }

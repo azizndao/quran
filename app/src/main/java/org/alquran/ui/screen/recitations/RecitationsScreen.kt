@@ -127,7 +127,7 @@ private fun ControlBar(onShuffle: () -> Unit, onPlayAll: () -> Unit) {
 
     Button(onClick = onPlayAll, modifier = Modifier.weight(1f)) {
       Icon(
-        painterResource(R.drawable.ic_play_arrow), null,
+        painterResource(R.drawable.play), null,
         modifier = Modifier.size(ButtonDefaults.IconSize),
       )
       Spacer(modifier = Modifier.width(ButtonDefaults.IconSpacing))

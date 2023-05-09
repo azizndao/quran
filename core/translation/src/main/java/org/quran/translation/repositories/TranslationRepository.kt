@@ -5,7 +5,7 @@ import arg.quran.models.quran.Verse
 import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.flow.Flow
 import org.quran.datastore.LocaleTranslation
-import org.quran.translation.models.TranslatedEdition
+import org.quran.translation.local.models.TranslatedEdition
 
 interface TranslationRepository {
 
@@ -15,19 +15,7 @@ interface TranslationRepository {
 
   suspend fun downloadTranslations()
 
-  suspend fun downloadQuranTranslation(translation: LocaleTranslation): Operation
-
-  fun getVerses(
-    slug: String,
-    page: Int,
-  ): Flow<TranslatedEdition?>
-
-  fun getSelectedEditions(page: Int): Flow<List<TranslatedEdition>>
-
-  fun getVerses(
-    edition: LocaleTranslation,
-    page: Int,
-  ): Flow<TranslatedEdition?>
+  suspend fun downloadQuranTranslation(slug: String): Operation
 
   suspend fun getQuranTranslation(
     translation: LocaleTranslation,
@@ -39,4 +27,11 @@ interface TranslationRepository {
   suspend fun getAyahTranslation(key: VerseKey, slug: String): Verse?
 
   fun getSelectedTranslations(): Flow<List<LocaleTranslation>>
+
+  suspend fun search(query: String): List<TranslatedEdition>
+
+  suspend fun search(locale: LocaleTranslation, query: String): List<Verse>
+
+  fun getAllVerses(locale: LocaleTranslation): Flow<List<Verse>>
+  fun getSelectedTranslationSlugs(): Flow<List<String>>
 }

@@ -9,7 +9,6 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
@@ -18,12 +17,13 @@ import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import org.alquran.audio.models.AudioState
-import org.alquran.ui.uistate.PagerUiState
 import org.alquran.ui.uistate.QuranPageItem
-import org.alquran.ui.uistate.Selection
+import org.alquran.ui.uistate.QuranPagerUiState
+import org.alquran.ui.uistate.QuranSelection
 import org.alquran.usecases.GetMushafPage
 import org.alquran.usecases.GetTranslationPage
 import org.muslimapp.core.audio.PlaybackConnection
@@ -35,6 +35,8 @@ import org.quran.datastore.repositories.AudioPreferencesRepository
 import org.quran.datastore.repositories.QuranPreferencesRepository
 import org.quran.datastore.serializers.DEFAULT_QURAN_FONT_SIZE
 import org.quran.datastore.serializers.DEFAULT_TRANSLATION_FONT_SIZE
+import org.quran.translation.exception.NoTranslationException
+import org.quran.translation.repositories.TranslationRepository
 import timber.log.Timber
 
 internal class QuranPagerViewModel(
@@ -46,70 +48,60 @@ internal class QuranPagerViewModel(
   private val getTranslationPage: GetTranslationPage,
   private val getMushafPage: GetMushafPage,
   private val bookmarkRepository: BookmarkRepository,
+  translationRepository: TranslationRepository
 ) : ViewModel() {
 
   private val args = quranPagerDestinationArgs(savedStateHandle)
 
-  private val playingPage: Flow<Int?> = combine(
-    playbackConnection.playingState,
-    playbackConnection.nowPlaying,
-  ) { state, mediaItem ->
-    when (state) {
-      AudioState.PLAYING -> mediaItem?.let { quranInfo.getPageFromSuraAyah(it.sura, it.ayah) }
-      else -> null
-    }
+  val nowPlayingFlow = playbackConnection.nowPlaying
+
+  private val playingPageFlow = playbackConnection.playingAyahFlow.map { key ->
+    key?.let { quranInfo.getPageFromSuraAyah(it.sura, it.aya) }
   }.distinctUntilChanged()
 
   private val fullscreenFlow = MutableStateFlow(false)
-  private val _selection = MutableStateFlow<Selection>(
-    if (args.verseKey != null) Selection.InitialVerse(args.verseKey) else Selection.None
+
+  private val selectionFlow = MutableStateFlow(
+    if (args.verseKey != null) QuranSelection.InitialVerse(args.verseKey) else QuranSelection.None
   )
 
-
-  val uiState = combine(
+  val uiStateFlow = combine(
     quranPreferences.getAllPreferences(),
-    playingPage,
+    playingPageFlow,
     fullscreenFlow,
-    _selection,
-  ) { preferences, page, fullscreen, selectedAyah ->
-    PagerUiState(
-      initialPage = args.page,
+    translationRepository.getSelectedTranslationSlugs(),
+  ) { preferences, page, fullscreen, locales ->
+    QuranPagerUiState(
+      page = args.page,
       playingPage = page,
       displayMode = preferences.displayMode,
       quranFontScale = preferences.quranFontScale,
       translationFontScale = preferences.translationFontScale,
       version = preferences.fontVersion,
-      onDisplayModeChange = ::onDisplayMode,
-      onAyahEvent = ::onAyahEvent,
-      onFullscreen = { fullscreenFlow.value = it },
+      onEvent = ::onEvent,
       isFullscreen = fullscreen,
-      selection = selectedAyah,
-      setSelection = { _selection.value = it }
+      exception = if (locales.isEmpty()) NoTranslationException() else null,
     )
-  }.distinctUntilChanged()
-    .stateIn(
-      scope = viewModelScope,
-      started = SharingStarted.WhileSubscribed(5_000),
-      initialValue = PagerUiState(
-        args.page,
-        null,
-        DisplayMode.UNRECOGNIZED,
-        quranFontScale = DEFAULT_QURAN_FONT_SIZE,
-        translationFontScale = DEFAULT_TRANSLATION_FONT_SIZE,
-        version = 1,
-        onDisplayModeChange = ::onDisplayMode,
-        onAyahEvent = ::onAyahEvent,
-        onFullscreen = { fullscreenFlow.value = it },
-        selection = _selection.value,
-        setSelection = { _selection.value = it }
-      )
+  }.distinctUntilChanged().stateIn(
+    scope = viewModelScope,
+    started = SharingStarted.WhileSubscribed(5_000),
+    initialValue = QuranPagerUiState(
+      page = args.page,
+      playingPage = null,
+      displayMode = DisplayMode.UNRECOGNIZED,
+      quranFontScale = DEFAULT_QURAN_FONT_SIZE,
+      translationFontScale = DEFAULT_TRANSLATION_FONT_SIZE,
+      version = 1,
+      onEvent = ::onEvent,
     )
+  )
 
   init {
+    getTranslationPage.coroutineScope = viewModelScope
     viewModelScope.launch {
       delay(5000)
-      if (_selection.value is Selection.InitialVerse) {
-        _selection.value = Selection.None
+      if (selectionFlow.value is QuranSelection.InitialVerse) {
+        selectionFlow.value = QuranSelection.None
       }
     }
   }
@@ -120,21 +112,18 @@ internal class QuranPagerViewModel(
 
       when (mode) {
         DisplayMode.QURAN_TRANSLATION -> {
-          val selectedVerse = when (val s = _selection.value) {
-            is Selection.InitialVerse -> s.key
-            is Selection.Highlight -> s.key
+          val selectedVerse = when (val s = selectionFlow.value) {
+            is QuranSelection.InitialVerse -> s.key
+            is QuranSelection.Highlight -> s.key
             else -> null
           }
-          getTranslationPage(page, selectedVerse, version)
-            .catch { Timber.e(it) }
+          getTranslationPage(page, selectedVerse, version).catch { Timber.e(it) }
         }
 
-        DisplayMode.QURAN -> getMushafPage(page, version, _selection)
+        DisplayMode.QURAN -> getMushafPage(page, version, selectionFlow)
         DisplayMode.UNRECOGNIZED -> flowOf(null)
       }.flowOn(Dispatchers.IO).stateIn(
-        viewModelScope,
-        SharingStarted.WhileSubscribed(5_000),
-        null
+        viewModelScope, SharingStarted.WhileSubscribed(5_000), null
       )
     }
 
@@ -143,33 +132,41 @@ internal class QuranPagerViewModel(
     return itemState
   }
 
-  private fun onAyahEvent(event: AyahEvent) {
+  private fun onEvent(event: QuranEvent) {
     viewModelScope.launch(Dispatchers.IO) {
       when (event) {
-        is AyahEvent.ToggleBookmark -> if (event.isBookmark) {
+        is QuranEvent.ToggleBookmark -> if (event.isBookmark) {
           bookmarkRepository.removeBookmark(event.verseKey)
         } else {
           bookmarkRepository.addBookmark(Bookmark(key = event.verseKey, name = "Bookmarks"))
         }
 
-        is AyahEvent.UpdateSelection -> {}
+        is QuranEvent.UpdateSelection -> {}
 
-        is AyahEvent.Play -> playbackConnection.onPlaySurah(
+        is QuranEvent.Play -> playbackConnection.onPlaySurah(
           sura = event.verseKey.sura,
           reciterId = audioSettings.getCurrentReciter().first(),
           startAya = event.verseKey.aya
         )
 
-        is AyahEvent.AyahLongPressed -> {}
+        is QuranEvent.AyahLongPressed -> selectionFlow.value =
+          QuranSelection.Highlight(event.verseKey, event.word, event.bookmarked)
 
-        is AyahEvent.AyahPressed -> {}
+        QuranEvent.AyahPressed -> {
+          if (selectionFlow.value == QuranSelection.None) {
+            fullscreenFlow.update { !it }
+          } else {
+            selectionFlow.update { QuranSelection.None }
+          }
+        }
+
+        is QuranEvent.ChangeDisplayMode -> quranPreferences.setDisplayMode(event.mode)
+        is QuranEvent.FullscreenChange -> fullscreenFlow.value = event.value
+        is QuranEvent.Selection -> selectionFlow.value = event.selection
+        QuranEvent.PlayOrPause -> playbackConnection.playOrPause()
+        QuranEvent.SkipToNext -> playbackConnection.skipToNextSurah()
+        QuranEvent.SkipToPrevious -> playbackConnection.skipToPreviousSurah()
       }
-    }
-  }
-
-  private fun onDisplayMode(value: DisplayMode) {
-    viewModelScope.launch(Dispatchers.IO) {
-      quranPreferences.setDisplayMode(value)
     }
   }
 }

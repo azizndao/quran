@@ -1,6 +1,5 @@
 package org.hadeeths.dao
 
-import androidx.paging.PagingSource
 import androidx.room.Dao
 import androidx.room.Insert
 import androidx.room.OnConflictStrategy
@@ -37,18 +36,6 @@ interface HadithDao {
     """
   )
   fun getHadeethSummaries(categoryId: Int, language: String): Flow<List<HadithSummary>>
-
-  @Query(
-    """
-        SELECT *, s.rowid id FROM summaries s
-        LEFT JOIN hadith_bookmarks b ON b.hadith_id = s.rowid
-        WHERE categoryId = :categoryId AND language = :language
-    """
-  )
-  fun paginateHadeethSummaries(
-    categoryId: Int,
-    language: String,
-  ): PagingSource<Int, HadithSummary>
 
   @Query("SELECT * FROM hadiths WHERE id = :id")
   suspend fun getHadeeth(id: Int): Hadith?

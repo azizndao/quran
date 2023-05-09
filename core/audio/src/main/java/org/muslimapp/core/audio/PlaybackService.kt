@@ -16,7 +16,6 @@ import androidx.media3.exoplayer.source.DefaultMediaSourceFactory
 import androidx.media3.session.LibraryResult
 import androidx.media3.session.MediaLibraryService
 import androidx.media3.session.MediaSession
-import arg.quran.models.quran.VerseKey
 import com.google.common.collect.ImmutableList
 import com.google.common.util.concurrent.Futures
 import com.google.common.util.concurrent.ListenableFuture
@@ -28,17 +27,10 @@ import org.koin.android.ext.android.inject
 import org.muslimapp.core.audio.models.MediaId
 import org.muslimapp.core.audio.repositories.QariRepository
 import org.muslimapp.core.audio.repositories.RecitationRepository
-import org.muslimapp.core.audio.repositories.TimingRepository
-import org.muslimapp.core.audio.utils.setAyah
-import org.quram.common.core.QuranInfo
 import org.quram.common.utils.MuslimsConstants.MUSLIMS_BROWSABLE_ROOT
-import org.quram.common.utils.QuranDisplayData
-import org.quran.datastore.repositories.AudioPreferencesRepository
-import timber.log.Timber
 import java.io.File
 import java.util.concurrent.Callable
 import java.util.concurrent.Executors
-import kotlin.math.abs
 
 class PlaybackService : MediaLibraryService() {
 
@@ -50,76 +42,21 @@ class PlaybackService : MediaLibraryService() {
   private lateinit var player: ExoPlayer
   private lateinit var mediaSession: MediaLibrarySession
 
-  private val json by inject<Json>()
-  private val quranInfo by inject<QuranInfo>()
   private val qariRepository by inject<QariRepository>()
   private val recitationRepository by inject<RecitationRepository>()
   private val httpDataSourceFactory by inject<HttpDataSource.Factory>()
   private val cache by inject<Cache>()
-  private val audioPreferences by inject<AudioPreferencesRepository>()
-  private val timingRepository by inject<TimingRepository>()
-  private val quranDisplayData by inject<QuranDisplayData>()
-  private val currentMediaItem = MutableStateFlow<MediaItem?>(null)
 
-  private var gaplessSura = currentMediaItem
-    .map { it?.let { MediaId.fromString(it.mediaId) } }
-    .distinctUntilChanged()
-    .stateIn(serviceScope, SharingStarted.WhileSubscribed(), null)
-
-  private var gaplessSuraData = gaplessSura
-    .map { it?.let { timingRepository.getGaplessData(it.reciter, it.sura) } }
-    .stateIn(serviceScope, SharingStarted.WhileSubscribed(), null)
-
-  private val playingAyah = gaplessSuraData.transform { data ->
-    data ?: return@transform emit(null)
-    while (true) {
-      val (_, sura, ayah) = gaplessSura.value ?: return@transform emit(null)
-
-      var updatedAyah = ayah
-      val pos = player.currentPosition
-      var ayahTime = data[ayah]
-      val maxAyahs = quranInfo.getNumberOfAyahs(sura)
-      var iterAyah = ayah
-      if (ayahTime > pos) {
-        while (--iterAyah > 0) {
-          ayahTime = data[iterAyah]
-          if (ayahTime <= pos) {
-            updatedAyah = iterAyah
-            break
-          } else {
-            updatedAyah--
-          }
-        }
-      } else {
-        while (++iterAyah <= maxAyahs) {
-          ayahTime = data[iterAyah]
-          if (ayahTime > pos) {
-            updatedAyah = iterAyah - 1
-            break
-          } else {
-            updatedAyah++
-          }
-        }
-      }
-      if (updatedAyah != ayah) emit(VerseKey(sura, updatedAyah))
-      ayahTime = if (updatedAyah < quranInfo.getNumberOfAyahs(sura) - 1) {
-        data[updatedAyah + 1]
-      } else {
-        0
-      }
-      delay(abs(pos - ayahTime))
-    }
-  }
 
   @SuppressLint("UnsafeOptInUsageError")
   override fun onCreate() {
     super.onCreate()
 
-    val daris = qariRepository.getQariItemList();
+    val qaris = qariRepository.getQariItemList()
 
     val dir = File(getExternalFilesDir(null), "qari.json")
 
-    dir.writeText(Json.encodeToString(daris))
+    dir.writeText(Json.encodeToString(qaris))
 
     val audioAttributes = Builder()
       .setContentType(C.AUDIO_CONTENT_TYPE_MUSIC)
@@ -150,25 +87,6 @@ class PlaybackService : MediaLibraryService() {
 
     mediaSession = MediaLibrarySession.Builder(this, player, MediaSessionCallback())
       .also { pendingIntent?.let { intent -> it.setSessionActivity(intent) } }.build()
-
-    serviceScope.launch {
-      try {
-        val history = audioPreferences.getPlaybackHistory().first()
-        val mediaItems = recitationRepository.getRecitations(history.reciterId)
-        val position = timingRepository.getPosition(
-          history.reciterId,
-          history.surah,
-          history.ayah
-        )
-
-        player.setMediaItems(mediaItems, history.surah - 1, position)
-        player.prepare()
-
-        currentMediaItem.value = mediaItems[history.surah - 1]
-      } catch (e: Exception) {
-        Timber.e(e)
-      }
-    }
   }
 
   override fun onDestroy() {
@@ -225,12 +143,6 @@ class PlaybackService : MediaLibraryService() {
       LibraryResult.ofItemList(mediaItem, params)
     }, Executors.newSingleThreadExecutor())
 
-    override fun onGetItem(
-      session: MediaLibrarySession, browser: MediaSession.ControllerInfo, mediaId: String
-    ): ListenableFuture<LibraryResult<MediaItem>> {
-      return super.onGetItem(session, browser, mediaId)
-    }
-
     override fun onSubscribe(
       session: MediaLibrarySession,
       browser: MediaSession.ControllerInfo,
@@ -247,47 +159,16 @@ class PlaybackService : MediaLibraryService() {
       mediaItems: MutableList<MediaItem>,
     ): ListenableFuture<List<MediaItem>> {
       val updatedMediaItems = mediaItems.map { mediaItem ->
-        mediaItem.buildUpon().setUri(mediaItem.requestMetadata.mediaUri)
-          .setMediaMetadata(mediaItem.mediaMetadata).build()
+        mediaItem.buildUpon()
+          .setUri(mediaItem.requestMetadata.mediaUri)
+          .setMediaMetadata(mediaItem.mediaMetadata)
+          .build()
       }
       return Futures.immediateFuture(updatedMediaItems)
     }
   }
 
-  var updateMetadataJob: Job? = null
-
-
   private inner class PlayerEventListener : Player.Listener {
-
-    override fun onIsPlayingChanged(isPlaying: Boolean) {
-      updateMetadataJob?.cancel()
-      if (isPlaying) {
-        updateMetadataJob = serviceScope.launch {
-          playingAyah.filterNotNull().collect { aya ->
-            val title = quranDisplayData.getSuraAyahString(aya.sura, aya.aya)
-            player.playlistMetadata = player.playlistMetadata.buildUpon()
-              .setTitle(title)
-              .setAyah(aya)
-              .build()
-            audioPreferences.setRecentPlayback(
-              sura = aya.sura,
-              aya = aya.aya,
-              reciterId = MediaId.fromString(currentMediaItem.value!!.mediaId).reciter
-            )
-          }
-        }
-      }
-    }
-
-    override fun onMediaItemTransition(mediaItem: MediaItem?, reason: Int) {
-      serviceScope.launch {
-        currentMediaItem.value = mediaItem
-        if (mediaItem?.mediaId != null) {
-          val mediaId: MediaId = MediaId.fromString(mediaItem.mediaId)
-          audioPreferences.setRecentPlayback(mediaId.reciter, mediaId.sura, mediaId.ayah)
-        }
-      }
-    }
 
     override fun onPlaybackStateChanged(playbackState: Int) {
       super.onPlaybackStateChanged(playbackState)

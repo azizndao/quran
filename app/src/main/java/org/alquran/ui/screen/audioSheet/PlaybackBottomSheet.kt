@@ -63,10 +63,6 @@ fun PlaybackBottomSheet(
           }
         }
 
-        val collapseAlpha by remember {
-          derivedStateOf { lerp(1f, 0f, 0f, 0.3f, fraction) }
-        }
-
         val expandedAlpha by remember {
           derivedStateOf { lerp(0f, 1f, 0.2f, 0.5f, fraction) }
         }
@@ -110,14 +106,6 @@ fun PlaybackBottomSheet(
                 translationY = topPadding
               }
               .zIndex(10f)
-          )
-
-          AudioBottomBar(
-            uiState = uiState,
-            modifier = Modifier
-              .zIndex(if (fraction < 1f) 11f else 0f)
-              .graphicsLayer { alpha = collapseAlpha },
-            onExpand = { coroutineScope.launch { sheetState.bottomSheetState.expand() } }
           )
         }
       },
