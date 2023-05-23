@@ -21,9 +21,7 @@ abstract class Verse {
 
     if (sura != other.sura) return false
     if (ayah != other.ayah) return false
-    if (text != other.text) return false
-
-    return true
+    return text == other.text
   }
 
   override fun hashCode(): Int {

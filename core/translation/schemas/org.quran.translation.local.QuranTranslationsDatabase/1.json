@@ -2,7 +2,7 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "1f4effa018b84633127a61f897ad8ea8",
+    "identityHash": "3cbca2786353d8f5a0af1c67f0f3f245",
     "entities": [
       {
         "ftsVersion": "FTS4",
@@ -17,7 +17,7 @@
           "preferredOrder": "ASC"
         },
         "contentSyncTriggers": [],
-        "tableName": "verses",
+        "tableName": "translations",
         "createSql": "CREATE VIRTUAL TABLE IF NOT EXISTS `${TABLE_NAME}` USING FTS4(`sura` INTEGER NOT NULL, `ayah` INTEGER NOT NULL, `text` TEXT NOT NULL)",
         "fields": [
           {
@@ -52,7 +52,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '1f4effa018b84633127a61f897ad8ea8')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3cbca2786353d8f5a0af1c67f0f3f245')"
     ]
   }
 }

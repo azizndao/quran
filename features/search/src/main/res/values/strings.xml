@@ -1,0 +1,6 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="search_ayah">Search verse or translation...</string>
+    <string name="clear_search">Clear search query</string>
+    <string name="quran">Quran</string>
+</resources>

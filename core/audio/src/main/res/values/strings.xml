@@ -5,4 +5,5 @@
     <string name="download_notification_channel_desc">This channel is used to download in progress</string>
     <string name="cancel">Cancel</string>
     <string name="waiting_downloads">Waiting downloads</string>
+    <string name="error_download_recitation_data">Error while download recitation data</string>
 </resources>

@@ -1,11 +1,15 @@
 package org.quran.datastore.di
 
 import android.content.Context
+import androidx.datastore.core.DataStore
 import androidx.datastore.core.DataStoreFactory
 import androidx.datastore.core.handlers.ReplaceFileCorruptionHandler
 import androidx.datastore.dataStoreFile
 import androidx.datastore.preferences.core.PreferenceDataStoreFactory
+import androidx.datastore.preferences.core.Preferences
 import androidx.datastore.preferences.core.emptyPreferences
+import org.koin.core.qualifier.named
+import org.koin.dsl.bind
 import org.koin.dsl.module
 import org.quran.datastore.AudioPreferences
 import org.quran.datastore.QuranPreferences
@@ -18,6 +22,8 @@ import org.quran.datastore.serializers.AudioPreferencesSerializer
 import org.quran.datastore.serializers.QuranPreferencesSerializer
 import org.quran.datastore.serializers.ReadingPositionSerializer
 import org.quran.datastore.serializers.TranslationsListSerializer
+
+
 
 
 val DataStoreModule = module {
@@ -38,11 +44,14 @@ val DataStoreModule = module {
         produceFile = { get<Context>().dataStoreFile("quran") },
         serializer = QuranPreferencesSerializer()
       ),
-      DataStoreFactory.create(
-        corruptionHandler = ReplaceFileCorruptionHandler { TranslationList.getDefaultInstance() },
-        produceFile = { get<Context>().dataStoreFile("translations") },
-        serializer = TranslationsListSerializer()
-      ),
+    )
+  }
+
+  single<DataStore<TranslationList>>(TranslationDataStoreQualifier) {
+    DataStoreFactory.create(
+      corruptionHandler = ReplaceFileCorruptionHandler { TranslationList.getDefaultInstance() },
+      produceFile = { get<Context>().dataStoreFile("translations") },
+      serializer = TranslationsListSerializer()
     )
   }
 
@@ -59,7 +68,7 @@ val DataStoreModule = module {
   single {
     PreferenceDataStoreFactory.create(
       corruptionHandler = ReplaceFileCorruptionHandler { emptyPreferences() },
-      produceFile = { get<Context>().dataStoreFile("user_settings") },
+      produceFile = { get<Context>().dataStoreFile("settings.preferences_pb") },
     )
   }
 }

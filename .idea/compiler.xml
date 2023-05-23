@@ -2,6 +2,7 @@
 <project version="4">
   <component name="CompilerConfiguration">
     <bytecodeTargetLevel target="11">
+      <module name="quran.app.features.pager" target="17" />
       <module name="quran.domain.quran" target="17" />
     </bytecodeTargetLevel>
   </component>

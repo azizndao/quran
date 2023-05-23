@@ -48,23 +48,6 @@ object QuranUtils {
     get() = (TextUtilsCompat.getLayoutDirectionFromLocale(Locale.getDefault())
       == ViewCompat.LAYOUT_DIRECTION_RTL)
 
-  fun isOnWifiNetwork(context: Context): Boolean {
-    val cm = context.getSystemService(
-      Context.CONNECTIVITY_SERVICE
-    ) as ConnectivityManager
-    val activeNetwork = cm.activeNetworkInfo
-    return activeNetwork != null &&
-      activeNetwork.type == ConnectivityManager.TYPE_WIFI
-  }
-
-  fun haveInternet(context: Context): Boolean {
-    val cm = context.getSystemService(
-      Context.CONNECTIVITY_SERVICE
-    ) as ConnectivityManager
-    val networkInfo = cm.activeNetworkInfo
-    return networkInfo != null && networkInfo.isConnectedOrConnecting
-  }
-
   fun getLocalizedNumber(number: Int): String {
     val locale = Locale.getDefault()
     val change = numberFormat == null || locale != lastLocale
@@ -74,5 +57,4 @@ object QuranUtils {
     }
     return numberFormat!!.format(number.toLong())
   }
-
 }

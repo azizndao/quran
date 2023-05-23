@@ -1,10 +1,13 @@
 package org.alquran.verses.repository
 
 import android.content.Context
+import arg.quran.models.VerseRange
 import arg.quran.models.quran.QuranWord
 import arg.quran.models.quran.Verse
+import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 import kotlinx.serialization.decodeFromString
@@ -59,8 +62,7 @@ class VerseRepository internal constructor(
 
   suspend fun hasMissingVerses() = database.verses.hasMissingVerses()
 
-  fun getVerses(page: Int): Flow<List<Verse>> {
-    val range = quranInfo.getVerseRangeForPage(page)
+  fun getVerses(range: VerseRange): Flow<List<Verse>> {
     return _verseCache.map { verses ->
       if (range.startSura == range.endingSura) {
         verses
@@ -82,5 +84,9 @@ class VerseRepository internal constructor(
 
   suspend fun search(query: String): List<Verse> {
     return database.searchables.search(query)
+  }
+
+  suspend fun get(suraAyah: VerseKey): Verse? {
+    return _verseCache.first().find { it.sura == suraAyah.sura && it.ayah == suraAyah.aya }
   }
 }
