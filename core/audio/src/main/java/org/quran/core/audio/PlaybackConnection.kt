@@ -94,11 +94,11 @@ class PlaybackConnection(
 
   private lateinit var mediaController: MediaController
 
-  override fun onStart(owner: LifecycleOwner) {
+  override fun onCreate(owner: LifecycleOwner) {
     connect()
   }
 
-  override fun onStop(owner: LifecycleOwner) {
+  override fun onDestroy(owner: LifecycleOwner) {
     release()
   }
 

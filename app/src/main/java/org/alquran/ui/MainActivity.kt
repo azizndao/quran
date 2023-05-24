@@ -16,6 +16,7 @@ import org.koin.android.ext.android.get
 import org.koin.android.ext.android.inject
 import org.koin.android.scope.AndroidScopeComponent
 import org.koin.androidx.scope.activityRetainedScope
+import org.koin.androidx.scope.activityScope
 import org.koin.core.scope.Scope
 import org.quran.core.audio.PlaybackConnection
 import org.quran.ui.theme.QuranFontFamilies
@@ -23,7 +24,7 @@ import org.quran.ui.theme.QuranTheme
 
 class MainActivity : ComponentActivity(), AndroidScopeComponent {
 
-  override val scope: Scope by activityRetainedScope()
+  override val scope: Scope by activityScope()
 
   private val playbackConnection by inject<PlaybackConnection>()
 
