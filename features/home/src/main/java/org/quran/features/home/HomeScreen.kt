@@ -2,6 +2,7 @@ package org.quran.features.home
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
@@ -39,6 +40,7 @@ val tabItems = listOf(Ui.string.surats, Ui.string.juzs)
 @Composable
 internal fun HomeScreen(
   viewModel: HomeViewModel,
+  contentPadding: PaddingValues,
   navigateToMore: () -> Unit,
   navigateToSearch: () -> Unit,
   navigateToPage: (page: Int, key: VerseKey?) -> Unit,
@@ -60,13 +62,16 @@ internal fun HomeScreen(
       Box(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
         when (position) {
           0 -> SurahList(
+            contentPadding = contentPadding,
             uiStateFlow = viewModel.surahsFlow,
-            onNavigate = { page, key -> navigateToPage(page, key) }
+            onNavigate = { page, key -> navigateToPage(page, key) },
           )
 
-          1 -> ListJuzs(uiStateFlow = viewModel.hibzUiStateFlow) {
-            navigateToPage(it.page, null)
-          }
+          1 -> ListJuzs(
+            contentPadding = contentPadding,
+            uiStateFlow = viewModel.hibzUiStateFlow,
+            onNavigate = { navigateToPage(it.page, null) }
+          )
 
           else -> throw IndexOutOfBoundsException()
         }

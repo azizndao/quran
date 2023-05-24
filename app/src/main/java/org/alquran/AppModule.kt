@@ -9,6 +9,7 @@ import org.quran.core.audio.AudioCoreModule
 import org.quran.core.audio.PlaybackConnection
 import org.quran.features.home.FeatureHomeModule
 import org.quran.features.pager.FeaturePagerModule
+import org.quran.features.saved.FeatureSavedModule
 import org.quran.features.verse_menu.FeatureVerseMenuModule
 
 val AppModule = module {
@@ -17,6 +18,7 @@ val AppModule = module {
     AudioCoreModule,
 
     FeatureHomeModule,
+    FeatureSavedModule,
     FeatureSearchModule,
     FeaturePagerModule,
     FeatureTranslationModule,

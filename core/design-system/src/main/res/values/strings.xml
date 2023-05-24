@@ -196,4 +196,6 @@
     <string name="tafsir">Tafsir</string>
     <string name="select_at_least_one_translation">Select at least one translation</string>
     <string name="selected_translations">Selected translations</string>
+    <string name="notes">Notes</string>
+    <string name="saved">Saved</string>
 </resources>

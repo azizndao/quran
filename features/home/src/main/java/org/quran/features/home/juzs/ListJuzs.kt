@@ -4,15 +4,13 @@ import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.add
 import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
@@ -40,17 +38,20 @@ import arg.quran.models.HizbQuarter
 import kotlinx.coroutines.flow.StateFlow
 import org.alquran.ui.components.LineSeparator
 import org.quran.ui.components.CircularProgressLoader
+import org.quran.ui.utils.extensions.add
 import org.quran.ui.R as Ui
 
 @Composable
 fun ListJuzs(
   modifier: Modifier = Modifier,
+  contentPadding: PaddingValues,
   uiStateFlow: StateFlow<JuzListUiState>,
   onNavigate: (HizbQuarter) -> Unit,
 ) {
   val uiState by uiStateFlow.collectAsStateWithLifecycle()
   CircularProgressLoader(uiState.loading) {
     ListJuz(
+      contentPadding = contentPadding,
       modifier = modifier,
       uiState = uiState,
       onItemClick = onNavigate
@@ -61,6 +62,7 @@ fun ListJuzs(
 @Composable
 private fun ListJuz(
   modifier: Modifier = Modifier,
+  contentPadding: PaddingValues,
   listState: LazyListState = rememberLazyListState(),
   uiState: JuzListUiState,
   onItemClick: (HizbQuarter) -> Unit,
@@ -78,9 +80,8 @@ private fun ListJuz(
   LazyColumn(
     modifier = modifier,
     state = listState,
-    contentPadding = WindowInsets.navigationBars
-      .add(WindowInsets(bottom = 16.dp, left = 12.dp, right = 12.dp, top = 16.dp))
-      .asPaddingValues(),
+    contentPadding = contentPadding
+      .add(bottom = 16.dp, end = 12.dp, start = 12.dp, top = 16.dp),
   ) {
     for ((juz, page, quarters) in uiState.data) {
       item {

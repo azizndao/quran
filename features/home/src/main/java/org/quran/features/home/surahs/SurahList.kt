@@ -5,15 +5,12 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.add
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
@@ -45,9 +42,11 @@ import org.quran.features.home.juzs.JuzHeader
 import org.quran.ui.components.CircularProgressLoader
 import org.quran.ui.components.SectionTitle
 import org.quran.ui.theme.QuranFontFamilies
+import org.quran.ui.utils.extensions.add
 
 @Composable
 fun SurahList(
+  contentPadding: PaddingValues,
   modifier: Modifier = Modifier,
   uiStateFlow: StateFlow<SurahListUiState>,
   onNavigate: (Int, VerseKey?) -> Unit,
@@ -57,6 +56,7 @@ fun SurahList(
 
   CircularProgressLoader(uiState.loading, modifier = modifier) {
     SurahList(
+      contentPadding = contentPadding,
       uiState = uiState,
       onNavigate = onNavigate
     )
@@ -66,6 +66,7 @@ fun SurahList(
 @Composable
 private fun SurahList(
   modifier: Modifier = Modifier,
+  contentPadding: PaddingValues,
   state: LazyListState = rememberLazyListState(),
   uiState: SurahListUiState,
   onNavigate: (Int, VerseKey?) -> Unit,
@@ -80,11 +81,9 @@ private fun SurahList(
   )
   LazyColumn(
     modifier = modifier.testTag("quran:surahList"),
-    contentPadding = WindowInsets.navigationBars
-      .add(WindowInsets(top = 16.dp, bottom = 16.dp, right = 12.dp, left = 12.dp))
-      .asPaddingValues(),
-    state = state,
-//    verticalArrangement = Arrangement.spacedBy(16.dp),
+    contentPadding = contentPadding
+      .add(top = 16.dp, bottom = 16.dp, start = 12.dp, end = 12.dp),
+      state = state,
   ) {
 
     uiState.recentSurah?.let { recentSura ->
