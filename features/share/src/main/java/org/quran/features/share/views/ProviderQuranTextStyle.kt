@@ -1,4 +1,4 @@
-package org.quran.features.pager.components
+package org.quran.features.share.views
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider

@@ -6,25 +6,14 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.PaddingValues
-import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.asPaddingValues
-import androidx.compose.foundation.layout.calculateEndPadding
-import androidx.compose.foundation.layout.calculateStartPadding
-import androidx.compose.foundation.layout.displayCutout
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.PagerState
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -34,8 +23,8 @@ import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.platform.LocalView
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -45,20 +34,26 @@ import androidx.core.view.WindowInsetsCompat
 import androidx.core.view.WindowInsetsControllerCompat
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import arg.quran.models.quran.VerseKey
-import kotlinx.coroutines.flow.StateFlow
-import org.quran.core.audio.models.NowPlaying
+import kotlinx.coroutines.flow.collectLatest
+import kotlinx.coroutines.flow.filter
+import kotlinx.coroutines.flow.map
 import org.quran.datastore.DisplayMode
+import org.quran.features.pager.components.AddNoteBottomSheet
 import org.quran.features.pager.components.AudioBottomBar
 import org.quran.features.pager.components.DisplayModeButton
 import org.quran.features.pager.components.MushafPageView
-import org.quran.features.pager.components.NoTranslationView
 import org.quran.features.pager.components.ProviderQuranTextStyle
+import org.quran.features.pager.components.SelectBookmarkTagSheet
+import org.quran.features.pager.components.ShowBookmarksSheet
 import org.quran.features.pager.components.TranslationPageItem
+import org.quran.features.pager.components.VerseMenuSheet
+import org.quran.features.pager.components.VerseTafsirSheet
+import org.quran.features.pager.uiState.DialogUiState
 import org.quran.features.pager.uiState.MushafPage
+import org.quran.features.pager.uiState.QuranEvent
 import org.quran.features.pager.uiState.QuranPageItem
 import org.quran.features.pager.uiState.QuranPagerUiState
 import org.quran.features.pager.uiState.TranslationPage
-import org.quran.translation.exceptions.NoTranslationException
 import org.quran.ui.components.AnimatedCounter
 import org.quran.ui.components.BackButton
 import org.quran.ui.components.MuslimsTopAppBarDefaults
@@ -69,136 +64,155 @@ import org.quran.ui.R as Ui
 
 @Composable
 internal fun QuranPagerScreen(
-  uiState: QuranPagerUiState,
-  audioStateFlow: StateFlow<NowPlaying?>,
+  viewModel: QuranPagerViewModel,
   popBackStack: () -> Unit,
   pageProvider: @Composable (DisplayMode, page: Int, version: Int) -> QuranPageItem?,
-  pagerState: PagerState = rememberPagerState(uiState.page - 1) { 604 },
+  pagerState: PagerState = rememberPagerState(viewModel.args.page - 1) { 604 },
   navigateToSearch: () -> Unit,
   navigateToTranslations: () -> Unit,
-  navigateToVerseMenu: (verse: VerseKey, word: Int?) -> Unit,
+  navigateToShare: (verse: VerseKey) -> Unit,
 ) {
 
-  Scaffold(
-    topBar = {
-      val currentPage by remember { derivedStateOf { pagerState.currentPage + 1 } }
-      AnimatedVisibility(
-        visible = !uiState.isFullscreen,
-        enter = slideInVertically { -it },
-        exit = slideOutVertically { -it },
-      ) {
-        TopBar(
-          page = currentPage,
-          displayMode = uiState.displayMode,
-          navigateToSearch = navigateToSearch,
-          navigateToTranslations = navigateToTranslations,
-          onPopBackStack = popBackStack,
-          onDisplayModeChange = { uiState.onEvent(QuranEvent.ChangeDisplayMode(it)) },
-        )
-      }
-    },
-    bottomBar = {
-      val nowPlaying by audioStateFlow.collectAsStateWithLifecycle()
-      val visible by remember(uiState, nowPlaying) {
-        derivedStateOf {
-          !uiState.isFullscreen && nowPlaying != null
+  Box {
+    val currentPage by remember { derivedStateOf { pagerState.currentPage + 1 } }
+
+    HandleFullscreen(viewModel.isFullscreen) { viewModel.toggleFullscreen() }
+
+    LaunchedEffect(Unit) {
+      val currentIndex = pagerState.currentPage
+      viewModel.playingPageFlow.map { it - 1 }
+        .filter { it != pagerState.currentPage }
+        .collectLatest { index ->
+          if (abs(index - currentIndex) == 1) {
+            pagerState.animateScrollToPage(index)
+          }
         }
-      }
+    }
 
-      AnimatedVisibility(
-        visible = visible,
-        enter = slideInVertically { it },
-        exit = slideOutVertically { it },
-      ) {
-        AudioBottomBar(uiState = nowPlaying!!, onEvent = { uiState.onEvent(it) }) {}
-      }
-    },
-  ) { innerPadding ->
+    val uiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
-    if (uiState.exception is NoTranslationException && uiState.displayMode == DisplayMode.QURAN_TRANSLATION) {
-      NoTranslationView(navigate = navigateToTranslations)
-    } else {
-      QuranPaged(
-        pagerState = pagerState,
-        uiState = uiState,
-        innerPadding = innerPadding,
-        navigateToVerseMenu = navigateToVerseMenu,
-        pageProvider = pageProvider
+    QuranPaged(
+      pagerState = pagerState,
+      uiState = uiState,
+      onEvent = viewModel::onEvent,
+      pageProvider = pageProvider,
+    )
+
+    DialogHandler(viewModel, navigateToShare = navigateToShare)
+
+    AnimatedVisibility(
+      visible = !viewModel.isFullscreen,
+      enter = slideInVertically { -it },
+      exit = slideOutVertically { -it },
+      modifier = Modifier.align(Alignment.TopCenter)
+    ) {
+      TopBar(
+        page = currentPage,
+        displayMode = uiState.displayMode,
+        navigateToSearch = navigateToSearch,
+        navigateToTranslations = navigateToTranslations,
+        onPopBackStack = popBackStack,
+        onDisplayModeChange = viewModel::changeDisplayMode,
       )
+    }
+
+    val nowPlaying by viewModel.nowPlayingFlow.collectAsStateWithLifecycle()
+    val visible by remember(viewModel, nowPlaying) {
+      derivedStateOf {
+        !viewModel.isFullscreen && nowPlaying != null
+      }
+    }
+
+    AnimatedVisibility(
+      visible = visible,
+      enter = slideInVertically { it },
+      exit = slideOutVertically { it },
+      modifier = Modifier.align(Alignment.BottomCenter)
+    ) {
+      AudioBottomBar(uiState = nowPlaying!!, onEvent = { viewModel.onEvent(it) }) {}
     }
   }
 }
 
 @Composable
+internal fun DialogHandler(viewModel: QuranPagerViewModel, navigateToShare: (VerseKey) -> Unit) {
+  when (val uiState = viewModel.dialogUiState) {
+    is DialogUiState.CreateNote -> AddNoteBottomSheet(
+      verse = uiState.verse,
+      onDismissRequest = viewModel::onDismissRequest,
+      onCreate = viewModel::createNote
+    )
+
+    is DialogUiState.SelectBookmarkTab -> SelectBookmarkTagSheet(
+      uiState = uiState,
+      onDismissRequest = viewModel::onDismissRequest,
+      onCreate = viewModel::onCreateBookmarkAndTag,
+      onSelect = viewModel::onCreateBookmark
+    )
+
+    is DialogUiState.ShowBookmarks -> ShowBookmarksSheet(
+      uiState = uiState,
+      onDelete = viewModel::removeBookmark,
+      onDismissRequest = viewModel::onDismissRequest
+    )
+
+    is DialogUiState.VerseMenu -> VerseMenuSheet(
+      uiState = uiState,
+      onEvent = viewModel::onEvent,
+      onDismissRequest = viewModel::onDismissRequest,
+      navigateToShare = {
+        viewModel.onDismissRequest()
+        navigateToShare(uiState.verse)
+      },
+    )
+
+    is DialogUiState.VerseTafsir -> VerseTafsirSheet(
+      uiState = uiState,
+      onDismissRequest = viewModel::onDismissRequest
+    )
+
+    DialogUiState.None -> {}
+  }
+}
+
+@Composable
 private fun QuranPaged(
+  modifier: Modifier = Modifier,
   pagerState: PagerState,
   uiState: QuranPagerUiState,
-  innerPadding: PaddingValues,
-  navigateToVerseMenu: (verse: VerseKey, word: Int?) -> Unit,
+  onEvent: (QuranEvent) -> Unit,
   pageProvider: @Composable (DisplayMode, page: Int, version: Int) -> QuranPageItem?
 ) {
-  LaunchedEffect(uiState) {
-    val currentIndex = pagerState.currentPage
-    if (uiState.playingPage != null && uiState.playingPage != currentIndex) {
-      val page = uiState.playingPage - 1
-      if (abs(page - currentIndex) == 1) {
-        pagerState.animateScrollToPage(page)
-      }
-    }
-  }
-
-  HandleFullscreen(uiState.isFullscreen) { uiState.onEvent(QuranEvent.FullscreenChange(it)) }
-
-  val safeContentInsets = WindowInsets.displayCutout.asPaddingValues()
-
-  val contentPadding = PaddingValues(
-    top = safeContentInsets.calculateTopPadding(),
-    bottom = 16.dp + safeContentInsets.calculateBottomPadding(),
-    start = innerPadding.calculateEndPadding(LocalLayoutDirection.current),
-    end = innerPadding.calculateStartPadding(LocalLayoutDirection.current),
-  )
 
   val currentOnQuranEvent by rememberUpdatedState { event: QuranEvent ->
-    if (event is QuranEvent.AyahLongPressed) {
-      navigateToVerseMenu(event.verseKey, event.word)
-    }
-    uiState.onEvent(event)
+    onEvent(event)
   }
 
   HorizontalPager(
     state = pagerState,
     reverseLayout = true,
     beyondBoundsPageCount = 1,
-    pageSpacing = 24.dp,
+    pageSpacing = 1.dp,
     key = { it },
-    modifier = Modifier
+    modifier = modifier
       .background(MaterialTheme.colorScheme.surfaceVariant)
-      .clickable(remember { MutableInteractionSource() }, indication = null) {
-        uiState.onEvent(QuranEvent.FullscreenChange(!uiState.isFullscreen))
-      },
   ) { pageIndex ->
-    val page = pageProvider(uiState.displayMode, pageIndex + 1, uiState.version)
 
     ProviderQuranTextStyle(page = pageIndex + 1, fontScale = uiState.quranFontScale) {
       Surface(modifier = Modifier.fillMaxSize()) {
-        when (page) {
+
+        when (val page = pageProvider(uiState.displayMode, pageIndex + 1, uiState.version)) {
           is MushafPage -> MushafPageView(
             page = page,
             onAyahEvent = currentOnQuranEvent,
-            modifier = Modifier.padding(contentPadding),
           )
 
           is TranslationPage -> TranslationPageItem(
             page = page,
-            contentPadding = contentPadding,
-            onAyahEvent = currentOnQuranEvent,
+            onEvent = currentOnQuranEvent,
           )
 
-          else -> CircularProgressIndicator(
-            modifier = Modifier
-              .fillMaxSize()
-              .wrapContentSize()
-          )
+          else -> {}
         }
       }
     }

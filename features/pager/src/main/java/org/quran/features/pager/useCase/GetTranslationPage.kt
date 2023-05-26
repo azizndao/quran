@@ -99,7 +99,7 @@ class GetTranslationPage(
     return combine(
       verseRepository.getVerses(range),
       getSelectedTranslationEditions(range).filter(List<LocalTranslationContent>::isNotEmpty),
-      bookmarkRepository.getBookmarksWithKeys(keys),
+      bookmarkRepository.observeBookmarksWithKeys(keys),
       playbackConnection.currentAyah,
     ) { verses, translations, bookmarks, playingVerse ->
 

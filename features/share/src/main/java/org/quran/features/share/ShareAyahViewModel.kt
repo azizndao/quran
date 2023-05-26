@@ -19,9 +19,10 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import org.alquran.verses.repository.VerseRepository
+import org.quram.common.core.QuranInfo
+import org.quram.common.repositories.SurahRepository
 import org.quran.features.share.navigation.shareAyahDestinationArgs
 import org.quran.features.share.views.ShareCardView
-import org.quram.common.repositories.SurahRepository
 import org.quran.translation.repositories.TranslationsRepository
 import org.quran.translation.repositories.VerseTranslationRepository
 import java.io.File
@@ -35,6 +36,7 @@ internal class ShareAyahViewModel(
   private val surahRepository: SurahRepository,
   private val translationsRepository: TranslationsRepository,
   private val verseTranslationRepository: VerseTranslationRepository,
+  private val quranInfo: QuranInfo,
   app: Application
 ) : AndroidViewModel(app) {
 
@@ -65,7 +67,8 @@ internal class ShareAyahViewModel(
         sura = ayah.sura,
         surahName = suraName,
         text = ayah.text,
-        translation = translation?.text
+        translation = translation?.text,
+        page = quranInfo.getPageFromSuraAyah(suraAyah.sura, suraAyah.aya)
       )
     }
   }

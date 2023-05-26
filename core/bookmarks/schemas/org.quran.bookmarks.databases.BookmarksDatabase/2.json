@@ -1,12 +1,12 @@
 {
   "formatVersion": 1,
   "database": {
-    "version": 1,
-    "identityHash": "03d18d68bfbb672c047f2ce40a918ec7",
+    "version": 2,
+    "identityHash": "3bfa3d18ce289fc2f00e2f0fd33de0cf",
     "entities": [
       {
         "tableName": "bookmarks",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `key` TEXT NOT NULL, `label` TEXT NOT NULL, `tagId` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `key` TEXT NOT NULL, `name` TEXT NOT NULL, `tagId` INTEGER NOT NULL, `createdAt` INTEGER NOT NULL)",
         "fields": [
           {
             "fieldPath": "id",
@@ -21,8 +21,8 @@
             "notNull": true
           },
           {
-            "fieldPath": "label",
-            "columnName": "label",
+            "fieldPath": "name",
+            "columnName": "name",
             "affinity": "TEXT",
             "notNull": true
           },
@@ -70,11 +70,11 @@
       },
       {
         "tableName": "tags",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`tagId` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `color` INTEGER)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `name` TEXT NOT NULL, `createdAt` INTEGER NOT NULL, `color` INTEGER)",
         "fields": [
           {
             "fieldPath": "id",
-            "columnName": "tagId",
+            "columnName": "id",
             "affinity": "INTEGER",
             "notNull": true
           },
@@ -100,7 +100,7 @@
         "primaryKey": {
           "autoGenerate": true,
           "columnNames": [
-            "tagId"
+            "id"
           ]
         },
         "indices": [
@@ -120,7 +120,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '03d18d68bfbb672c047f2ce40a918ec7')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '3bfa3d18ce289fc2f00e2f0fd33de0cf')"
     ]
   }
 }

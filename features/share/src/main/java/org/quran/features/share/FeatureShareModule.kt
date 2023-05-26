@@ -7,7 +7,7 @@ import org.quram.common.CommonModule
 import org.quran.datastore.di.DataStoreModule
 import org.quran.translation.TranslationModule
 
-val QuranShareModule = module {
+val FeatureShareModule = module {
   includes(CommonModule, VersesModule, TranslationModule, DataStoreModule)
 
   viewModelOf(::ShareAyahViewModel)

@@ -13,7 +13,6 @@ fun NavGraphBuilder.translationDestination(popBackStack: () -> Unit) {
     TranslationsScreen(
       uiState = viewModel.uiState,
       popBackStack = popBackStack,
-      refresh = viewModel::refresh
     )
   }
 }

@@ -1,4 +1,4 @@
-package org.alquran.ui.components
+package org.quran.ui.components
 
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
@@ -26,7 +26,7 @@ fun TabBar(
   contentColor: Color = contentColorFor(containerColor),
   divider: @Composable () -> Unit = { /*Divider()*/ },
   indicator: @Composable (tabPositions: List<TabPosition>) -> Unit = @Composable { tabPositions ->
-    TabRowDefaults.Indicator(
+    TabRowDefaults.SecondaryIndicator(
       Modifier.tabIndicatorOffset(tabPositions[selectedTabIndex]),
       height = 2.dp
     )

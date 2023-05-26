@@ -11,9 +11,9 @@ data class TranslationPage(
   val scrollIndex: Int,
   val firstItem: Boolean,
 ) : QuranPageItem() {
-  sealed class Row(open val key: Any)
+  sealed class Row(val key: String)
 
-  data class Chapter(val number: Int, val name: String) : Row(number)
+  data class Chapter(val number: Int, val name: String) : Row("$number")
 
   data class Verse(
     val suraAyah: VerseKey,
@@ -39,5 +39,5 @@ data class TranslationPage(
     val isPlaying: Boolean,
   ) : Row("Toolbar($suraAyah)")
 
-  class Divider(key: Any) : Row(key)
+  class Divider(key: String) : Row(key)
 }

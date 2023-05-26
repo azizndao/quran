@@ -1,4 +1,4 @@
-package org.alquran.ui.theme
+package org.quran.ui.theme
 
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material3.Shapes

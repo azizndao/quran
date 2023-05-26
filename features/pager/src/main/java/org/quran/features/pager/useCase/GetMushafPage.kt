@@ -49,7 +49,7 @@ class GetMushafPage(
 
     return combine(
       verseRepository.getVersesWordsByPage(page),
-      bookmarkRepository.getBookmarksWithKeys(keys),
+      bookmarkRepository.observeBookmarksWithKeys(keys),
       playbackConnection.currentAyah,
       selectionFlow
     ) { pageWords, bookmarks, verseKey, selectedAya ->

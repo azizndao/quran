@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -34,9 +35,9 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import org.alquran.ui.theme.LocalQuranTextStyle
-import org.alquran.ui.theme.surahNames
-import org.quran.features.pager.QuranEvent
+import org.quran.ui.theme.LocalQuranTextStyle
+import org.quran.ui.theme.surahNames
+import org.quran.features.pager.uiState.QuranEvent
 import org.quran.features.pager.R
 import org.quran.features.pager.uiState.MushafPage
 import org.quran.ui.components.LongClickableText
@@ -48,7 +49,11 @@ fun MushafPageView(
   onAyahEvent: (QuranEvent) -> Unit
 ) {
 
-  BoxWithConstraints(modifier = modifier.fillMaxSize()) {
+  BoxWithConstraints(
+    modifier = modifier
+      .displayCutoutPadding()
+      .fillMaxSize()
+  ) {
 
     val lineHeight = with(LocalDensity.current) {
       LocalQuranTextStyle.current.lineHeight.toDp()
@@ -176,7 +181,7 @@ fun MushafTextLine(
 
   LongClickableText(
     text = text,
-    style = style.copy(textAlign = TextAlign.Justify),
+    style = style,
     modifier = modifier
       .fillMaxWidth()
       .wrapContentWidth(),

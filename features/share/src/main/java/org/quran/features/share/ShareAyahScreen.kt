@@ -19,7 +19,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ElevatedAssistChip
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
-import androidx.compose.material3.LocalTextStyle
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
@@ -39,12 +38,15 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.viewinterop.AndroidView
+import org.quran.ui.theme.LocalQuranTextStyle
+import org.quran.datastore.FontScale
 import org.quran.features.share.utils.ShareAyahPreviewParameterProvider
+import org.quran.features.share.views.ProviderQuranTextStyle
 import org.quran.features.share.views.ShareCardView
+import org.quran.ui.R
 import org.quran.ui.components.CircularProgressLoader
 import org.quran.ui.theme.QuranTheme
 import org.quran.ui.utils.extensions.htmlToAnnotatedString
-import org.quran.ui.R as UI
 
 @Composable
 internal fun ShareAyahScreen(
@@ -52,11 +54,11 @@ internal fun ShareAyahScreen(
   uiState: ShareAyahUiState,
   popBackStack: () -> Unit,
 ) {
-  QuranTheme(darkTheme = true) {
-    Surface(color = MaterialTheme.colorScheme.background) {
-      CircularProgressLoader(loading = uiState is ShareAyahUiState.Loading) {
-        ShareAyahScreen(uiState, onBackPress = popBackStack, share)
-      }
+
+  CircularProgressLoader(loading = uiState is ShareAyahUiState.Loading) {
+    val state = uiState as ShareAyahUiState.Success
+    ProviderQuranTextStyle(page = state.page, fontScale = FontScale.NORMAL) {
+      ShareAyahScreen(uiState, onBackPress = popBackStack, share)
     }
   }
 }
@@ -106,23 +108,23 @@ private fun BottomMenu() {
   ) {
     ElevatedAssistChip(
       onClick = { /*TODO*/ },
-      leadingIcon = { Icon(painterResource(id = UI.drawable.ic_palette), null) },
-      label = { Text(stringResource(id = UI.string.color_palette)) }
+      leadingIcon = { Icon(painterResource(id = R.drawable.ic_palette), null) },
+      label = { Text(stringResource(id = R.string.color_palette)) }
     )
     ElevatedAssistChip(
       onClick = { /*TODO*/ },
-      leadingIcon = { Icon(painterResource(id = UI.drawable.ic_edit), null) },
-      label = { Text(stringResource(id = UI.string.text)) }
+      leadingIcon = { Icon(painterResource(id = R.drawable.ic_edit), null) },
+      label = { Text(stringResource(id = R.string.text)) }
     )
     ElevatedAssistChip(
       onClick = { /*TODO*/ },
-      leadingIcon = { Icon(painterResource(id = UI.drawable.ic_translate), null) },
-      label = { Text(stringResource(id = UI.string.translation)) }
+      leadingIcon = { Icon(painterResource(id = R.drawable.ic_translate), null) },
+      label = { Text(stringResource(id = R.string.translation)) }
     )
     ElevatedAssistChip(
       onClick = { /*TODO*/ },
-      leadingIcon = { Icon(painterResource(id = UI.drawable.ic_translate), null) },
-      label = { Text(stringResource(id = UI.string.translation)) }
+      leadingIcon = { Icon(painterResource(id = R.drawable.ic_translate), null) },
+      label = { Text(stringResource(id = R.string.translation)) }
     )
   }
 }
@@ -136,11 +138,11 @@ private fun NavigationBar(onBackPress: () -> Unit, onShare: () -> Unit) {
     horizontalArrangement = Arrangement.SpaceBetween
   ) {
     TextButton(onClick = onBackPress) {
-      Text(stringResource(id = org.quram.common.R.string.canceling))
+      Text(stringResource(id = R.string.cancel))
     }
 
     FilledTonalButton(onClick = onShare) {
-      Text(stringResource(id = org.quran.ui.R.string.share))
+      Text(stringResource(id = R.string.share))
     }
   }
 }
@@ -166,25 +168,23 @@ private fun ShareCard(
           .padding(bottom = 8.dp)
       ) {
         Icon(
-          painterResource(id = UI.drawable.logo),
-          contentDescription = stringResource(id = UI.string.app_name),
+          painterResource(id = R.drawable.logo),
+          contentDescription = stringResource(id = R.string.app_name),
           tint = colorScheme.primary,
           modifier = Modifier.size(24.dp)
         )
         Spacer(modifier = Modifier.width(16.dp))
         Text(
-          stringResource(id = UI.string.app_name),
+          stringResource(id = R.string.app_name),
           fontWeight = FontWeight.Bold,
           color = colorScheme.onSurface.copy(alpha = 0.7f),
         )
       }
 
-      val textStyle = LocalTextStyle.current
-
       AnimatedVisibility(visible = uiState.text != null) {
         Text(
           uiState.text!!,
-          style = textStyle,
+          style = LocalQuranTextStyle.current,
           modifier = Modifier.fillMaxWidth(),
           textAlign = TextAlign.Center
         )

@@ -1,8 +1,12 @@
 package org.quran.features.pager.components
 
+import androidx.compose.foundation.clickable
+import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
+import androidx.compose.foundation.layout.displayCutout
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -12,6 +16,9 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
@@ -21,9 +28,10 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.alquran.ui.components.LineSeparator
-import org.quran.features.pager.QuranEvent
+import org.quran.features.pager.uiState.QuranEvent
 import org.quran.features.pager.uiState.QuranPageItem
 import org.quran.features.pager.uiState.TranslationPage
+import org.quran.ui.utils.extensions.add
 import kotlin.math.min
 import org.quran.ui.R as UI
 
@@ -31,9 +39,10 @@ import org.quran.ui.R as UI
 fun TranslationPageItem(
   page: TranslationPage,
   modifier: Modifier = Modifier,
-  contentPadding: PaddingValues = PaddingValues(),
-  onAyahEvent: (QuranEvent) -> Unit,
+  onEvent: (QuranEvent) -> Unit,
 ) {
+
+  val currentOnEvent by rememberUpdatedState(onEvent)
 
   val scrollOffset = -with(LocalDensity.current) { 64.dp.roundToPx() }
 
@@ -48,9 +57,12 @@ fun TranslationPageItem(
     }
   }
 
+  val interactionSource = remember { MutableInteractionSource() }
+
   LazyColumn(
     modifier = modifier.fillMaxSize(),
-    contentPadding = contentPadding,
+    contentPadding = WindowInsets.displayCutout.asPaddingValues()
+      .add(bottom = 16.dp),
     state = listState,
     verticalArrangement = spacedByWithFooter(0.dp),
   ) {
@@ -68,23 +80,51 @@ fun TranslationPageItem(
           SurahHeader(
             surahName = row.name,
             suraNumber = row.number,
+            modifier = Modifier.clickable(
+              interactionSource,
+              indication = null,
+              onClick = { currentOnEvent(QuranEvent.AyahPressed) }
+            )
           )
         }
 
         is TranslationPage.Verse -> item(key = row.key, contentType = "verse") {
-          VerseItemView(verse = row)
+          VerseItemView(
+            verse = row,
+            modifier = Modifier.clickable(
+              interactionSource,
+              indication = null,
+              onClick = { currentOnEvent(QuranEvent.AyahPressed) }
+            )
+          )
         }
 
         is TranslationPage.Divider -> item(key = row.key) {
-          LineSeparator(modifier = Modifier.padding(horizontal = 16.dp))
+          LineSeparator(
+            modifier = Modifier.padding(horizontal = 16.dp),
+          )
         }
 
         is TranslationPage.TranslatedVerse -> item(key = row.key, contentType = "translation") {
-          TranslationItemView(translation = row)
+          TranslationItemView(
+            translation = row,
+            modifier = Modifier.clickable(
+              interactionSource,
+              indication = null,
+              onClick = { currentOnEvent(QuranEvent.AyahPressed) }
+            )
+          )
         }
 
         is TranslationPage.VerseToolbar -> item(row.key, contentType = "toolbar") {
-          VerseToolbarView(verse = row, onEvent = onAyahEvent)
+          VerseToolbarView(
+            verse = row, onEvent = currentOnEvent,
+            modifier = Modifier.clickable(
+              interactionSource,
+              indication = null,
+              onClick = { currentOnEvent(QuranEvent.AyahPressed) }
+            )
+          )
         }
       }
     }

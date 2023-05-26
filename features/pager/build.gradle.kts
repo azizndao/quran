@@ -10,6 +10,6 @@ android {
 dependencies {
   implementation(project(":core:audio"))
   implementation(project(":core:translation"))
-  implementation(project(mapOf("path" to ":core:bookmarks")))
-  implementation(project(mapOf("path" to ":core:verses")))
+  implementation(project(":core:bookmarks"))
+  implementation(project(":core:verses"))
 }

@@ -1,4 +1,4 @@
-package org.alquran.ui.theme
+package org.quran.ui.theme
 
 import androidx.compose.material3.darkColorScheme
 import androidx.compose.material3.lightColorScheme

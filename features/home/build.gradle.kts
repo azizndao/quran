@@ -9,5 +9,5 @@ android {
 }
 
 dependencies {
-  implementation(project(mapOf("path" to ":core:verses")))
+  implementation(project(":core:verses"))
 }

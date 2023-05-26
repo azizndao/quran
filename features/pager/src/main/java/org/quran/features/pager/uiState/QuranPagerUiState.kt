@@ -1,23 +1,20 @@
 package org.quran.features.pager.uiState
 
+import androidx.compose.runtime.Stable
 import arg.quran.models.quran.VerseKey
-import org.quran.core.audio.models.NowPlaying
 import org.quran.datastore.DisplayMode
 import org.quran.datastore.FontScale
-import org.quran.features.pager.QuranEvent
+import org.quran.datastore.serializers.DEFAULT_QURAN_FONT_SIZE
+import org.quran.datastore.serializers.DEFAULT_TRANSLATION_FONT_SIZE
 
-
+@Stable
 data class QuranPagerUiState(
   val page: Int,
-  val playingPage: Int? = null,
-  val displayMode: DisplayMode,
-  val quranFontScale: FontScale,
-  val translationFontScale: FontScale,
-  val version: Int,
-  val isFullscreen: Boolean = false,
-  val nowPlaying: NowPlaying? = null,
+  val displayMode: DisplayMode = DisplayMode.UNRECOGNIZED,
+  val quranFontScale: FontScale = DEFAULT_QURAN_FONT_SIZE,
+  val translationFontScale: FontScale = DEFAULT_TRANSLATION_FONT_SIZE,
+  val version: Int = 1,
   val exception: Exception? = null,
-  val onEvent: (QuranEvent) -> Unit,
 )
 
 sealed class QuranSelection {

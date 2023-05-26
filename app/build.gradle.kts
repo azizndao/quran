@@ -9,9 +9,13 @@ plugins {
 android {
   namespace = "org.alquran"
 
+  buildFeatures {
+    buildConfig = true
+  }
+
   defaultConfig {
     applicationId = "org.alquran"
-    versionCode = 10
+    versionCode = 12
     versionName = "1.0.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"
@@ -41,18 +45,11 @@ android {
       // Enable experimental coroutines APIs, including Flow
       "-opt-in=kotlinx.coroutines.ExperimentalCoroutinesApi",
       "-opt-in=kotlinx.coroutines.FlowPreview",
-      "-opt-in=kotlin.Experimental",
       // Enable experimental kotlinx serialization APIs
-      "-opt-in=kotlinx.serialization.ExperimentalSerializationApi",
       "-opt-in=androidx.compose.material3.ExperimentalMaterial3Api",
       "-opt-in=androidx.compose.animation.graphics.ExperimentalAnimationGraphicsApi",
-      "-opt-in=androidx.lifecycle.compose.ExperimentalLifecycleComposeApi",
-      "-opt-in=androidx.compose.ui.ExperimentalComposeUiApi",
       "-opt-in=androidx.compose.foundation.ExperimentalFoundationApi",
       "-opt-in=androidx.compose.animation.ExperimentalAnimationApi",
-      "-opt-in=com.bumptech.glide.integration.compose.ExperimentalGlideComposeApi",
-      "-opt-in=androidx.compose.material.ExperimentalMaterialApi",
-      "-opt-in=com.google.accompanist.navigation.material.ExperimentalMaterialNavigationApi",
     )
   }
 }
@@ -63,6 +60,7 @@ dependencies {
   implementation(project(":core:design-system"))
   implementation(project(":core:audio"))
   implementation(project(":core:models"))
+  implementation(project(":core:navigation"))
 
   implementation(project(":features:home"))
   implementation(project(":features:search"))
@@ -70,12 +68,9 @@ dependencies {
   implementation(project(":features:share"))
   implementation(project(":features:pager"))
   implementation(project(":features:translations"))
-  implementation(project(":features:verse-menu"))
 
   implementation(libs.androidx.compose.material)
   implementation(libs.timber)
-
-  implementation(libs.accompanist.navigation.material)
 
   implementation(libs.androidx.work)
 

@@ -39,6 +39,7 @@ import org.quran.core.audio.models.NowPlaying
 import org.quran.core.audio.repositories.RecitationRepository
 import org.quran.core.audio.repositories.TimingRepository
 import org.quran.datastore.repositories.AudioPreferencesRepository
+import java.util.concurrent.Executors
 
 class PlaybackConnection(
   private val context: Context,
@@ -50,55 +51,27 @@ class PlaybackConnection(
   private lateinit var coroutineScope: CoroutineScope
 
   private val _isConnected = MutableStateFlow(false)
-  val isConnected = _isConnected.asStateFlow()
 
   private val _playingState = MutableStateFlow(AudioState())
 
   private val _repeatMode = MutableStateFlow(Player.REPEAT_MODE_OFF)
-  val repeatMode = _repeatMode.asStateFlow()
 
   private val _currentMediaItem = MutableStateFlow<MediaItem?>(null)
-  val currentMediaItem: StateFlow<MediaItem?> get() = _currentMediaItem
 
 
-  val currentAyah by lazy {
-    nowPlaying.map { playing -> playing?.let { VerseKey(it.sura, it.ayah) } }.distinctUntilChanged()
-  }
+  lateinit var currentAyah: Flow<VerseKey?>
 
-  val nowPlaying by lazy {
-    getTimingFlow(100).combine(_playingState) { timing, state ->
-      val currentMediaItem = mediaController.currentMediaItem
-
-      if (currentMediaItem == null || timing == null) return@combine null
-
-      val mediaMetadata = currentMediaItem.mediaMetadata
-      val mediaId = MediaId.fromString(currentMediaItem.mediaId)
-
-      NowPlaying(
-        title = mediaMetadata.title.toString() + " (${mediaId.sura}:${timing.ayah})",
-        reciterName = mediaMetadata.artist.toString(),
-        sura = timing.sura,
-        ayah = timing.ayah,
-        reciter = mediaId.reciter,
-        artWork = mediaMetadata.artworkUri,
-        position = mediaController.currentPosition,
-        bufferedPosition = mediaController.bufferedPosition,
-        duration = mediaController.duration,
-        isPlaying = state.isPlaying,
-        isLoading = state.isLoading,
-      )
-    }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
-  }
+  lateinit var nowPlaying: StateFlow<NowPlaying?>
 
   private var mediaControllerFuture: ListenableFuture<MediaController>? = null
 
   private lateinit var mediaController: MediaController
 
-  override fun onCreate(owner: LifecycleOwner) {
+  override fun onStart(owner: LifecycleOwner) {
     connect()
   }
 
-  override fun onDestroy(owner: LifecycleOwner) {
+  override fun onStop(owner: LifecycleOwner) {
     release()
   }
 
@@ -113,14 +86,42 @@ class PlaybackConnection(
         mediaController.addListener(PlayerListener())
         _isConnected.value = true
         _currentMediaItem.value = mediaController.currentMediaItem
+
+        nowPlaying = getPlayingStateFlow()
+        currentAyah = nowPlaying.map { playing -> playing?.let { VerseKey(it.sura, it.ayah) } }
+          .distinctUntilChanged()
       }
     }, DirectExecutor.INSTANCE)
   }
+
 
   private fun release() {
     coroutineScope.cancel()
     mediaControllerFuture?.let { MediaController.releaseFuture(it) }
   }
+
+  private fun getPlayingStateFlow() = getTimingFlow(100).combine(_playingState) { timing, state ->
+    val currentMediaItem = mediaController.currentMediaItem
+
+    if (currentMediaItem == null || timing == null) return@combine null
+
+    val mediaMetadata = currentMediaItem.mediaMetadata
+    val mediaId = MediaId.fromString(currentMediaItem.mediaId)
+
+    NowPlaying(
+      title = mediaMetadata.title.toString() + " (${mediaId.sura}:${timing.ayah})",
+      reciterName = mediaMetadata.artist.toString(),
+      sura = timing.sura,
+      ayah = timing.ayah,
+      reciter = mediaId.reciter,
+      artWork = mediaMetadata.artworkUri,
+      position = mediaController.currentPosition,
+      bufferedPosition = mediaController.bufferedPosition,
+      duration = mediaController.duration,
+      isPlaying = state.isPlaying,
+      isLoading = state.isLoading,
+    )
+  }.stateIn(coroutineScope, SharingStarted.Eagerly, null)
 
   private fun getTimingFlow(delay: Long = 200): Flow<AyahTiming?> =
     _currentMediaItem.flatMapLatest { mediaItem ->

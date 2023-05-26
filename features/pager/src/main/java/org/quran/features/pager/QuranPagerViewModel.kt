@@ -2,11 +2,15 @@ package org.quran.features.pager
 
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.lifecycle.viewModelScope
+import arg.quran.models.quran.VerseKey
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,7 +18,7 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
-import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.filterNotNull
 import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
@@ -22,14 +26,15 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.quram.common.core.QuranInfo
-import org.quran.bookmarks.model.Bookmark
+import org.quram.common.utils.QuranDisplayData
+import org.quran.bookmarks.models.Bookmark
+import org.quran.bookmarks.models.BookmarkTag
 import org.quran.bookmarks.repository.BookmarkRepository
 import org.quran.core.audio.PlaybackConnection
 import org.quran.datastore.DisplayMode
-import org.quran.datastore.repositories.AudioPreferencesRepository
 import org.quran.datastore.repositories.QuranPreferencesRepository
-import org.quran.datastore.serializers.DEFAULT_QURAN_FONT_SIZE
-import org.quran.datastore.serializers.DEFAULT_TRANSLATION_FONT_SIZE
+import org.quran.features.pager.uiState.DialogUiState
+import org.quran.features.pager.uiState.QuranEvent
 import org.quran.features.pager.uiState.QuranPageItem
 import org.quran.features.pager.uiState.QuranPagerUiState
 import org.quran.features.pager.uiState.QuranSelection
@@ -44,58 +49,47 @@ internal class QuranPagerViewModel(
   private val quranInfo: QuranInfo,
   private val playbackConnection: PlaybackConnection,
   private val quranPreferences: QuranPreferencesRepository,
-  private val audioSettings: AudioPreferencesRepository,
   private val getTranslationPage: GetTranslationPage,
   private val getMushafPage: GetMushafPage,
   private val bookmarkRepository: BookmarkRepository,
+  private val quranDisplayData: QuranDisplayData,
   translationRepository: TranslationsRepository
 ) : ViewModel() {
 
-  private val args = quranPagerDestinationArgs(savedStateHandle)
+  val args = quranPagerDestinationArgs(savedStateHandle)
 
   val nowPlayingFlow =
     playbackConnection.nowPlaying.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
-  private val playingPageFlow = playbackConnection.nowPlaying.map { key ->
+  val playingPageFlow = playbackConnection.nowPlaying.map { key ->
     key?.let { quranInfo.getPageFromSuraAyah(it.sura, it.ayah) }
-  }.distinctUntilChanged()
+  }.distinctUntilChanged().filterNotNull()
 
-  private val fullscreenFlow = MutableStateFlow(false)
 
   private val selectionFlow = MutableStateFlow(
     if (args.verseKey != null) QuranSelection.InitialVerse(args.verseKey) else QuranSelection.None
   )
 
+  var isFullscreen by mutableStateOf(false)
+    private set
+
+  var dialogUiState: DialogUiState by mutableStateOf(DialogUiState.None)
+    private set
+
   val uiStateFlow = combine(
     quranPreferences.getAllPreferences(),
-    playingPageFlow,
-    fullscreenFlow,
     translationRepository.observeSelectedEditions(),
-  ) { preferences, page, fullscreen, locales ->
+  ) { preferences, locales ->
     QuranPagerUiState(
       page = args.page,
-      playingPage = page,
       displayMode = preferences.displayMode,
       quranFontScale = preferences.quranFontScale,
       translationFontScale = preferences.translationFontScale,
       version = preferences.fontVersion,
-      onEvent = ::onEvent,
-      isFullscreen = fullscreen,
       exception = if (locales.isEmpty()) NoTranslationException() else null,
     )
-  }.distinctUntilChanged().stateIn(
-    scope = viewModelScope,
-    started = SharingStarted.WhileSubscribed(5_000),
-    initialValue = QuranPagerUiState(
-      page = args.page,
-      playingPage = null,
-      displayMode = DisplayMode.UNRECOGNIZED,
-      quranFontScale = DEFAULT_QURAN_FONT_SIZE,
-      translationFontScale = DEFAULT_TRANSLATION_FONT_SIZE,
-      version = 1,
-      onEvent = ::onEvent,
-    )
-  )
+  }.distinctUntilChanged()
+    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), QuranPagerUiState(page = args.page))
 
   init {
     getTranslationPage.coroutineScope = viewModelScope
@@ -105,6 +99,10 @@ internal class QuranPagerViewModel(
         selectionFlow.value = QuranSelection.None
       }
     }
+  }
+
+  fun toggleFullscreen() {
+    isFullscreen = !isFullscreen
   }
 
   @Composable
@@ -133,42 +131,97 @@ internal class QuranPagerViewModel(
     return itemState
   }
 
-  private fun onEvent(event: QuranEvent) {
-    viewModelScope.launch(Dispatchers.IO) {
-      when (event) {
-        is QuranEvent.ToggleBookmark -> if (event.isBookmark) {
-          bookmarkRepository.removeBookmark(event.verseKey)
+  fun onEvent(event: QuranEvent) {
+    when (event) {
+      is QuranEvent.ToggleBookmark -> viewModelScope.launch {
+        dialogUiState = if (event.isBookmark) {
+          showBookmarkTagUiState(event.verse)
         } else {
-          bookmarkRepository.addBookmark(Bookmark(key = event.verseKey, name = "Bookmarks"))
+          selectBookmarkTagUiState(event.verse)
         }
-
-        is QuranEvent.UpdateSelection -> {}
-
-        is QuranEvent.Play -> playbackConnection.onPlaySurah(
-          sura = event.verseKey.sura,
-          reciterId = audioSettings.getCurrentReciter().first(),
-          startAya = event.verseKey.aya
-        )
-
-        is QuranEvent.AyahLongPressed -> selectionFlow.value =
-          QuranSelection.Highlight(event.verseKey, event.word, event.bookmarked)
-
-        QuranEvent.AyahPressed -> {
-          if (selectionFlow.value == QuranSelection.None) {
-            fullscreenFlow.update { !it }
-          } else {
-            selectionFlow.update { QuranSelection.None }
-          }
-        }
-
-        is QuranEvent.ChangeDisplayMode -> quranPreferences.setDisplayMode(event.mode)
-        is QuranEvent.FullscreenChange -> fullscreenFlow.value = event.value
-        is QuranEvent.Selection -> selectionFlow.value = event.selection
-        QuranEvent.PlayOrPause -> playbackConnection.playOrPause()
-        QuranEvent.SkipToNext -> playbackConnection.skipToNextSurah()
-        QuranEvent.SkipToPrevious -> playbackConnection.skipToPreviousSurah()
       }
+
+      is QuranEvent.Play -> playbackConnection.onPlaySurah(event.key)
+
+      is QuranEvent.AyahLongPressed -> viewModelScope.launch {
+        selectionFlow.value = QuranSelection.Highlight(event.key, event.word, event.bookmarked)
+        dialogUiState = DialogUiState.VerseMenu(event.key, event.bookmarked)
+      }
+
+      QuranEvent.AyahPressed -> {
+        if (selectionFlow.value == QuranSelection.None) {
+          toggleFullscreen()
+        } else {
+          selectionFlow.update { QuranSelection.None }
+        }
+      }
+
+      is QuranEvent.Selection -> selectionFlow.value = event.selection
+      QuranEvent.PlayOrPause -> playbackConnection.playOrPause()
+      QuranEvent.SkipToNext -> playbackConnection.skipToNextSurah()
+      QuranEvent.SkipToPrevious -> playbackConnection.skipToPreviousSurah()
+      is QuranEvent.VerseNote -> dialogUiState = DialogUiState.CreateNote(event.key)
+
+      is QuranEvent.VerseTafsir -> dialogUiState = DialogUiState.VerseTafsir(event.key)
     }
+  }
+
+  private suspend fun showBookmarkTagUiState(verse: VerseKey): DialogUiState {
+    return DialogUiState.ShowBookmarks(
+      verse = verse,
+      tags = bookmarkRepository.getAllTagfsForVerse(verse).toPersistentList()
+    )
+  }
+
+  private suspend fun selectBookmarkTagUiState(key: VerseKey) = DialogUiState.SelectBookmarkTab(
+    tags = bookmarkRepository.getAllTags().toPersistentList(),
+    verse = key
+  )
+
+  fun changeDisplayMode(mode: DisplayMode) {
+    viewModelScope.launch {
+      quranPreferences.setDisplayMode(mode)
+    }
+  }
+
+  fun onDismissRequest() {
+    dialogUiState = DialogUiState.None
+    selectionFlow.value = QuranSelection.None
+  }
+
+  fun createNote(verse: VerseKey, note: String) {
+    onDismissRequest()
+  }
+
+  fun removeBookmark(verse: VerseKey, tag: BookmarkTag) {
+    onDismissRequest()
+  }
+
+  fun onCreateBookmarkAndTag(verse: VerseKey, tagName: String) {
+    viewModelScope.launch(Dispatchers.IO) {
+      val tag = bookmarkRepository.addReturnTag(tagName)
+      bookmarkRepository.addBookmark(
+        Bookmark(
+          key = verse,
+          label = quranDisplayData.getAyahString(verse.sura, verse.aya),
+          tagId = tag.id
+        )
+      )
+    }
+    onDismissRequest()
+  }
+
+  fun onCreateBookmark(verse: VerseKey, tagId: Int) {
+    viewModelScope.launch(Dispatchers.IO) {
+      bookmarkRepository.addBookmark(
+        Bookmark(
+          key = verse,
+          label = quranDisplayData.getAyahString(verse.sura, verse.aya),
+          tagId = tagId
+        )
+      )
+    }
+    onDismissRequest()
   }
 }
 

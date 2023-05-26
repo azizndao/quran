@@ -19,8 +19,6 @@ import androidx.compose.ui.res.stringResource
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
-import com.google.accompanist.navigation.material.BottomSheetNavigator
-import com.google.accompanist.navigation.material.rememberBottomSheetNavigator
 import org.alquran.ui.components.NiaNavigationBar
 import org.alquran.ui.components.NiaNavigationBarItem
 import org.quran.core.audio.PlaybackConnection
@@ -32,14 +30,13 @@ import org.quran.ui.R
 @Composable
 fun QuranApp(
   playbackConnection: PlaybackConnection,
-  bottomSheetNavigator: BottomSheetNavigator = rememberBottomSheetNavigator(),
-  navController: NavHostController = rememberNavController(bottomSheetNavigator)
+  navController: NavHostController = rememberNavController()
 ) {
   Scaffold(
     bottomBar = { BottomBar(navController = navController) },
     contentWindowInsets = WindowInsets.navigationBars,
   ) { innerPadding ->
-    NabGraph(contentPadding = innerPadding, playbackConnection, bottomSheetNavigator, navController)
+    NabGraph(contentPadding = innerPadding, playbackConnection, navController)
   }
 }
 

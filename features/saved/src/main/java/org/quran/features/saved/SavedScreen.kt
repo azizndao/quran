@@ -18,6 +18,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.TopAppBarScrollBehavior
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -25,20 +26,22 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.launch
-import org.alquran.ui.components.TabBar
-import org.alquran.ui.components.TabItem
-import org.alquran.ui.components.pagerTabIndicatorOffset
+import org.quran.bookmarks.models.Bookmark
 import org.quran.features.saved.bookmarks.BookmarkTabView
 import org.quran.features.saved.notes.NotesTabView
 import org.quran.ui.R
 import org.quran.ui.components.MuslimsTopAppBarDefaults
+import org.quran.ui.components.TabBar
+import org.quran.ui.components.TabItem
+import org.quran.ui.components.pagerTabIndicatorOffset
 
 val tabItems = listOf(R.string.bookmarks, R.string.notes)
 
 @Composable
-fun SavedScreen(
+internal fun SavedScreen(
   viewModel: SavedViewModel,
   contentPadding: PaddingValues,
   navigateToMore: () -> Unit,
@@ -59,10 +62,18 @@ fun SavedScreen(
       navigateToMore = navigateToMore
     )
 
+    val uiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
+
     HorizontalPager(state = pagerState) { position ->
       Box(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
         when (position) {
-          0 -> BookmarkTabView(contentPadding = contentPadding)
+          0 -> BookmarkTabView(
+            contentPadding = contentPadding,
+            bookmarksTags = uiState.bookmarksTags
+          ) { bookmark: Bookmark ->
+
+          }
+
           1 -> NotesTabView(contentPadding = contentPadding)
           else -> throw IndexOutOfBoundsException()
         }

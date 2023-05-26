@@ -13,6 +13,7 @@ sealed class ShareAyahUiState {
     val surahName: String,
     val ayah: Int,
     val text: String? = null,
+    val page: Int,
     val translation: String? = null,
     val textAlign: TextAlign = TextAlign.Center,
     val translationFontSize: TextUnit? = 0.sp,

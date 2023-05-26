@@ -4,17 +4,19 @@ import androidx.room.Database
 import androidx.room.RoomDatabase
 import androidx.room.TypeConverters
 import org.quran.bookmarks.dao.BookmarkDao
-import org.quran.bookmarks.databases.convertors.BookmarkTagConvertor
-import org.quran.bookmarks.databases.convertors.CalendarConvertor
+import org.quran.bookmarks.dao.BookmarkTagDao
 import org.quran.bookmarks.databases.convertors.VerseKeyConvertor
-import org.quran.bookmarks.model.Bookmark
+import org.quran.bookmarks.models.Bookmark
+import org.quran.bookmarks.models.BookmarkTag
 
 @Database(
   version = 1,
-  entities = [Bookmark::class]
+  entities = [Bookmark::class, BookmarkTag::class]
 )
-@TypeConverters(BookmarkTagConvertor::class, CalendarConvertor::class, VerseKeyConvertor::class)
+@TypeConverters(VerseKeyConvertor::class)
 internal abstract class BookmarksDatabase : RoomDatabase() {
 
   abstract val bookmarkDao: BookmarkDao
+
+  abstract val tagDao: BookmarkTagDao
 }

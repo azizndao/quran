@@ -42,7 +42,6 @@
             <option value="$PROJECT_DIR$/features/search" />
             <option value="$PROJECT_DIR$/features/share" />
             <option value="$PROJECT_DIR$/features/translations" />
-            <option value="$PROJECT_DIR$/features/verse-menu" />
           </set>
         </option>
       </GradleProjectSettings>

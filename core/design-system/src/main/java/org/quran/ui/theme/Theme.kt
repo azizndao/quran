@@ -22,12 +22,6 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
-import org.alquran.ui.theme.AppTypography
-import org.alquran.ui.theme.DarkDefaultThemeColors
-import org.alquran.ui.theme.DefaultQuranTextStyle
-import org.alquran.ui.theme.LightDefaultThemeColors
-import org.alquran.ui.theme.LocalQuranTextStyle
-import org.alquran.ui.theme.shapes
 import kotlin.math.ln
 
 @SuppressLint("NewApi")

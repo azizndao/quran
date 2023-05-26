@@ -10,7 +10,6 @@ android {
 dependencies {
   implementation(libs.timber)
 
-  api(libs.androidx.compose.material)
   api(libs.androidx.compose.material3)
   api(libs.androidx.compose.material3.windowSizeClass)
   api(libs.androidx.compose.ui.util)
@@ -24,8 +23,4 @@ dependencies {
   androidTestApi(libs.androidx.compose.ui.test)
   debugApi(libs.androidx.compose.ui.tooling)
   debugApi(libs.androidx.compose.ui.testManifest)
-
-  testImplementation(libs.junit)
-  androidTestImplementation(libs.androidx.test.ext.junit)
-  androidTestImplementation(libs.espresso.core)
 }

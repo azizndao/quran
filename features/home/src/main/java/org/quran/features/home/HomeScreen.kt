@@ -26,9 +26,9 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.launch
-import org.alquran.ui.components.TabBar
-import org.alquran.ui.components.TabItem
-import org.alquran.ui.components.pagerTabIndicatorOffset
+import org.quran.ui.components.TabBar
+import org.quran.ui.components.TabItem
+import org.quran.ui.components.pagerTabIndicatorOffset
 import org.quran.features.home.juzs.ListJuzs
 import org.quran.features.home.surahs.SurahList
 import org.quran.ui.components.MuslimsTopAppBarDefaults

@@ -8,5 +8,4 @@ android {
 
 dependencies {
   api(libs.navigation.compose)
-  api(libs.accompanist.navigation.material)
 }

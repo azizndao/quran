@@ -37,7 +37,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import arg.quran.models.quran.VerseKey
 import org.alquran.ui.components.LineSeparator
-import org.alquran.ui.theme.quran
+import org.quran.ui.theme.quran
 import org.quran.search.R
 import org.quran.ui.components.BackButton
 import org.quran.ui.utils.extensions.htmlToAnnotatedString

@@ -30,7 +30,7 @@ import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.GlideImage
 import org.quran.core.audio.models.NowPlaying
 import org.quran.core.audio.models.progress
-import org.quran.features.pager.QuranEvent
+import org.quran.features.pager.uiState.QuranEvent
 
 @Composable
 internal fun AudioBottomBar(

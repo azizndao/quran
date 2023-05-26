@@ -3,7 +3,8 @@ package org.quran.bookmarks.dao
 import androidx.room.*
 import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.flow.Flow
-import org.quran.bookmarks.model.Bookmark
+import org.quran.bookmarks.models.Bookmark
+import org.quran.bookmarks.models.BookmarkTag
 
 @Dao
 internal interface BookmarkDao {
@@ -25,8 +26,14 @@ internal interface BookmarkDao {
   suspend fun delete(key: VerseKey)
 
   @Query("SELECT * FROM bookmarks WHERE `key` = :key")
-  fun getBookmark(key: VerseKey): Flow<List<Bookmark>>
+  suspend fun getBookmark(key: VerseKey): List<Bookmark>
+
+  @Query("SELECT * FROM bookmarks WHERE `key` = :key")
+  fun observeBookmark(key: VerseKey): Flow<List<Bookmark>>
 
   @Query("SELECT * FROM bookmarks WHERE `key` in (:keys)")
   fun getByPage(keys: Set<VerseKey>): Flow<List<Bookmark>>
+
+  @Query("SELECT t.* FROM bookmarks b JOIN tags t ON b.tagId = t.tagId WHERE `key` = :verse")
+  suspend fun getAllTagsForVerse(verse: VerseKey): List<BookmarkTag>
 }

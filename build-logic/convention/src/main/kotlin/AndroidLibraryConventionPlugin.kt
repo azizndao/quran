@@ -21,16 +21,14 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         defaultConfig.targetSdk = 33
       }
       val libs = extensions.getByType<VersionCatalogsExtension>().named("libs")
-      configurations.configureEach {
-        resolutionStrategy {
-          force(libs.findLibrary("junit").get())
-          // Temporary workaround for https://issuetracker.google.com/174733673
-          force("org.objenesis:objenesis:2.6")
-        }
-      }
       dependencies {
-        add("androidTestImplementation", kotlin("test"))
-        add("testImplementation", kotlin("test"))
+
+        add("testImplementation", libs.findLibrary("junit").get())
+        add("androidTestImplementation", libs.findLibrary("androidx.test.ext.junit").get())
+        add("androidTestImplementation", libs.findLibrary("espresso.core").get())
+
+        add("implementation", libs.findLibrary("kotlinx.coroutines.android").get())
+
         add("implementation", libs.findLibrary("koin.android").get())
       }
     }
