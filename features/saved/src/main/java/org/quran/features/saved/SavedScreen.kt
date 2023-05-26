@@ -29,7 +29,6 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.launch
-import org.quran.bookmarks.models.Bookmark
 import org.quran.features.saved.bookmarks.BookmarkTabView
 import org.quran.features.saved.notes.NotesTabView
 import org.quran.ui.R
@@ -46,7 +45,7 @@ internal fun SavedScreen(
   contentPadding: PaddingValues,
   navigateToMore: () -> Unit,
   navigateToSearch: () -> Unit,
-  navigateToPage: (page: Int, key: VerseKey?) -> Unit,
+  navigateToPage: (page: Int, verse: VerseKey) -> Unit,
 ) {
   val pagerState = rememberPagerState { tabItems.size }
 
@@ -64,14 +63,14 @@ internal fun SavedScreen(
 
     val uiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
-    HorizontalPager(state = pagerState) { position ->
+    HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { position ->
       Box(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
         when (position) {
           0 -> BookmarkTabView(
             contentPadding = contentPadding,
             bookmarksTags = uiState.bookmarksTags
-          ) { bookmark: Bookmark ->
-
+          ) { bookmark ->
+            navigateToPage(viewModel.getPage(bookmark.key), bookmark.key)
           }
 
           1 -> NotesTabView(contentPadding = contentPadding)
@@ -127,7 +126,7 @@ private fun AppBar(
       selectedTabIndex = pagerState.currentPage,
       containerColor = Color.Transparent,
       indicator = { tabPositions ->
-        TabRowDefaults.Indicator(
+        TabRowDefaults.SecondaryIndicator(
           Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
           height = 2.dp
         )

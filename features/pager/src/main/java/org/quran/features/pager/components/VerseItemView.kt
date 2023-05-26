@@ -45,10 +45,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.core.text.HtmlCompat.fromHtml
-import org.quran.ui.theme.quran
-import org.quran.ui.theme.translation
 import org.quran.features.pager.uiState.QuranEvent
 import org.quran.features.pager.uiState.TranslationPage
+import org.quran.ui.theme.quran
+import org.quran.ui.theme.translation
 import org.quran.ui.utils.extensions.toAnnotatedString
 
 @Composable
@@ -155,8 +155,9 @@ fun VerseToolbarView(
 }
 
 @Composable
-private fun getPlayingBackground(
-  isPlaying: Boolean, colorScheme: ColorScheme = MaterialTheme.colorScheme
+fun getPlayingBackground(
+  isPlaying: Boolean,
+  colorScheme: ColorScheme = MaterialTheme.colorScheme
 ): State<Color> = animateColorAsState(
   when {
     isPlaying -> colorScheme.surfaceColorAtElevation(2.dp)

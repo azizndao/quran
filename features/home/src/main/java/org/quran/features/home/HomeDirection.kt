@@ -16,7 +16,7 @@ fun NavGraphBuilder.homeDestination(
 ) {
   composable(ROUTE_QURAN_HOME) {
     HomeScreen(
-      getViewModel(),
+      viewModel = getViewModel(),
       contentPadding = contentPadding,
       navigateToPage = navigateToPage,
       navigateToMore = navigateToMore,

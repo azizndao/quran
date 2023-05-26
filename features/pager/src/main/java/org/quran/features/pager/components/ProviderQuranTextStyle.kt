@@ -43,7 +43,6 @@ fun ProviderQuranTextStyle(
         fontSize = fontSize,
         lineHeight = fontSize * 1.8,
         platformStyle = PlatformTextStyle(includeFontPadding = false),
-        textAlign = TextAlign.Justify,
       )
     }
   }

@@ -65,7 +65,7 @@ fun ScrollableTabBar(
     containerColor = containerColor,
     contentColor = contentColor,
     indicator = { tabPositions ->
-      TabRowDefaults.Indicator(
+      TabRowDefaults.SecondaryIndicator(
         modifier = Modifier.pagerTabIndicatorOffset(lazyPagerState, tabPositions),
         height = 2.dp
       )

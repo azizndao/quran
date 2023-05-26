@@ -124,7 +124,7 @@ private fun AppBar(
       selectedTabIndex = pagerState.currentPage,
       containerColor = Color.Transparent,
       indicator = { tabPositions ->
-        TabRowDefaults.Indicator(
+        TabRowDefaults.SecondaryIndicator(
           Modifier.pagerTabIndicatorOffset(pagerState, tabPositions),
           height = 2.dp
         )

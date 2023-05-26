@@ -1,6 +1,7 @@
 package org.quran.features.share.navigation
 
 import androidx.lifecycle.SavedStateHandle
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import arg.quran.models.quran.VerseKey
@@ -10,7 +11,7 @@ import org.quran.features.share.ShareAyahViewModel
 
 private const val PARAM_SURAH_AYAH = "suraAyah"
 
-fun directionToShareAyah(sura: Int, ayah: Int) = "quran/share/$sura:$ayah"
+fun NavController.navigateToShareAyah(verse: VerseKey) = navigate("quran/share/$verse")
 
 internal fun shareAyahDestinationArgs(savedStateHandle: SavedStateHandle): VerseKey {
   return VerseKey.fromString(savedStateHandle[PARAM_SURAH_AYAH]!!)!!

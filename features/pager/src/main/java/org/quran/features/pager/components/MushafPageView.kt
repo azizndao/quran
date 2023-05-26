@@ -161,7 +161,7 @@ fun MushafTextLine(
     buildAnnotatedString {
       line.words.forEach { word ->
         val color = when {
-          word.playing -> colorScheme.primaryContainer
+          word.playing -> colorScheme.surfaceColorAtElevation(2.dp)
           word.selected -> colorScheme.surfaceVariant
           word.bookmarked -> colorScheme.surfaceColorAtElevation(3.dp)
           else -> colorScheme.surface

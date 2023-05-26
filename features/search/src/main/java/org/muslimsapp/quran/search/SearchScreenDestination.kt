@@ -1,6 +1,7 @@
 package org.muslimsapp.quran.search
 
 import androidx.compose.runtime.LaunchedEffect
+import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import arg.quran.models.quran.VerseKey
@@ -8,7 +9,7 @@ import org.koin.androidx.compose.getViewModel
 
 private const val QURAN_SEARCH_ROUTE = "quran/search"
 
-fun directionToSearch() = QURAN_SEARCH_ROUTE
+fun NavController.navigateToSearch() = navigate(QURAN_SEARCH_ROUTE)
 
 fun NavGraphBuilder.searchDestination(
   popBackStack: () -> Unit,

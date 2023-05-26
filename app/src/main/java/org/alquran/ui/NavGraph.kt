@@ -6,18 +6,18 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.CompositionLocalProvider
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
-import org.muslimsapp.quran.search.directionToSearch
+import org.muslimsapp.quran.search.navigateToSearch
 import org.muslimsapp.quran.search.searchDestination
-import org.muslimsapp.quran.translations.directionToTranslations
+import org.muslimsapp.quran.translations.navigateToTranslations
 import org.muslimsapp.quran.translations.translationDestination
 import org.quran.core.audio.PlaybackConnection
 import org.quran.features.home.LocalInsetsPadding
 import org.quran.features.home.ROUTE_QURAN_HOME
 import org.quran.features.home.homeDestination
-import org.quran.features.pager.directionToQuranPage
+import org.quran.features.pager.navigateToPage
 import org.quran.features.pager.quranPagerDestination
 import org.quran.features.saved.savedDestination
-import org.quran.features.share.navigation.directionToShareAyah
+import org.quran.features.share.navigation.navigateToShareAyah
 import org.quran.features.share.navigation.shareAyahDestination
 
 
@@ -36,30 +36,28 @@ fun NabGraph(
       homeDestination(
         contentPadding = contentPadding,
         navigateToMore = {},
-        navigateToSearch = { navController.navigate(directionToSearch()) },
-        navigateToPage = { page, key -> navController.navigate(directionToQuranPage(page, key)) }
+        navigateToSearch = navController::navigateToSearch,
+        navigateToPage = navController::navigateToPage
       )
 
       savedDestination(
         contentPadding = contentPadding,
         navigateToMore = {},
-        navigateToSearch = { navController.navigate(directionToSearch()) },
-        navigateToPage = { page, key -> navController.navigate(directionToQuranPage(page, key)) }
+        navigateToSearch = navController::navigateToSearch,
+        navigateToPage = navController::navigateToPage
       )
 
       searchDestination(
         popBackStack = navController::popBackStack,
-        navigateToPage = { page, key -> navController.navigate(directionToQuranPage(page, key)) }
+        navigateToPage = navController::navigateToPage
       )
 
       quranPagerDestination(
         playbackConnection = playbackConnection,
         popBackStack = navController::popBackStack,
-        navigateToSearch = { navController.navigate(directionToSearch()) },
-        navigateToTranslations = { navController.navigate(directionToTranslations()) },
-        navigateToShare = { verse ->
-          navController.navigate(directionToShareAyah(verse.sura, verse.aya))
-        },
+        navigateToSearch = navController::navigateToSearch,
+        navigateToTranslations = navController::navigateToTranslations,
+        navigateToShare = navController::navigateToShareAyah,
       )
 
       translationDestination(navController::popBackStack)

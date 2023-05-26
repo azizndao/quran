@@ -26,7 +26,7 @@ import org.quran.ui.components.SectionTitle
 import org.quran.ui.utils.extensions.add
 
 @Composable
-fun BookmarkTabView(
+internal fun BookmarkTabView(
   contentPadding: PaddingValues,
   bookmarksTags: PersistentList<TabWithBookmarks>,
   listState: LazyListState = rememberLazyListState(),
