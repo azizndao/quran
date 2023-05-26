@@ -3,11 +3,20 @@ package org.quran.ui.components
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.ColumnScope
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.pager.PagerState
-import androidx.compose.foundation.pager.VerticalPager
-import androidx.compose.material3.*
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.ProvideTextStyle
+import androidx.compose.material3.Tab
+import androidx.compose.material3.TabPosition
+import androidx.compose.material3.TabRow
+import androidx.compose.material3.TabRowDefaults
 import androidx.compose.material3.TabRowDefaults.tabIndicatorOffset
+import androidx.compose.material3.contentColorFor
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
@@ -46,36 +55,6 @@ fun TabBar(
   )
 }
 
-@OptIn(ExperimentalFoundationApi::class)
-@Composable
-fun ScrollableTabBar(
-  modifier: Modifier = Modifier,
-  lazyPagerState: PagerState,
-  containerColor: Color = MaterialTheme.colorScheme.surface,
-  contentColor: Color = contentColorFor(containerColor),
-  divider: @Composable () -> Unit = { /*Divider()*/ },
-  tabs: @Composable () -> Unit,
-) {
-
-  ScrollableTabRow(
-    modifier = modifier
-      .fillMaxWidth()
-      .background(containerColor),
-    selectedTabIndex = lazyPagerState.currentPage,
-    containerColor = containerColor,
-    contentColor = contentColor,
-    indicator = { tabPositions ->
-      TabRowDefaults.SecondaryIndicator(
-        modifier = Modifier.pagerTabIndicatorOffset(lazyPagerState, tabPositions),
-        height = 2.dp
-      )
-    },
-    divider = divider,
-    edgePadding = 0.dp,
-    tabs = tabs,
-  )
-}
-
 @Composable
 fun TabItem(
   selected: Boolean,
@@ -103,11 +82,6 @@ fun TabItem(
   )
 }
 
-/**
- * This indicator syncs up a [TabRow] or [ScrollableTabRow] tab indicator with a
- * [HorizontalPager] or [VerticalPager]. See the sample for a full demonstration.
- *
- */
 @OptIn(ExperimentalFoundationApi::class)
 fun Modifier.pagerTabIndicatorOffset(
   lazyPagerState: PagerState,

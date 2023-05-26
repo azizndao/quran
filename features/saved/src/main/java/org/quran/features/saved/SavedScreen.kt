@@ -101,7 +101,7 @@ private fun AppBar(
       navigationIcon = {
         IconButton(onClick = { }) {
           Icon(
-            painterResource(id = org.quran.ui.R.drawable.ic_notifications),
+            painterResource(id = R.drawable.ic_notifications),
             stringResource(id = R.string.notifications)
           )
         }
@@ -109,7 +109,7 @@ private fun AppBar(
       actions = {
         IconButton(onClick = search) {
           Icon(
-            painterResource(id = org.quran.ui.R.drawable.ic_search),
+            painterResource(id = R.drawable.ic_search),
             stringResource(id = R.string.search_ayah)
           )
         }

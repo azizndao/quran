@@ -9,10 +9,9 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.sp
-import org.quran.ui.theme.LocalQuranTextStyle
 import org.quran.datastore.FontScale
+import org.quran.ui.theme.LocalQuranTextStyle
 
 
 @Composable
