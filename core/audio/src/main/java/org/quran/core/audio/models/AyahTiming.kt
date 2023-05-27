@@ -1,4 +1,4 @@
-package org.muslimapp.core.audio.models
+package org.quran.core.audio.models
 
 import androidx.room.*
 import kotlinx.serialization.Serializable

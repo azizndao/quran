@@ -12,7 +12,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.IntOffset
 import org.quran.datastore.DisplayMode
-import org.quran.features.pager.R
 
 
 @Composable

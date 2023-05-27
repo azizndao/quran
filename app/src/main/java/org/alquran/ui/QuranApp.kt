@@ -22,8 +22,8 @@ import androidx.navigation.compose.rememberNavController
 import org.alquran.ui.components.NiaNavigationBar
 import org.alquran.ui.components.NiaNavigationBarItem
 import org.quran.core.audio.PlaybackConnection
-import org.quran.features.home.ROUTE_QURAN_HOME
-import org.quran.features.saved.ROUTE_SAVED_HOME
+import org.quran.features.home.HomeQuranRoute
+import org.quran.features.saved.SavedRoute
 import org.quran.ui.R
 
 
@@ -47,7 +47,7 @@ private fun BottomBar(navController: NavHostController) {
   val visible by remember {
     derivedStateOf {
       val route = entry?.destination?.route
-      route == ROUTE_QURAN_HOME || route == ROUTE_SAVED_HOME
+      route == HomeQuranRoute || route == SavedRoute
     }
   }
 
@@ -59,7 +59,7 @@ private fun BottomBar(navController: NavHostController) {
     BottomBar(entry?.destination?.route) {
       navController.navigate(it) {
         restoreState = true
-        popUpTo(ROUTE_QURAN_HOME) { saveState = true }
+        popUpTo(HomeQuranRoute) { saveState = true }
       }
     }
   }
@@ -69,15 +69,15 @@ private fun BottomBar(navController: NavHostController) {
 fun BottomBar(currentRoute: String?, navigate: (route: String) -> Unit) {
   NiaNavigationBar {
     NiaNavigationBarItem(
-      selected = currentRoute == ROUTE_QURAN_HOME,
-      onClick = { navigate(ROUTE_QURAN_HOME) },
+      selected = currentRoute == HomeQuranRoute,
+      onClick = { navigate(HomeQuranRoute) },
       icon = { Icon(painterResource(id = R.drawable.home), null) },
       selectedIcon = { Icon(painterResource(id = R.drawable.home_filled), null) },
       label = { Text(text = stringResource(id = R.string.home)) }
     )
     NiaNavigationBarItem(
-      selected = currentRoute == ROUTE_SAVED_HOME,
-      onClick = { navigate(ROUTE_SAVED_HOME) },
+      selected = currentRoute == SavedRoute,
+      onClick = { navigate(SavedRoute) },
       icon = { Icon(painterResource(id = R.drawable.bookmarks), null) },
       selectedIcon = { Icon(painterResource(id = R.drawable.bookmarks_filled), null) },
       label = { Text(text = stringResource(id = R.string.saved)) }

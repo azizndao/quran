@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import arg.quran.models.quran.VerseKey
 import org.koin.androidx.compose.getViewModel
 
-const val ROUTE_QURAN_HOME = "home"
+const val HomeQuranRoute = "home"
 
 fun NavGraphBuilder.homeDestination(
   contentPadding: PaddingValues,
@@ -14,7 +14,7 @@ fun NavGraphBuilder.homeDestination(
   navigateToSearch: () -> Unit,
   navigateToPage: (page: Int, key: VerseKey?) -> Unit,
 ) {
-  composable(ROUTE_QURAN_HOME) {
+  composable(HomeQuranRoute) {
     HomeScreen(
       viewModel = getViewModel(),
       contentPadding = contentPadding,

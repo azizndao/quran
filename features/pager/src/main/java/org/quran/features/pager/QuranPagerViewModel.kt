@@ -195,9 +195,13 @@ internal class QuranPagerViewModel(
 
   fun removeBookmark(verse: VerseKey, tag: BookmarkTag) {
     onDismissRequest()
+    viewModelScope.launch {
+      bookmarkRepository.removeBookmark(verse, tag.id)
+    }
   }
 
   fun onCreateBookmarkAndTag(verse: VerseKey, tagName: String) {
+    onDismissRequest()
     viewModelScope.launch(Dispatchers.IO) {
       val tag = bookmarkRepository.addReturnTag(tagName)
       bookmarkRepository.addBookmark(
@@ -208,10 +212,10 @@ internal class QuranPagerViewModel(
         )
       )
     }
-    onDismissRequest()
   }
 
   fun onCreateBookmark(verse: VerseKey, tagId: Int) {
+    onDismissRequest()
     viewModelScope.launch(Dispatchers.IO) {
       bookmarkRepository.addBookmark(
         Bookmark(
@@ -221,7 +225,6 @@ internal class QuranPagerViewModel(
         )
       )
     }
-    onDismissRequest()
   }
 }
 

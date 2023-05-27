@@ -63,7 +63,7 @@ class GetTranslationPage(
       .stateIn(coroutineScope, SharingStarted.WhileSubscribed(5_000), emptyList())
   }
 
-  private fun getSelectedTranslationEditions(
+  private fun observeSelectedTranslationEditions(
     range: VerseRange,
   ): Flow<List<LocalTranslationContent>> {
     return _caches.map { caches ->
@@ -98,7 +98,7 @@ class GetTranslationPage(
 
     return combine(
       verseRepository.getVerses(range),
-      getSelectedTranslationEditions(range).filter(List<LocalTranslationContent>::isNotEmpty),
+      observeSelectedTranslationEditions(range).filter(List<LocalTranslationContent>::isNotEmpty),
       bookmarkRepository.observeBookmarksWithKeys(keys),
       playbackConnection.currentAyah,
     ) { verses, translations, bookmarks, playingVerse ->

@@ -2,68 +2,12 @@
   "formatVersion": 1,
   "database": {
     "version": 1,
-    "identityHash": "81d6f6a5beceeabaf9246bbbe958a40c",
+    "identityHash": "7d8f31c8ca8aeab0407e5dbb595b8fa5",
     "entities": [
       {
         "tableName": "timings",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER PRIMARY KEY AUTOINCREMENT NOT NULL, `url` TEXT NOT NULL, `segments` TEXT NOT NULL, `duration` INTEGER NOT NULL, `sura` INTEGER NOT NULL, `aya` INTEGER NOT NULL)",
+        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`sura` INTEGER NOT NULL, `ayah` INTEGER NOT NULL, `time` INTEGER NOT NULL, PRIMARY KEY(`sura`, `ayah`))",
         "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "url",
-            "columnName": "url",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "segments",
-            "columnName": "segments",
-            "affinity": "TEXT",
-            "notNull": true
-          },
-          {
-            "fieldPath": "duration",
-            "columnName": "duration",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "verseKey.sura",
-            "columnName": "sura",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
-          {
-            "fieldPath": "verseKey.aya",
-            "columnName": "aya",
-            "affinity": "INTEGER",
-            "notNull": true
-          }
-        ],
-        "primaryKey": {
-          "autoGenerate": true,
-          "columnNames": [
-            "id"
-          ]
-        },
-        "indices": [],
-        "foreignKeys": []
-      },
-      {
-        "tableName": "audio_files",
-        "createSql": "CREATE TABLE IF NOT EXISTS `${TABLE_NAME}` (`id` INTEGER NOT NULL, `sura` INTEGER NOT NULL, `fileSize` INTEGER NOT NULL, `url` TEXT NOT NULL, PRIMARY KEY(`id`))",
-        "fields": [
-          {
-            "fieldPath": "id",
-            "columnName": "id",
-            "affinity": "INTEGER",
-            "notNull": true
-          },
           {
             "fieldPath": "sura",
             "columnName": "sura",
@@ -71,22 +15,23 @@
             "notNull": true
           },
           {
-            "fieldPath": "fileSize",
-            "columnName": "fileSize",
+            "fieldPath": "ayah",
+            "columnName": "ayah",
             "affinity": "INTEGER",
             "notNull": true
           },
           {
-            "fieldPath": "url",
-            "columnName": "url",
-            "affinity": "TEXT",
+            "fieldPath": "time",
+            "columnName": "time",
+            "affinity": "INTEGER",
             "notNull": true
           }
         ],
         "primaryKey": {
           "autoGenerate": false,
           "columnNames": [
-            "id"
+            "sura",
+            "ayah"
           ]
         },
         "indices": [],
@@ -96,7 +41,7 @@
     "views": [],
     "setupQueries": [
       "CREATE TABLE IF NOT EXISTS room_master_table (id INTEGER PRIMARY KEY,identity_hash TEXT)",
-      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '81d6f6a5beceeabaf9246bbbe958a40c')"
+      "INSERT OR REPLACE INTO room_master_table (id,identity_hash) VALUES(42, '7d8f31c8ca8aeab0407e5dbb595b8fa5')"
     ]
   }
 }

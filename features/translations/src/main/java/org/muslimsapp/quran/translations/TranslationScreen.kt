@@ -7,6 +7,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.WindowInsets
@@ -27,8 +28,6 @@ import androidx.compose.material3.IconButton
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ListItemDefaults
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Scaffold
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
@@ -51,9 +50,11 @@ import org.alquran.ui.components.LineSeparator
 import org.alquran.ui.components.SurfaceCard
 import org.alquran.utils.getLanguageFlag
 import org.quram.common.extensions.capital
+import org.quran.ui.R
 import org.quran.ui.components.BackButton
 import org.quran.ui.components.MuslimsTopAppBarDefaults
 import org.quran.ui.components.NiaLoadingWheel
+import org.quran.ui.components.SectionTitle
 import org.quran.ui.utils.extensions.add
 import java.util.Locale
 
@@ -67,82 +68,72 @@ internal fun TranslationsScreen(
 
   val snackbarHost = remember { SnackbarHostState() }
 
-  Scaffold(
-    topBar = {
-      Crossfade(targetState = uiState.selectedTranslation, label = "TranslationsScreen") { id ->
-        if (id == null) {
-          TopAppBar(
-            navigationIcon = { BackButton(onClick = popBackStack) },
-            title = { Text(stringResource(R.string.translations)) },
-            scrollBehavior = scrollBehavior,
-            windowInsets = WindowInsets.statusBars,
-            colors = MuslimsTopAppBarDefaults.smallTopAppBarColors()
-          )
-        } else {
-          TopAppBar(
-            navigationIcon = {
-              IconButton(onClick = { uiState.clearSelection() }) {
-                Icon(painterResource(id = org.quran.ui.R.drawable.ic_clear), null)
-              }
-            },
-            title = { },
-            scrollBehavior = scrollBehavior,
-            windowInsets = WindowInsets.statusBars,
-            colors = MuslimsTopAppBarDefaults.smallTopAppBarColors(
-              containerColor = MaterialTheme.colorScheme.surface,
-            ),
-            actions = {
-              IconButton(onClick = { uiState.moveUp() }) {
-                Icon(painterResource(id = org.quran.ui.R.drawable.circle_up), null)
-              }
-              IconButton(onClick = { uiState.moveDown() }) {
-                Icon(painterResource(id = org.quran.ui.R.drawable.circle_down), null)
-              }
-              IconButton(onClick = { uiState.delete() }) {
-                Icon(painterResource(id = org.quran.ui.R.drawable.ic_delete), null)
-              }
-            }
-          )
-        }
-      }
-    },
+  Column(
     modifier = Modifier
       .fillMaxSize()
       .nestedScroll(scrollBehavior.nestedScrollConnection),
-    snackbarHost = { SnackbarHost(hostState = snackbarHost) },
-  ) { innerPadding ->
+  ) {
+    Crossfade(
+      targetState = uiState.selectedTranslation,
+      label = "TranslationsScreen"
+    ) { translation ->
+      when (translation) {
+        null -> TopAppBar(
+          navigationIcon = { BackButton(onClick = popBackStack) },
+          title = { Text(stringResource(R.string.translations)) },
+          scrollBehavior = scrollBehavior,
+          windowInsets = WindowInsets.statusBars,
+          colors = MuslimsTopAppBarDefaults.smallTopAppBarColors()
+        )
+
+        else -> TopAppBar(
+          navigationIcon = {
+            IconButton(onClick = { uiState.clearSelection() }) {
+              Icon(painterResource(id = R.drawable.ic_clear), null)
+            }
+          },
+          title = { },
+          scrollBehavior = scrollBehavior,
+          windowInsets = WindowInsets.statusBars,
+          colors = MuslimsTopAppBarDefaults.smallTopAppBarColors(
+            containerColor = MaterialTheme.colorScheme.surface,
+          ),
+          actions = {
+            IconButton(onClick = { uiState.moveUp() }) {
+              Icon(painterResource(id = R.drawable.circle_up), null)
+            }
+            IconButton(onClick = { uiState.moveDown() }) {
+              Icon(painterResource(id = R.drawable.circle_down), null)
+            }
+            IconButton(onClick = { uiState.delete() }) {
+              Icon(painterResource(id = R.drawable.ic_delete), null)
+            }
+          }
+        )
+      }
+    }
 
     LaunchedEffect(uiState) {
       uiState.exception?.let { it1 -> snackbarHost.showSnackbar(it1) }
     }
 
-
-    TranslationList(
-      uiState = uiState,
-      contentPadding = innerPadding
-    )
+    TranslationList(uiState = uiState)
 
     if (uiState.loading) {
       NiaLoadingWheel(
         modifier = Modifier
           .fillMaxWidth()
           .wrapContentWidth()
-          .padding(innerPadding)
       )
     }
   }
 }
 
-// J'aurais aimé que tu sois là
-// J'aurais aime que tu me vois la
-// J'aurais aime que tu me regarde et leur dire me voila
-
-
 @ExperimentalFoundationApi
 @Composable
 fun TranslationList(
   uiState: TranslationsListUiState,
-  contentPadding: PaddingValues,
+  contentPadding: PaddingValues = PaddingValues(),
 ) {
 
   val topShape = MaterialTheme.shapes.extraLarge.copy(
@@ -160,13 +151,8 @@ fun TranslationList(
 
     if (uiState.downloadedTranslations.isNotEmpty()) {
       item {
-        SurfaceCard(shape = topShape) {
-          Text(
-            stringResource(id = R.string.downloaded),
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(horizontal = 16.dp, vertical = 8.dp)
-          )
+        SectionTitle(modifier = Modifier.clip(topShape)) {
+          Text(stringResource(id = R.string.downloaded))
         }
       }
 
@@ -203,18 +189,11 @@ fun TranslationList(
 
     for ((displayLanguage, editions) in uiState.locales) {
 
-      item {
-        Spacer(modifier = Modifier.height(16.dp))
-      }
+      item { Spacer(modifier = Modifier.height(16.dp)) }
 
       item {
-        SurfaceCard(shape = topShape) {
-          Text(
-            displayLanguage,
-            modifier = Modifier
-              .fillMaxWidth()
-              .padding(horizontal = 16.dp, vertical = 8.dp)
-          )
+        SectionTitle(modifier = Modifier.clip(topShape)) {
+          Text(displayLanguage)
         }
       }
 
@@ -251,25 +230,25 @@ fun TranslationItem(
         .clip(CircleShape),
       contentScale = ContentScale.Crop,
     ) {
-      it.placeholder(org.quran.ui.R.drawable.ic_language)
-        .error(org.quran.ui.R.drawable.ic_language)
+      it.placeholder(R.drawable.ic_language)
+        .error(R.drawable.ic_language)
     }
   }
 
   val trailing = @Composable {
     when {
       edition.downloaded && edition.enabled -> Icon(
-        painter = painterResource(id = org.quran.ui.R.drawable.ic_radio_button_checked),
+        painter = painterResource(id = R.drawable.ic_radio_button_checked),
         contentDescription = null,
         tint = MaterialTheme.colorScheme.secondary,
       )
 
       edition.downloaded -> Icon(
-        painter = painterResource(id = org.quran.ui.R.drawable.ic_radio_button_unchecked),
+        painter = painterResource(id = R.drawable.ic_radio_button_unchecked),
         contentDescription = null,
       )
 
-      else -> Icon(painterResource(id = org.quran.ui.R.drawable.ic_download), null)
+      else -> Icon(painterResource(id = R.drawable.ic_download), null)
     }
   }
 
@@ -298,7 +277,7 @@ fun SelectedTranslationItem(
         .clip(CircleShape),
       contentScale = ContentScale.Crop,
     ) {
-      it.placeholder(org.quran.ui.R.drawable.ic_language).error(org.quran.ui.R.drawable.ic_language)
+      it.placeholder(R.drawable.ic_language).error(R.drawable.ic_language)
     }
   }
 

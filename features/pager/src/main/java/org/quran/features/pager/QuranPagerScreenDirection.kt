@@ -52,7 +52,7 @@ fun NavGraphBuilder.quranPagerDestination(
     CompositionLocalProvider(
       LocalQuranTextStyle provides LocalQuranTextStyle.current.copy(fontSize = 28.sp),
       LocalTranslationTextStyle provides LocalTranslationTextStyle.current.copy(fontSize = 14.sp),
-      LocalSurahTextStyle provides LocalSurahTextStyle.current.copy()
+      LocalSurahTextStyle provides LocalSurahTextStyle.current
     ) {
       QuranPagerScreen(
         viewModel = viewModel,

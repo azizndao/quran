@@ -36,18 +36,17 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.map
 import org.quran.datastore.DisplayMode
-import org.quran.features.pager.components.AddNoteBottomSheet
 import org.quran.features.pager.components.AudioBottomBar
 import org.quran.features.pager.components.DisplayModeButton
-import org.quran.features.pager.components.MushafPageView
 import org.quran.features.pager.components.ProviderQuranTextStyle
-import org.quran.features.pager.components.SelectBookmarkTagSheet
-import org.quran.features.pager.components.ShowBookmarksSheet
-import org.quran.features.pager.components.TranslationPageItem
-import org.quran.features.pager.components.VerseMenuSheet
-import org.quran.features.pager.components.VerseTafsirSheet
+import org.quran.features.pager.components.menu.AddNoteBottomSheet
+import org.quran.features.pager.components.menu.SelectBookmarkTagSheet
+import org.quran.features.pager.components.menu.ShowBookmarksSheet
+import org.quran.features.pager.components.menu.VerseMenuSheet
+import org.quran.features.pager.components.menu.VerseTafsirSheet
+import org.quran.features.pager.components.pages.MushafPageView
+import org.quran.features.pager.components.pages.TranslationPageItem
 import org.quran.features.pager.uiState.DialogUiState
 import org.quran.features.pager.uiState.MushafPage
 import org.quran.features.pager.uiState.QuranEvent
@@ -59,7 +58,7 @@ import org.quran.ui.components.BackButton
 import org.quran.ui.components.MuslimsTopAppBarDefaults
 import org.quran.ui.components.SearchButton
 import kotlin.math.abs
-import org.quran.ui.R as Ui
+import org.quran.ui.R
 
 
 @Composable
@@ -79,12 +78,11 @@ internal fun QuranPagerScreen(
     HandleFullscreen(viewModel.isFullscreen) { viewModel.toggleFullscreen() }
 
     LaunchedEffect(Unit) {
-      val currentIndex = pagerState.currentPage
-      viewModel.playingPageFlow.map { it - 1 }
-        .filter { it != pagerState.currentPage }
-        .collectLatest { index ->
-          if (abs(index - currentIndex) == 1) {
-            pagerState.animateScrollToPage(index)
+      viewModel.playingPageFlow
+        .filter { it != currentPage }
+        .collectLatest { page ->
+          if (abs(page - currentPage) == 1) {
+            pagerState.animateScrollToPage(page - 1)
           }
         }
     }
@@ -184,9 +182,7 @@ private fun QuranPaged(
   pageProvider: @Composable (DisplayMode, page: Int, version: Int) -> QuranPageItem?
 ) {
 
-  val currentOnQuranEvent by rememberUpdatedState { event: QuranEvent ->
-    onEvent(event)
-  }
+  val currentOnQuranEvent by rememberUpdatedState(onEvent)
 
   HorizontalPager(
     state = pagerState,
@@ -197,20 +193,13 @@ private fun QuranPaged(
     modifier = modifier
       .background(MaterialTheme.colorScheme.surfaceVariant)
   ) { pageIndex ->
-
-    ProviderQuranTextStyle(page = pageIndex + 1, fontScale = uiState.quranFontScale) {
-      Surface(modifier = Modifier.fillMaxSize()) {
+    Surface(modifier = Modifier.fillMaxSize()) {
+      ProviderQuranTextStyle(page = pageIndex + 1, fontScale = uiState.quranFontScale) {
 
         when (val page = pageProvider(uiState.displayMode, pageIndex + 1, uiState.version)) {
-          is MushafPage -> MushafPageView(
-            page = page,
-            onAyahEvent = currentOnQuranEvent,
-          )
+          is MushafPage -> MushafPageView(page = page, onAyahEvent = currentOnQuranEvent)
 
-          is TranslationPage -> TranslationPageItem(
-            page = page,
-            onEvent = currentOnQuranEvent,
-          )
+          is TranslationPage -> TranslationPageItem(page = page, onEvent = currentOnQuranEvent)
 
           else -> {}
         }
@@ -254,19 +243,23 @@ private fun TopBar(
   navigateToSearch: () -> Unit,
   navigateToTranslations: () -> Unit,
 ) {
-  TopAppBar(title = {
-    AnimatedCounter(count = page) {
-      Text(stringResource(Ui.string.page_x, page))
-    }
-  }, modifier = modifier, navigationIcon = { BackButton(onClick = onPopBackStack) }, actions = {
-    SearchButton(onClick = navigateToSearch)
+  TopAppBar(
+    title = {
+      AnimatedCounter(count = page) {
+        Text(stringResource(R.string.page_x, page))
+      }
+    },
+    modifier = modifier,
+    navigationIcon = { BackButton(onClick = onPopBackStack) },
+    actions = {
+      SearchButton(onClick = navigateToSearch)
 
-    DisplayModeButton(displayMode = displayMode) { onDisplayModeChange(it) }
+      DisplayModeButton(displayMode = displayMode) { onDisplayModeChange(it) }
 
-    IconButton(onClick = navigateToTranslations) {
-      Icon(painterResource(id = Ui.drawable.ic_more_vert), null)
-    }
-  },
+      IconButton(onClick = navigateToTranslations) {
+        Icon(painterResource(id = R.drawable.ic_more_vert), null)
+      }
+    },
     colors = MuslimsTopAppBarDefaults.smallTopAppBarColors(MaterialTheme.colorScheme.background)
   )
 }

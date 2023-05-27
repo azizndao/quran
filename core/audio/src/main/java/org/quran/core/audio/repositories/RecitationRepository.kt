@@ -11,10 +11,9 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import org.muslimapp.core.audio.models.MediaId
-import org.muslimapp.core.audio.models.Reciter
-import org.muslimapp.core.audio.repositories.QariRepository
+import org.quran.core.audio.models.MediaId
 import org.quram.common.repositories.SurahRepository
+import org.quram.common.utils.QuranDisplayData
 import org.quran.core.audio.datasources.RecitationsDataSource
 import org.quran.core.audio.models.QariItem
 
@@ -23,6 +22,7 @@ class RecitationRepository internal constructor(
   private val recitationsDataSource: RecitationsDataSource,
   private val surahRepository: SurahRepository,
   private val qariRepository: QariRepository,
+  private val quranDisplayData: QuranDisplayData,
 ) {
 
   private fun downloadRecitation(mediaItems: MediaItem) {
@@ -63,7 +63,7 @@ class RecitationRepository internal constructor(
   }
 
   suspend fun getSurahRecitation(surah: Int, reciter: QariItem) = withContext(Dispatchers.IO) {
-    val suraName = surahRepository.getSurah(surah).nameSimple
+    val suraName = quranDisplayData.getSuraName(surah, true)
     val mediaItem = buildMediaItem(reciter, suraName, surah)
     coroutineScope { downloadRecitation(mediaItem) }
     mediaItem

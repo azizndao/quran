@@ -6,7 +6,7 @@ import androidx.navigation.compose.composable
 import arg.quran.models.quran.VerseKey
 import org.koin.androidx.compose.getViewModel
 
-const val ROUTE_SAVED_HOME = "saved"
+const val SavedRoute = "saved"
 
 fun NavGraphBuilder.savedDestination(
   contentPadding: PaddingValues,
@@ -14,7 +14,7 @@ fun NavGraphBuilder.savedDestination(
   navigateToSearch: () -> Unit,
   navigateToPage: (page: Int, key: VerseKey?) -> Unit,
 ) {
-  composable(ROUTE_SAVED_HOME) {
+  composable(SavedRoute) {
     SavedScreen(
       viewModel = getViewModel(),
       contentPadding = contentPadding,

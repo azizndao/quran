@@ -1,4 +1,4 @@
-package org.muslimapp.core.audio
+package org.quran.core.audio
 
 object PlaybackConstants {
 

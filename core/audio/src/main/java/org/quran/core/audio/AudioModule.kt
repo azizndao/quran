@@ -21,7 +21,7 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.bind
 import org.koin.dsl.module
-import org.muslimapp.core.audio.repositories.QariRepository
+import org.quran.core.audio.repositories.QariRepository
 import org.quran.core.audio.api.AudioApiService
 import org.quran.core.audio.datasources.RecitationsDataSource
 import org.quran.core.audio.repositories.RecitationRepository

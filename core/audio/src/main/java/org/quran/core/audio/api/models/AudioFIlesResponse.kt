@@ -1,4 +1,4 @@
-package org.quran.network.audio.models
+package org.quran.core.audio.api.models
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

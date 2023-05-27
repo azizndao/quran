@@ -56,11 +56,11 @@ android {
 
 dependencies {
 
+  implementation(project(":core:common"))
   implementation(project(":core:datastore"))
   implementation(project(":core:design-system"))
   implementation(project(":core:audio"))
   implementation(project(":core:models"))
-  implementation(project(":core:navigation"))
 
   implementation(project(":features:home"))
   implementation(project(":features:search"))
@@ -68,8 +68,10 @@ dependencies {
   implementation(project(":features:share"))
   implementation(project(":features:pager"))
   implementation(project(":features:translations"))
+  implementation(project(":features:settings"))
 
-  implementation(libs.androidx.compose.material)
+  implementation(libs.navigation.compose)
+
   implementation(libs.timber)
 
   implementation(libs.androidx.work)

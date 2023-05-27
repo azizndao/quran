@@ -1,6 +1,8 @@
 package org.quran.features.saved.bookmarks
 
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListState
@@ -36,6 +38,7 @@ internal fun BookmarkTabView(
     bottomEnd = CornerSize(0),
     bottomStart = CornerSize(0)
   )
+
   val bottomShape = MaterialTheme.shapes.large.copy(
     topEnd = CornerSize(0),
     topStart = CornerSize(0)
@@ -43,7 +46,7 @@ internal fun BookmarkTabView(
 
   LazyColumn(
     state = listState,
-    contentPadding = contentPadding.add(vertical = 12.dp, horizontal = 16.dp)
+    contentPadding = contentPadding.add(vertical = 12.dp, horizontal = 12.dp)
   ) {
 
     for (tag in bookmarksTags) {
@@ -71,6 +74,10 @@ internal fun BookmarkTabView(
             )
           }
         }
+      }
+
+      item {
+        Spacer(modifier = Modifier.height(16.dp))
       }
     }
   }

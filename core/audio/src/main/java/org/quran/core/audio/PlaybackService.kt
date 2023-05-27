@@ -41,9 +41,9 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import org.koin.android.ext.android.inject
-import org.muslimapp.core.audio.PlaybackConstants.MUSLIMS_BROWSABLE_ROOT
-import org.muslimapp.core.audio.models.MediaId
-import org.muslimapp.core.audio.repositories.QariRepository
+import org.quran.core.audio.PlaybackConstants.MUSLIMS_BROWSABLE_ROOT
+import org.quran.core.audio.models.MediaId
+import org.quran.core.audio.repositories.QariRepository
 import org.quran.core.audio.repositories.TimingRepository
 import org.quran.core.audio.repositories.RecitationRepository
 import org.quran.datastore.repositories.AudioPreferencesRepository

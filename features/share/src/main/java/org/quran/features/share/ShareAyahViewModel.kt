@@ -60,7 +60,7 @@ internal class ShareAyahViewModel(
           }
       }
 
-      val suraName = surahRepository.getSurahName(suraAyah.sura)
+      val suraName = surahRepository.getSurahName(suraAyah.sura - 1)
 
       uiState = ShareAyahUiState.Success(
         ayah = ayah.ayah,

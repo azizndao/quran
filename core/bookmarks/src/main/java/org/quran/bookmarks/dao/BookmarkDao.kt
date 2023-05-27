@@ -22,8 +22,8 @@ internal interface BookmarkDao {
   @Delete
   suspend fun delete(bookmark: Bookmark)
 
-  @Query("DELETE FROM bookmarks WHERE `key` = :key")
-  suspend fun delete(key: VerseKey)
+  @Query("DELETE FROM bookmarks WHERE `key` = :key AND tagId = :tagId")
+  suspend fun delete(key: VerseKey, tagId: Int)
 
   @Query("SELECT * FROM bookmarks WHERE `key` = :key")
   suspend fun getBookmark(key: VerseKey): List<Bookmark>

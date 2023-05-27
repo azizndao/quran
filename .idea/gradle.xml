@@ -31,7 +31,6 @@
             <option value="$PROJECT_DIR$/core/datastore" />
             <option value="$PROJECT_DIR$/core/design-system" />
             <option value="$PROJECT_DIR$/core/models" />
-            <option value="$PROJECT_DIR$/core/navigation" />
             <option value="$PROJECT_DIR$/core/network" />
             <option value="$PROJECT_DIR$/core/translation" />
             <option value="$PROJECT_DIR$/core/verses" />
@@ -40,6 +39,7 @@
             <option value="$PROJECT_DIR$/features/pager" />
             <option value="$PROJECT_DIR$/features/saved" />
             <option value="$PROJECT_DIR$/features/search" />
+            <option value="$PROJECT_DIR$/features/settings" />
             <option value="$PROJECT_DIR$/features/share" />
             <option value="$PROJECT_DIR$/features/translations" />
           </set>

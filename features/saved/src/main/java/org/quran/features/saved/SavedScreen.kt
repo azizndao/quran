@@ -63,15 +63,20 @@ internal fun SavedScreen(
 
     val uiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
 
-    HorizontalPager(state = pagerState, modifier = Modifier.fillMaxSize()) { position ->
-      Box(modifier = Modifier.nestedScroll(scrollBehavior.nestedScrollConnection)) {
+    HorizontalPager(state = pagerState) { position ->
+      Box(
+        modifier = Modifier
+          .fillMaxSize()
+          .nestedScroll(scrollBehavior.nestedScrollConnection)
+      ) {
         when (position) {
           0 -> BookmarkTabView(
             contentPadding = contentPadding,
-            bookmarksTags = uiState.bookmarksTags
-          ) { bookmark ->
-            navigateToPage(viewModel.getPage(bookmark.key), bookmark.key)
-          }
+            bookmarksTags = uiState.bookmarksTags,
+            onBookmarkClick = { bookmark ->
+              navigateToPage(viewModel.getPage(bookmark.key), bookmark.key)
+            }
+          )
 
           1 -> NotesTabView(contentPadding = contentPadding)
           else -> throw IndexOutOfBoundsException()

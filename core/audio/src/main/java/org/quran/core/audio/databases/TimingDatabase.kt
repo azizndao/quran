@@ -1,11 +1,11 @@
-package org.muslimapp.core.audio.databases
+package org.quran.core.audio.databases
 
 import android.content.Context
 import androidx.room.Database
 import androidx.room.Room
 import androidx.room.RoomDatabase
-import org.muslimapp.core.audio.models.AyahTiming
-import org.muslimapp.core.audio.models.AyahTimingDao
+import org.quran.core.audio.models.AyahTiming
+import org.quran.core.audio.models.AyahTimingDao
 
 @Database(
   version = 1,

@@ -25,13 +25,14 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         add("implementation", project(":core:models"))
         add("implementation", project(":core:design-system"))
         add("implementation", project(":core:datastore"))
-        add("implementation", project(":core:navigation"))
 
         add("testImplementation", libs.findLibrary("junit").get())
         add("androidTestImplementation", libs.findLibrary("androidx.test.ext.junit").get())
         add("androidTestImplementation", libs.findLibrary("espresso.core").get())
 
         add("implementation", libs.findLibrary("koin.compose").get())
+
+        add("implementation", libs.findLibrary("navigation-compose").get())
 
         add("implementation", libs.findLibrary("glide.compose").get())
 

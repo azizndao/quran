@@ -14,8 +14,8 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.flow.debounce
-import org.muslimapp.core.audio.MediaDownloadService
-import org.muslimapp.core.audio.models.MediaId
+import org.quran.core.audio.MediaDownloadService
+import org.quran.core.audio.models.MediaId
 import timber.log.Timber
 
 @androidx.annotation.OptIn(UnstableApi::class)

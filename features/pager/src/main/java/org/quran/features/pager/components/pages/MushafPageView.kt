@@ -1,4 +1,4 @@
-package org.quran.features.pager.components
+package org.quran.features.pager.components.pages
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
@@ -35,12 +35,12 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
-import org.quran.ui.theme.LocalQuranTextStyle
-import org.quran.ui.theme.surahNames
-import org.quran.features.pager.uiState.QuranEvent
 import org.quran.features.pager.R
 import org.quran.features.pager.uiState.MushafPage
+import org.quran.features.pager.uiState.QuranEvent
 import org.quran.ui.components.LongClickableText
+import org.quran.ui.theme.LocalQuranTextStyle
+import org.quran.ui.theme.surahNames
 
 @Composable
 fun MushafPageView(

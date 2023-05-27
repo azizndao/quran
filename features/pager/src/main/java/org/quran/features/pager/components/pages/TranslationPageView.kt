@@ -1,4 +1,4 @@
-package org.quran.features.pager.components
+package org.quran.features.pager.components.pages
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
@@ -11,6 +11,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -28,6 +29,10 @@ import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.alquran.ui.components.LineSeparator
+import org.quran.features.pager.components.SurahHeader
+import org.quran.features.pager.components.TranslationItemView
+import org.quran.features.pager.components.VerseItemView
+import org.quran.features.pager.components.VerseToolbarView
 import org.quran.features.pager.uiState.QuranEvent
 import org.quran.features.pager.uiState.QuranPageItem
 import org.quran.features.pager.uiState.TranslationPage
@@ -52,7 +57,7 @@ fun TranslationPageItem(
   )
 
   LaunchedEffect(page) {
-    if (page.scrollIndex >= 0) {
+    if (page.scrollIndex >= 1) {
       listState.animateScrollToItem(page.scrollIndex)
     }
   }
@@ -74,58 +79,48 @@ fun TranslationPageItem(
       )
     }
 
-    for (row in page.items) {
+    items(page.items, contentType = { it::class.simpleName }, key = { it.key }) { row ->
       when (row) {
-        is TranslationPage.Chapter -> item(key = row.key, contentType = "surah") {
-          SurahHeader(
-            surahName = row.name,
-            suraNumber = row.number,
-            modifier = Modifier.clickable(
-              interactionSource,
-              indication = null,
-              onClick = { currentOnEvent(QuranEvent.AyahPressed) }
-            )
+        is TranslationPage.Chapter -> SurahHeader(
+          surahName = row.name,
+          suraNumber = row.number,
+          modifier = Modifier.clickable(
+            interactionSource,
+            indication = null,
+            onClick = { currentOnEvent(QuranEvent.AyahPressed) }
           )
-        }
+        )
 
-        is TranslationPage.Verse -> item(key = row.key, contentType = "verse") {
-          VerseItemView(
-            verse = row,
-            modifier = Modifier.clickable(
-              interactionSource,
-              indication = null,
-              onClick = { currentOnEvent(QuranEvent.AyahPressed) }
-            )
+        is TranslationPage.Verse -> VerseItemView(
+          verse = row,
+          modifier = Modifier.clickable(
+            interactionSource,
+            indication = null,
+            onClick = { currentOnEvent(QuranEvent.AyahPressed) }
           )
-        }
+        )
 
-        is TranslationPage.Divider -> item(key = row.key) {
-          LineSeparator(
-            modifier = Modifier.padding(horizontal = 16.dp),
-          )
-        }
+        is TranslationPage.Divider -> LineSeparator(
+          modifier = Modifier.padding(horizontal = 16.dp),
+        )
 
-        is TranslationPage.TranslatedVerse -> item(key = row.key, contentType = "translation") {
-          TranslationItemView(
-            translation = row,
-            modifier = Modifier.clickable(
-              interactionSource,
-              indication = null,
-              onClick = { currentOnEvent(QuranEvent.AyahPressed) }
-            )
+        is TranslationPage.TranslatedVerse -> TranslationItemView(
+          translation = row,
+          modifier = Modifier.clickable(
+            interactionSource,
+            indication = null,
+            onClick = { currentOnEvent(QuranEvent.AyahPressed) }
           )
-        }
+        )
 
-        is TranslationPage.VerseToolbar -> item(row.key, contentType = "toolbar") {
-          VerseToolbarView(
-            verse = row, onEvent = currentOnEvent,
-            modifier = Modifier.clickable(
-              interactionSource,
-              indication = null,
-              onClick = { currentOnEvent(QuranEvent.AyahPressed) }
-            )
+        is TranslationPage.VerseToolbar -> VerseToolbarView(
+          verse = row, onEvent = currentOnEvent,
+          modifier = Modifier.clickable(
+            interactionSource,
+            indication = null,
+            onClick = { currentOnEvent(QuranEvent.AyahPressed) }
           )
-        }
+        )
       }
     }
 
@@ -170,19 +165,6 @@ fun spacedByWithFooter(space: Dp) = object : Arrangement.Vertical {
     occupied -= lastSpace
   }
 }
-
-//@Preview(showBackground = true)
-//@Composable
-//fun PageItemPreview(
-//    @PreviewParameter(PageItemPreviewParameterProvider::class) page: TranslationPage,
-//) {
-//    MuslimsTheme {
-//        Surface {
-//            TranslationPageItem(page = page) {}
-//        }
-//    }
-//}
-//
 
 @Composable
 fun PageHeaderView(header: QuranPageItem.Header, modifier: Modifier = Modifier) {

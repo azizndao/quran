@@ -1,4 +1,4 @@
-package org.muslimapp.core.audio
+package org.quran.core.audio
 
 import android.annotation.SuppressLint
 import android.app.Notification
@@ -13,9 +13,8 @@ import androidx.media3.exoplayer.scheduler.Requirements
 import androidx.media3.exoplayer.scheduler.Scheduler
 import androidx.media3.exoplayer.workmanager.WorkManagerScheduler
 import org.koin.android.ext.android.inject
-import org.muslimapp.core.audio.models.MediaId
+import org.quran.core.audio.models.MediaId
 import org.quram.common.utils.MuslimsConstants.DOWNLOAD_CHANNEL_ID
-import org.quran.core.audio.R
 
 /**
  * A service for downloading media.

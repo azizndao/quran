@@ -1,13 +1,10 @@
-package org.quran.features.pager.components
+package org.quran.features.pager.components.menu
 
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.WindowInsets
-import androidx.compose.foundation.layout.mandatorySystemGestures
-import androidx.compose.foundation.layout.navigationBars
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.systemBars
 import androidx.compose.material3.Icon
 import androidx.compose.material3.ListItem
 import androidx.compose.material3.ModalBottomSheet
@@ -22,7 +19,6 @@ import org.quran.features.pager.uiState.DialogUiState
 import org.quran.features.pager.uiState.QuranEvent
 import org.quran.ui.R
 
-
 @Composable
 fun VerseMenuSheet(
   uiState: DialogUiState.VerseMenu,
@@ -32,7 +28,7 @@ fun VerseMenuSheet(
 ) {
   ModalBottomSheet(
     onDismissRequest = onDismissRequest,
-    windowInsets = WindowInsets(0,0,0,0)
+    windowInsets = WindowInsets(0, 0, 0, 0),
   ) {
     ListItem(
       leadingContent = { Icon(painterResource(id = R.drawable.play), null) },
@@ -49,19 +45,19 @@ fun VerseMenuSheet(
       headlineContent = { Text(stringResource(id = R.string.repeat_ayah)) },
       modifier = Modifier.clickable { }
     )
-    LineSeparator(modifier = Modifier.padding(horizontal = 16.dp))
+    LineSeparator(modifier = Modifier.padding(start = 58.dp, end = 16.dp))
     ListItem(
       leadingContent = { Icon(painterResource(id = R.drawable.menu_book), null) },
       headlineContent = { Text(stringResource(id = R.string.tafsir)) },
       modifier = Modifier.clickable { onEvent(QuranEvent.VerseTafsir(uiState.verse)) }
     )
-    LineSeparator(modifier = Modifier.padding(horizontal = 16.dp))
+    LineSeparator(modifier = Modifier.padding(start = 58.dp, end = 16.dp))
     ListItem(
       leadingContent = { Icon(painterResource(id = R.drawable.content_copy), null) },
       headlineContent = { Text(stringResource(id = R.string.copy)) },
       modifier = Modifier.clickable { }
     )
-    LineSeparator(modifier = Modifier.padding(horizontal = 16.dp))
+    LineSeparator(modifier = Modifier.padding(start = 58.dp, end = 16.dp))
     ListItem(
       leadingContent = { Icon(painterResource(id = R.drawable.ic_edit), null) },
       headlineContent = { Text(stringResource(id = R.string.add_note)) },
@@ -74,7 +70,7 @@ fun VerseMenuSheet(
       }
     )
 
-    LineSeparator(modifier = Modifier.padding(horizontal = 16.dp))
+    LineSeparator(modifier = Modifier.padding(start = 58.dp, end = 16.dp))
 
     ListItem(
       leadingContent = { Icon(painterResource(id = R.drawable.ic_share), null) },

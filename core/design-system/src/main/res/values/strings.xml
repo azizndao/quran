@@ -202,4 +202,6 @@
     <string name="tag_name" >Tag name</string>
     <string name="bookmark_tags">Bookmark tags</string>
     <string name="create_tag_button">Create</string>
+    <string name="streaming_audio">Streaming audio</string>
+    <string name="audio">Audio</string>
 </resources>

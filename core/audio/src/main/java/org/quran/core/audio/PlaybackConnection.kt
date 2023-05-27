@@ -21,7 +21,6 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -32,20 +31,21 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
-import org.muslimapp.core.audio.models.AyahTiming
-import org.muslimapp.core.audio.models.MediaId
+import org.quram.common.utils.QuranDisplayData
 import org.quran.core.audio.models.AudioState
+import org.quran.core.audio.models.AyahTiming
+import org.quran.core.audio.models.MediaId
 import org.quran.core.audio.models.NowPlaying
 import org.quran.core.audio.repositories.RecitationRepository
 import org.quran.core.audio.repositories.TimingRepository
 import org.quran.datastore.repositories.AudioPreferencesRepository
-import java.util.concurrent.Executors
 
 class PlaybackConnection(
   private val context: Context,
   private val recitationRepository: RecitationRepository,
   private val audioSettings: AudioPreferencesRepository,
   private val timingRepository: TimingRepository,
+  private val quranDisplayData: QuranDisplayData,
 ) : DefaultLifecycleObserver {
 
   private lateinit var coroutineScope: CoroutineScope
@@ -109,7 +109,7 @@ class PlaybackConnection(
     val mediaId = MediaId.fromString(currentMediaItem.mediaId)
 
     NowPlaying(
-      title = mediaMetadata.title.toString() + " (${mediaId.sura}:${timing.ayah})",
+      title = quranDisplayData.getSuraAyahString(mediaId.sura, mediaId.ayah),
       reciterName = mediaMetadata.artist.toString(),
       sura = timing.sura,
       ayah = timing.ayah,

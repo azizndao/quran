@@ -30,7 +30,7 @@ class BookmarkRepository internal constructor(db: BookmarksDatabase) {
 
   suspend fun addBookmark(bookmark: Bookmark) = bookmarkDao.insertBookmarks(bookmark)
 
-  suspend fun removeBookmark(key: VerseKey) = bookmarkDao.delete(key)
+  suspend fun removeBookmark(key: VerseKey, tag: Int) = bookmarkDao.delete(key, tag)
 
   fun observeBookmarksWithKeys(keys: Set<VerseKey>) =
     bookmarkDao.getByPage(keys).distinctUntilChanged()

@@ -4,11 +4,10 @@ import android.content.Context
 import android.widget.Toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.decodeFromString
 import kotlinx.serialization.json.Json
 import org.quran.core.audio.api.AudioApiService
-import org.muslimapp.core.audio.databases.TimingDatabase
-import org.muslimapp.core.audio.models.AyahTiming
+import org.quran.core.audio.databases.TimingDatabase
+import org.quran.core.audio.models.AyahTiming
 import org.quran.core.audio.R
 import timber.log.Timber
 
