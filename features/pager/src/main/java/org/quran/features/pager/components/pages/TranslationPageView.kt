@@ -1,5 +1,6 @@
 package org.quran.features.pager.components.pages
 
+import android.content.res.Configuration
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
@@ -14,6 +15,7 @@ import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -23,22 +25,25 @@ import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalDensity
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import org.alquran.ui.components.LineSeparator
+import org.quran.features.pager.components.ProviderPage77QuranTextStyle
 import org.quran.features.pager.components.SurahHeader
 import org.quran.features.pager.components.TranslationItemView
 import org.quran.features.pager.components.VerseItemView
 import org.quran.features.pager.components.VerseToolbarView
+import org.quran.features.pager.previews.TranslationPageProvider
+import org.quran.features.pager.uiState.PageItem
 import org.quran.features.pager.uiState.QuranEvent
-import org.quran.features.pager.uiState.QuranPageItem
 import org.quran.features.pager.uiState.TranslationPage
+import org.quran.ui.theme.QuranTheme
 import org.quran.ui.utils.extensions.add
 import kotlin.math.min
-import org.quran.ui.R as UI
 
 @Composable
 fun TranslationPageItem(
@@ -75,7 +80,7 @@ fun TranslationPageItem(
     item(key = "header") {
       PageHeaderView(
         header = page.header,
-        modifier = Modifier.padding(12.dp)
+        modifier = Modifier.padding(8.dp)
       )
     }
 
@@ -101,7 +106,7 @@ fun TranslationPageItem(
         )
 
         is TranslationPage.Divider -> LineSeparator(
-          modifier = Modifier.padding(horizontal = 16.dp),
+          modifier = Modifier.padding(horizontal = 12.dp),
         )
 
         is TranslationPage.TranslatedVerse -> TranslationItemView(
@@ -167,7 +172,7 @@ fun spacedByWithFooter(space: Dp) = object : Arrangement.Vertical {
 }
 
 @Composable
-fun PageHeaderView(header: QuranPageItem.Header, modifier: Modifier = Modifier) {
+fun PageHeaderView(header: PageItem.Header, modifier: Modifier = Modifier) {
   Row(
     modifier = modifier
       .fillMaxWidth()
@@ -177,14 +182,29 @@ fun PageHeaderView(header: QuranPageItem.Header, modifier: Modifier = Modifier) 
   ) {
 
     Text(
-      stringResource(UI.string.surah, header.leading),
-      style = MaterialTheme.typography.bodyMedium
+      text = header.leading,
+      style = MaterialTheme.typography.labelMedium
     )
 
     Text(
       text = header.trailing,
       textAlign = TextAlign.End,
-      style = MaterialTheme.typography.bodySmall
+      style = MaterialTheme.typography.labelMedium
     )
+  }
+}
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Composable
+fun TranslationPagePreview(
+  @PreviewParameter(TranslationPageProvider::class) page: TranslationPage
+) {
+  QuranTheme {
+    Surface {
+      ProviderPage77QuranTextStyle {
+        TranslationPageItem(page = page) { }
+      }
+    }
   }
 }

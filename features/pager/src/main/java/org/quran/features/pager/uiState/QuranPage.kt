@@ -3,11 +3,11 @@ package org.quran.features.pager.uiState
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.collections.immutable.persistentListOf
 
-data class MushafPage(
+data class QuranPage(
   override val page: Int = 0,
   override val header: Header,
   val lines: PersistentList<Line> = persistentListOf(),
-) : QuranPageItem() {
+) : PageItem() {
 
   sealed class Line
 

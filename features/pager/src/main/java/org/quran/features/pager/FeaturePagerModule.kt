@@ -6,8 +6,8 @@ import org.koin.core.module.dsl.factoryOf
 import org.koin.dsl.module
 import org.quran.bookmarks.BookmarkModule
 import org.quran.core.audio.AudioCoreModule
-import org.quran.features.pager.useCase.GetMushafPage
-import org.quran.features.pager.useCase.GetTranslationPage
+import org.quran.features.pager.useCase.GetQuranPageUseCase
+import org.quran.features.pager.useCase.GetTranslationPageUseCase
 import org.quran.features.pager.useCase.PageHeaderUseCase
 import org.quran.translation.TranslationModule
 
@@ -15,9 +15,9 @@ val FeaturePagerModule = module {
 
   includes(AudioCoreModule, VersesModule, TranslationModule, BookmarkModule)
 
-  factoryOf(::GetTranslationPage)
+  factoryOf(::GetTranslationPageUseCase)
 
-  factoryOf(::GetMushafPage)
+  factoryOf(::GetQuranPageUseCase)
 
   factoryOf(::PageHeaderUseCase)
 

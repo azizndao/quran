@@ -1,6 +1,6 @@
 plugins {
-  id("muslimapp.android.library")
-  id("muslimapp.android.library.compose")
+  id("quran.android.library")
+  id("quran.android.library.compose")
 }
 
 android {
@@ -8,8 +8,6 @@ android {
 }
 
 dependencies {
-  implementation(libs.timber)
-
   api(libs.androidx.compose.material3)
   api(libs.androidx.compose.material3.windowSizeClass)
   api(libs.androidx.compose.ui.util)

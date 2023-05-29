@@ -5,8 +5,7 @@ import org.gradle.api.artifacts.VersionCatalogsExtension
 import org.gradle.kotlin.dsl.configure
 import org.gradle.kotlin.dsl.dependencies
 import org.gradle.kotlin.dsl.getByType
-import org.gradle.kotlin.dsl.kotlin
-import org.muslimapp.configureKotlinAndroid
+import org.quran.configureKotlinAndroid
 
 class AndroidLibraryConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
@@ -30,6 +29,8 @@ class AndroidLibraryConventionPlugin : Plugin<Project> {
         add("implementation", libs.findLibrary("kotlinx.coroutines.android").get())
 
         add("implementation", libs.findLibrary("koin.android").get())
+
+        add("implementation", libs.findLibrary("timber").get())
       }
     }
   }

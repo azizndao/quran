@@ -1,5 +1,5 @@
 plugins {
-  id("muslimapp.android.library")
+  id("quran.android.library")
 }
 
 android {
@@ -7,11 +7,8 @@ android {
 }
 
 dependencies {
-  implementation(libs.timber)
-
   api(libs.kotlinx.serialization)
 
-  api(libs.koin.android)
   api(libs.koin.workmanager)
 
   api(libs.androidx.work)

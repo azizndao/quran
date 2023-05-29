@@ -21,6 +21,7 @@ import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.distinctUntilChanged
 import kotlinx.coroutines.flow.first
@@ -53,15 +54,18 @@ class PlaybackConnection(
   private val _isConnected = MutableStateFlow(false)
 
   private val _playingState = MutableStateFlow(AudioState())
+  val playingState = _playingState.asStateFlow()
 
   private val _repeatMode = MutableStateFlow(Player.REPEAT_MODE_OFF)
+  val repeatMode = _repeatMode.asStateFlow()
 
   private val _currentMediaItem = MutableStateFlow<MediaItem?>(null)
 
-
   lateinit var currentAyah: Flow<VerseKey?>
+    private set
 
   lateinit var nowPlaying: StateFlow<NowPlaying?>
+    private set
 
   private var mediaControllerFuture: ListenableFuture<MediaController>? = null
 
@@ -109,7 +113,7 @@ class PlaybackConnection(
     val mediaId = MediaId.fromString(currentMediaItem.mediaId)
 
     NowPlaying(
-      title = quranDisplayData.getSuraAyahString(mediaId.sura, mediaId.ayah),
+      title = quranDisplayData.getSuraAyahString(timing.sura, timing.ayah),
       reciterName = mediaMetadata.artist.toString(),
       sura = timing.sura,
       ayah = timing.ayah,

@@ -31,15 +31,18 @@ import org.quran.bookmarks.models.Bookmark
 import org.quran.bookmarks.models.BookmarkTag
 import org.quran.bookmarks.repository.BookmarkRepository
 import org.quran.core.audio.PlaybackConnection
+import org.quran.core.audio.repositories.QariRepository
 import org.quran.datastore.DisplayMode
+import org.quran.datastore.repositories.AudioPreferencesRepository
 import org.quran.datastore.repositories.QuranPreferencesRepository
+import org.quran.features.pager.uiState.AudioUiState
 import org.quran.features.pager.uiState.DialogUiState
+import org.quran.features.pager.uiState.PageItem
 import org.quran.features.pager.uiState.QuranEvent
-import org.quran.features.pager.uiState.QuranPageItem
 import org.quran.features.pager.uiState.QuranPagerUiState
 import org.quran.features.pager.uiState.QuranSelection
-import org.quran.features.pager.useCase.GetMushafPage
-import org.quran.features.pager.useCase.GetTranslationPage
+import org.quran.features.pager.useCase.GetQuranPageUseCase
+import org.quran.features.pager.useCase.GetTranslationPageUseCase
 import org.quran.translation.exceptions.NoTranslationException
 import org.quran.translation.repositories.TranslationsRepository
 import timber.log.Timber
@@ -49,14 +52,17 @@ internal class QuranPagerViewModel(
   private val quranInfo: QuranInfo,
   private val playbackConnection: PlaybackConnection,
   private val quranPreferences: QuranPreferencesRepository,
-  private val getTranslationPage: GetTranslationPage,
-  private val getMushafPage: GetMushafPage,
+  private val getTranslationPage: GetTranslationPageUseCase,
+  private val getQuranPage: GetQuranPageUseCase,
   private val bookmarkRepository: BookmarkRepository,
   private val quranDisplayData: QuranDisplayData,
+  private val qariRepository: QariRepository,
+  private val audioPreferences: AudioPreferencesRepository,
   translationRepository: TranslationsRepository
 ) : ViewModel() {
 
-  val args = quranPagerDestinationArgs(savedStateHandle)
+  val initialPage = getInitialPage(savedStateHandle)
+  private val initialVerse = getInitialVerse(savedStateHandle)
 
   val nowPlayingFlow =
     playbackConnection.nowPlaying.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
@@ -67,7 +73,7 @@ internal class QuranPagerViewModel(
 
 
   private val selectionFlow = MutableStateFlow(
-    if (args.verseKey != null) QuranSelection.InitialVerse(args.verseKey) else QuranSelection.None
+    if (initialVerse != null) QuranSelection.InitialVerse(initialVerse) else QuranSelection.None
   )
 
   var isFullscreen by mutableStateOf(false)
@@ -81,7 +87,7 @@ internal class QuranPagerViewModel(
     translationRepository.observeSelectedEditions(),
   ) { preferences, locales ->
     QuranPagerUiState(
-      page = args.page,
+      page = initialPage,
       displayMode = preferences.displayMode,
       quranFontScale = preferences.quranFontScale,
       translationFontScale = preferences.translationFontScale,
@@ -89,7 +95,11 @@ internal class QuranPagerViewModel(
       exception = if (locales.isEmpty()) NoTranslationException() else null,
     )
   }.distinctUntilChanged()
-    .stateIn(viewModelScope, SharingStarted.WhileSubscribed(), QuranPagerUiState(page = args.page))
+    .stateIn(
+      viewModelScope,
+      SharingStarted.WhileSubscribed(),
+      QuranPagerUiState(page = initialPage)
+    )
 
   init {
     getTranslationPage.coroutineScope = viewModelScope
@@ -106,7 +116,7 @@ internal class QuranPagerViewModel(
   }
 
   @Composable
-  fun pageFactory(mode: DisplayMode, page: Int, version: Int): QuranPageItem? {
+  fun pageFactory(mode: DisplayMode, page: Int, version: Int): PageItem? {
     val itemFlow = remember(mode, page) {
 
       when (mode) {
@@ -119,7 +129,7 @@ internal class QuranPagerViewModel(
           getTranslationPage(page, selectedVerse, version).catch { Timber.e(it) }
         }
 
-        DisplayMode.QURAN -> getMushafPage(page, version, selectionFlow)
+        DisplayMode.QURAN -> getQuranPage(page, version, selectionFlow)
         DisplayMode.UNRECOGNIZED -> flowOf(null)
       }.flowOn(Dispatchers.IO).stateIn(
         viewModelScope, SharingStarted.WhileSubscribed(5_000), null
@@ -163,6 +173,10 @@ internal class QuranPagerViewModel(
       is QuranEvent.VerseNote -> dialogUiState = DialogUiState.CreateNote(event.key)
 
       is QuranEvent.VerseTafsir -> dialogUiState = DialogUiState.VerseTafsir(event.key)
+
+      is QuranEvent.ChangeReciter -> viewModelScope.launch {
+        audioPreferences.setCurrentReciter(event.qari.path)
+      }
     }
   }
 
@@ -190,7 +204,7 @@ internal class QuranPagerViewModel(
   }
 
   fun createNote(verse: VerseKey, note: String) {
-    onDismissRequest()
+    TODO()
   }
 
   fun removeBookmark(verse: VerseKey, tag: BookmarkTag) {
@@ -225,6 +239,27 @@ internal class QuranPagerViewModel(
         )
       )
     }
+  }
+
+  fun showAudioMenu() {
+    dialogUiState = DialogUiState.AudioMenu(
+      qaris = qariRepository.getQariList().toPersistentList(),
+      nowPlaying = combine(
+        audioPreferences.getCurrentReciter(),
+        playbackConnection.playingState,
+        playbackConnection.nowPlaying,
+        playbackConnection.repeatMode,
+      ) { currentReciterId, isPlaying, mediaItem, repeatMode ->
+
+        AudioUiState(
+          loading = false,
+          playing = mediaItem!!,
+          currentReciterId = currentReciterId,
+          audioState = isPlaying,
+          repeatMode = repeatMode
+        )
+      }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AudioUiState())
+    )
   }
 }
 

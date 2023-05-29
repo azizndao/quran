@@ -1,5 +1,6 @@
 package org.quran.features.pager.components.pages
 
+import android.content.res.Configuration
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
@@ -11,12 +12,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.requiredWidthIn
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.contentColorFor
 import androidx.compose.material3.surfaceColorAtElevation
@@ -34,17 +35,22 @@ import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import org.quran.features.pager.R
-import org.quran.features.pager.uiState.MushafPage
+import org.quran.features.pager.components.ProviderPage604QuranTextStyle
+import org.quran.features.pager.previews.QuranPageProvider
 import org.quran.features.pager.uiState.QuranEvent
+import org.quran.features.pager.uiState.QuranPage
 import org.quran.ui.components.LongClickableText
 import org.quran.ui.theme.LocalQuranTextStyle
+import org.quran.ui.theme.QuranTheme
 import org.quran.ui.theme.surahNames
 
 @Composable
-fun MushafPageView(
-  page: MushafPage,
+fun QuranPageView(
+  page: QuranPage,
   modifier: Modifier = Modifier,
   onAyahEvent: (QuranEvent) -> Unit
 ) {
@@ -73,7 +79,7 @@ fun MushafPageView(
 
       for (line in page.lines) {
         when (line) {
-          is MushafPage.Basmallah -> Image(
+          is QuranPage.Basmallah -> Image(
             painter = painterResource(id = R.drawable.bismillah),
             contentDescription = null,
             modifier = Modifier
@@ -84,20 +90,20 @@ fun MushafPageView(
             colorFilter = ColorFilter.tint(LocalContentColor.current)
           )
 
-          is MushafPage.Blank -> Spacer(
+          is QuranPage.Blank -> Spacer(
             Modifier
               .height(lineHeight)
               .fillMaxWidth()
           )
 
-          is MushafPage.ChapterLine -> MushafChapterLine(
+          is QuranPage.ChapterLine -> QuranChapterLine(
             line = line,
             modifier = Modifier
               .height(lineHeight)
               .fillMaxWidth()
           )
 
-          is MushafPage.TextLine -> MushafTextLine(
+          is QuranPage.TextLine -> QuranTextLine(
             line = line,
             modifier = Modifier
               .height(lineHeight)
@@ -123,13 +129,12 @@ fun MushafPageView(
 }
 
 @Composable
-fun MushafChapterLine(
-  line: MushafPage.ChapterLine,
+fun QuranChapterLine(
+  line: QuranPage.ChapterLine,
   modifier: Modifier = Modifier
 ) {
   Box(
     modifier = modifier
-      .fillMaxWidth()
       .paint(
         painterResource(id = R.drawable.surah_border),
         contentScale = ContentScale.Fit,
@@ -142,15 +147,14 @@ fun MushafChapterLine(
       textAlign = TextAlign.Center,
       style = MaterialTheme.typography.surahNames,
       modifier = Modifier
-        .requiredWidthIn()
         .align(Alignment.Center),
     )
   }
 }
 
 @Composable
-fun MushafTextLine(
-  line: MushafPage.TextLine,
+fun QuranTextLine(
+  line: QuranPage.TextLine,
   modifier: Modifier = Modifier,
   style: TextStyle = LocalQuranTextStyle.current,
   colorScheme: ColorScheme = MaterialTheme.colorScheme,
@@ -191,4 +195,20 @@ fun MushafTextLine(
       onAyahEvent(QuranEvent.AyahLongPressed(word.key, word.position, word.bookmarked))
     },
   )
+}
+
+
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL)
+@Composable
+fun QuranPageViewPreview(
+  @PreviewParameter(QuranPageProvider::class) page: QuranPage,
+) {
+  QuranTheme {
+    Surface {
+      ProviderPage604QuranTextStyle {
+        QuranPageView(page = page) { }
+      }
+    }
+  }
 }

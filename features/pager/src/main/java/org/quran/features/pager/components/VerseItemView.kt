@@ -1,5 +1,6 @@
 package org.quran.features.pager.components
 
+import android.content.res.Configuration
 import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.core.Spring
 import androidx.compose.animation.core.animateFloat
@@ -24,6 +25,7 @@ import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.surfaceColorAtElevation
 import androidx.compose.runtime.Composable
@@ -42,11 +44,18 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.core.text.HtmlCompat.FROM_HTML_MODE_COMPACT
 import androidx.core.text.HtmlCompat.fromHtml
+import arg.quran.models.quran.VerseKey
+import org.quran.features.pager.previews.TranslationProvider
+import org.quran.features.pager.previews.VerseProvider
 import org.quran.features.pager.uiState.QuranEvent
 import org.quran.features.pager.uiState.TranslationPage
+import org.quran.ui.R
+import org.quran.ui.theme.QuranTheme
 import org.quran.ui.theme.quran
 import org.quran.ui.theme.translation
 import org.quran.ui.utils.extensions.toAnnotatedString
@@ -66,6 +75,26 @@ fun VerseItemView(
       .padding(start = 24.dp, top = 24.dp, end = 24.dp)
       .fillMaxWidth()
   )
+}
+
+@Preview
+@Preview(
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Composable
+fun VerseItemViewPreview(
+  @PreviewParameter(
+    VerseProvider::class, limit = 1
+  ) ayah: TranslationPage.Verse,
+) {
+
+  QuranTheme {
+    Surface {
+      ProviderPage77QuranTextStyle {
+        VerseItemView(verse = ayah)
+      }
+    }
+  }
 }
 
 @Composable
@@ -104,6 +133,25 @@ fun TranslationItemView(
   }
 }
 
+@Preview
+@Preview(
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Composable
+fun VerseTranslationPreview(
+  @PreviewParameter(
+    TranslationProvider::class, limit = 1
+  ) verse: TranslationPage.TranslatedVerse,
+) {
+
+  QuranTheme {
+    Surface {
+      TranslationItemView(translation = verse)
+    }
+  }
+}
+
+
 private val IconSize = 20.dp
 
 @Composable
@@ -115,10 +163,13 @@ fun VerseToolbarView(
   CompositionLocalProvider(LocalContentColor provides MaterialTheme.colorScheme.secondary) {
     val background by getPlayingBackground(verse.isPlaying)
 
-    Row(modifier = modifier
-      .fillMaxWidth()
-      .drawBehind { drawRect(background) }
-      .padding(bottom = 12.dp, top = 12.dp), verticalAlignment = Alignment.CenterVertically) {
+    Row(
+      modifier = modifier
+        .fillMaxWidth()
+        .drawBehind { drawRect(background) }
+        .padding(bottom = 12.dp, top = 12.dp),
+      verticalAlignment = Alignment.CenterVertically
+    ) {
 
       Text(
         text = verse.suraAyah.toString(),
@@ -144,7 +195,7 @@ fun VerseToolbarView(
         modifier = Modifier.padding(horizontal = 8.dp),
       ) {
         Icon(
-          painter = painterResource(id = org.quran.ui.R.drawable.ic_more_vert),
+          painter = painterResource(id = R.drawable.ic_more_vert),
           contentDescription = null,
           tint = MaterialTheme.colorScheme.primary,
           modifier = Modifier.size(IconSize),
@@ -174,7 +225,7 @@ private fun PlayButton(
   onPlay: () -> Unit,
 ) {
 
-  val icon = AnimatedImageVector.animatedVectorResource(org.quran.ui.R.drawable.ic_play_pause)
+  val icon = AnimatedImageVector.animatedVectorResource(R.drawable.ic_play_pause)
 
   IconButton(onClick = onPlay, modifier = modifier) {
     Icon(
@@ -210,8 +261,8 @@ private fun BookmarkButton(
 
   IconButton(modifier = modifier, onClick = onClick, interactionSource = interactionSource) {
     val drawableId = when {
-      isBookmarked -> org.quran.ui.R.drawable.bookmark_added
-      else -> org.quran.ui.R.drawable.bookmark_add
+      isBookmarked -> R.drawable.bookmark_added
+      else -> R.drawable.bookmark_add
     }
 
     Icon(
@@ -224,32 +275,17 @@ private fun BookmarkButton(
   }
 }
 
-//@Preview(showBackground = true)
-//@Preview(
-//    showBackground = true,
-//    uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
-//)
-//@Composable
-//fun AyahItemPreview(
-//    @PreviewParameter(
-//        AyahPreviewParameterProvider::class, limit = 2
-//    ) ayah: Ayah,
-//) {
-//
-//    val uiState by remember {
-//        mutableStateOf(
-//            TranslationPage.Ayah(
-//                ayah,
-//                isBookmarked = true,
-//                highLighted = false,
-//                audioState = AudioState.PLAYING
-//            )
-//        )
-//    }
-//
-//    MuslimsTheme {
-//        Surface {
-//            AyahItemView(uiState = uiState) {}
-//        }
-//    }
-//}
+@Preview
+@Preview(
+  uiMode = Configuration.UI_MODE_NIGHT_YES or Configuration.UI_MODE_TYPE_NORMAL
+)
+@Composable
+fun VerseToolbarPreview() {
+  QuranTheme {
+    Surface {
+      ProviderPage77QuranTextStyle {
+        VerseToolbarView(verse = TranslationPage.VerseToolbar(VerseKey(4, 1)), onEvent = {})
+      }
+    }
+  }
+}

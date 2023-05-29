@@ -10,7 +10,7 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
   override fun apply(target: Project) {
     with(target) {
       pluginManager.apply {
-        apply("muslimapp.android.library")
+        apply("quran.android.library")
       }
       extensions.configure<LibraryExtension> {
         defaultConfig {
@@ -26,13 +26,9 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
         add("implementation", project(":core:design-system"))
         add("implementation", project(":core:datastore"))
 
-        add("testImplementation", libs.findLibrary("junit").get())
-        add("androidTestImplementation", libs.findLibrary("androidx.test.ext.junit").get())
-        add("androidTestImplementation", libs.findLibrary("espresso.core").get())
-
         add("implementation", libs.findLibrary("koin.compose").get())
 
-        add("implementation", libs.findLibrary("navigation-compose").get())
+        add("implementation", libs.findLibrary("navigation.compose").get())
 
         add("implementation", libs.findLibrary("glide.compose").get())
 
@@ -42,8 +38,6 @@ class AndroidFeatureConventionPlugin : Plugin<Project> {
 
         add("implementation", libs.findLibrary("lifecycle.runtime.compose").get())
         add("implementation", libs.findLibrary("lifecycle.runtime.ktx").get())
-
-        add("implementation", libs.findLibrary("kotlinx.coroutines.android").get())
       }
     }
   }

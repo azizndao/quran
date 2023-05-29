@@ -25,7 +25,7 @@ import org.quram.common.utils.QuranDisplayData
 import org.quran.bookmarks.repository.BookmarkRepository
 import org.quran.core.audio.PlaybackConnection
 import org.quran.datastore.LocaleTranslation
-import org.quran.features.pager.uiState.QuranPageItem
+import org.quran.features.pager.uiState.PageItem
 import org.quran.features.pager.uiState.TranslationPage
 import org.quran.translation.repositories.TranslationsRepository
 import org.quran.translation.repositories.VerseTranslationRepository
@@ -36,7 +36,7 @@ data class LocalTranslationContent(
   val verses: List<Verse>,
 )
 
-class GetTranslationPage(
+class GetTranslationPageUseCase(
   private val verseRepository: VerseRepository,
   private val bookmarkRepository: BookmarkRepository,
   private val surahRepository: SurahRepository,
@@ -88,7 +88,7 @@ class GetTranslationPage(
   operator fun invoke(page: Int, selectedVerse: VerseKey?, version: Int): Flow<TranslationPage> {
     val keys = quranDisplayData.getAyahKeysOnPage(page)
 
-    var pageHeader: QuranPageItem.Header? = null
+    var pageHeader: PageItem.Header? = null
 
     var suras: List<Sura>? = null
 

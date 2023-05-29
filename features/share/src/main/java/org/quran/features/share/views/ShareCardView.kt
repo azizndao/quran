@@ -9,7 +9,7 @@ class ShareCardView(
   context: Context,
   attrs: AttributeSet? = null,
   defStyleAttr: Int = 0,
-  private val content: @Composable () -> Unit,
+  private val content: @Composable () -> Unit = {},
 ) : AbstractComposeView(context, attrs, defStyleAttr) {
 
   @Composable

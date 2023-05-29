@@ -1,6 +1,6 @@
 package org.quran.features.pager.uiState
 
-sealed class QuranPageItem {
+sealed class PageItem {
   abstract val page: Int
   abstract val header: Header
 

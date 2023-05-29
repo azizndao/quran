@@ -24,6 +24,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -32,19 +33,25 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.text.font.Font
+import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.compose.ui.viewinterop.AndroidView
-import org.quran.ui.theme.LocalQuranTextStyle
 import org.quran.datastore.FontScale
 import org.quran.features.share.utils.ShareAyahPreviewParameterProvider
 import org.quran.features.share.views.ProviderQuranTextStyle
 import org.quran.features.share.views.ShareCardView
 import org.quran.ui.R
 import org.quran.ui.components.CircularProgressLoader
+import org.quran.ui.theme.LocalQuranTextStyle
 import org.quran.ui.theme.QuranTheme
 import org.quran.ui.utils.extensions.htmlToAnnotatedString
 
@@ -203,7 +210,7 @@ private fun ShareCard(
 
       Text(
         text = stringResource(
-          id = org.quran.ui.R.string.surah_ayah,
+          id = R.string.surah_ayah,
           uiState.surahName,
           uiState.ayah
         ),
@@ -217,6 +224,35 @@ private fun ShareCard(
   }
 }
 
+@Preview
+@Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
+@Composable
+fun PreviewShareScreen(
+  @PreviewParameter(
+    ShareAyahPreviewParameterProvider::class,
+    limit = 1
+  ) uiState: ShareAyahUiState,
+) {
+  val style = remember {
+    TextStyle(
+      fontFamily = FontFamily(Font(R.font.p77)),
+      fontSize = 24.75.sp,
+      lineHeight = 24.75.sp * 1.8,
+      platformStyle = PlatformTextStyle(includeFontPadding = false),
+      textDirection = TextDirection.Rtl
+    )
+  }
+  QuranTheme {
+    Surface(color = MaterialTheme.colorScheme.background) {
+      CompositionLocalProvider(LocalQuranTextStyle provides style) {
+        ShareAyahScreen(data = uiState, {}, { _ -> })
+      }
+    }
+  }
+}
+
+
+@Preview
 @Preview(uiMode = Configuration.UI_MODE_NIGHT_YES)
 @Composable
 fun PreviewShareCard(
@@ -225,7 +261,20 @@ fun PreviewShareCard(
     limit = 1
   ) uiState: ShareAyahUiState,
 ) {
+  val style = remember {
+    TextStyle(
+      fontFamily = FontFamily(Font(R.font.p77)),
+      fontSize = 24.75.sp,
+      lineHeight = 24.75.sp * 1.8,
+      platformStyle = PlatformTextStyle(includeFontPadding = false),
+      textDirection = TextDirection.Rtl
+    )
+  }
   QuranTheme {
-    ShareAyahScreen(data = uiState, {}, { _ -> })
+    Surface(color = MaterialTheme.colorScheme.background) {
+      CompositionLocalProvider(LocalQuranTextStyle provides style) {
+        ShareCard(uiState = uiState)
+      }
+    }
   }
 }

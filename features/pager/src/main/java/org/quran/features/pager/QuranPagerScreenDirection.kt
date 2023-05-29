@@ -17,21 +17,18 @@ import org.quran.ui.theme.LocalSurahTextStyle
 import org.quran.ui.theme.LocalTranslationTextStyle
 
 private const val PARAM_PAGE = "page"
-private const val PARAM_SURAH_AYAH = "suraAyah"
+private const val PARAM_VERSE = "verse"
 
 fun NavController.navigateToPage(page: Int, verseKey: VerseKey? = null) {
-  return navigate("quran/${PARAM_PAGE}s/$page?ayah=${verseKey ?: ""}") {
+  return navigate("quran/$page?ayah=${verseKey ?: ""}") {
     launchSingleTop = true
   }
 }
 
-internal fun quranPagerDestinationArgs(savedStateHandle: SavedStateHandle): QuranPagerArgs {
-  return QuranPagerArgs(
-    page = savedStateHandle.get<Int>(PARAM_PAGE)!!,
-    verseKey = savedStateHandle.get<String>(PARAM_SURAH_AYAH)
-      ?.let(VerseKey.Companion::fromString)
-  )
-}
+internal fun getInitialPage(savedStateHandle: SavedStateHandle) = savedStateHandle.get<Int>(PARAM_PAGE)!!
+
+internal fun getInitialVerse(savedStateHandle: SavedStateHandle) = savedStateHandle
+  .get<String>(PARAM_VERSE)?.let(VerseKey.Companion::fromString)
 
 fun NavGraphBuilder.quranPagerDestination(
   playbackConnection: PlaybackConnection,
@@ -41,10 +38,10 @@ fun NavGraphBuilder.quranPagerDestination(
   navigateToShare: (verse: VerseKey) -> Unit,
 ) {
   composable(
-    route = "quran/${PARAM_PAGE}s/{page}?ayah={$PARAM_SURAH_AYAH}",
+    route = "quran/{${PARAM_PAGE}}?ayah={$PARAM_VERSE}",
     arguments = listOf(
       navArgument(PARAM_PAGE) { type = NavType.IntType },
-      navArgument(PARAM_SURAH_AYAH) { type = NavType.StringType; nullable = true }
+      navArgument(PARAM_VERSE) { type = NavType.StringType; nullable = true }
     ),
   ) {
     val viewModel = getViewModel<QuranPagerViewModel> { parametersOf(playbackConnection) }
@@ -57,7 +54,6 @@ fun NavGraphBuilder.quranPagerDestination(
       QuranPagerScreen(
         viewModel = viewModel,
         popBackStack = popBackStack,
-        pageProvider = { mode, page, version -> viewModel.pageFactory(mode, page, version) },
         navigateToSearch = navigateToSearch,
         navigateToTranslations = navigateToTranslations,
         navigateToShare = navigateToShare

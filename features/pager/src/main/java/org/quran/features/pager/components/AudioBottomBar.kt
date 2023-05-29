@@ -39,10 +39,6 @@ internal fun AudioBottomBar(
   onEvent: (QuranEvent) -> Unit,
   onExpand: () -> Unit,
 ) {
-//  LaunchedEffect(key1 = uiState) {
-//    Timber.e(uiState.toString())
-//  }
-
   Column(
     modifier = modifier
       .background(MaterialTheme.colorScheme.background)
@@ -65,7 +61,8 @@ internal fun AudioBottomBar(
           .clip(MaterialTheme.shapes.medium)
           .background(MaterialTheme.colorScheme.primaryContainer)
       ) {
-        it.placeholder(org.quran.ui.R.drawable.ic_reciter).error(org.quran.ui.R.drawable.ic_reciter)
+        it.placeholder(org.quran.ui.R.drawable.ic_reciter)
+          .error(org.quran.ui.R.drawable.ic_reciter)
       }
 
       Column(

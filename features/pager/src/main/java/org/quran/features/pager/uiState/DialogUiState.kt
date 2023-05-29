@@ -1,7 +1,9 @@
 package org.quran.features.pager.uiState
 
+import arg.quran.models.audio.Qari
 import arg.quran.models.quran.VerseKey
 import kotlinx.collections.immutable.PersistentList
+import kotlinx.coroutines.flow.StateFlow
 import org.quran.bookmarks.models.BookmarkTag
 
 sealed class DialogUiState {
@@ -28,4 +30,9 @@ sealed class DialogUiState {
   ) : DialogUiState()
 
   data class VerseTafsir(val verse: VerseKey) : DialogUiState()
+
+  data class AudioMenu(
+    val qaris: PersistentList<Qari>,
+    val nowPlaying: StateFlow<AudioUiState?>
+  ) : DialogUiState()
 }

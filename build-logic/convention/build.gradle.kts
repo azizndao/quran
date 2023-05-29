@@ -2,7 +2,7 @@ plugins {
   `kotlin-dsl`
 }
 
-group = "org.muslimapp.buildlogic"
+group = "org.quran.buildlogic"
 
 java {
   sourceCompatibility = JavaVersion.VERSION_11
@@ -21,27 +21,27 @@ dependencies {
 gradlePlugin {
   plugins {
     register("androidApplicationCompose") {
-      id = "muslimapp.android.application.compose"
+      id = "quran.android.application.compose"
       implementationClass = "AndroidApplicationComposeConventionPlugin"
     }
     register("androidApplication") {
-      id = "muslimapp.android.application"
+      id = "quran.android.application"
       implementationClass = "AndroidApplicationConventionPlugin"
     }
     register("androidLibraryCompose") {
-      id = "muslimapp.android.library.compose"
+      id = "quran.android.library.compose"
       implementationClass = "AndroidLibraryComposeConventionPlugin"
     }
     register("androidLibrary") {
-      id = "muslimapp.android.library"
+      id = "quran.android.library"
       implementationClass = "AndroidLibraryConventionPlugin"
     }
     register("androidFeature") {
-      id = "muslimapp.android.feature"
+      id = "quran.android.feature"
       implementationClass = "AndroidFeatureConventionPlugin"
     }
     register("androidTest") {
-      id = "muslimapp.android.test"
+      id = "quran.android.test"
       implementationClass = "AndroidTestConventionPlugin"
     }
   }

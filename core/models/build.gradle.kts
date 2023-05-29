@@ -1,5 +1,6 @@
+@Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-  id("muslimapp.android.library")
+  id("quran.android.library")
   alias(libs.plugins.ksp)
   id("kotlinx-serialization")
 }

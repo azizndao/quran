@@ -7,17 +7,20 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.text.PlatformTextStyle
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.Font
 import androidx.compose.ui.text.font.FontFamily
+import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.unit.sp
 import org.quran.datastore.FontScale
+import org.quran.ui.R
 import org.quran.ui.theme.LocalQuranTextStyle
 
 
 @Composable
 fun ProviderQuranTextStyle(
   page: Int,
-  fontScale: FontScale,
+  fontScale: FontScale = FontScale.NORMAL,
   content: @Composable () -> Unit
 ) {
 
@@ -44,6 +47,43 @@ fun ProviderQuranTextStyle(
         platformStyle = PlatformTextStyle(includeFontPadding = false),
       )
     }
+  }
+
+  CompositionLocalProvider(LocalQuranTextStyle provides style, content = content)
+}
+
+@Composable
+fun ProviderPage77QuranTextStyle(
+  content: @Composable () -> Unit
+) {
+
+  val style = remember {
+    TextStyle(
+      fontFamily = FontFamily(Font(R.font.p77)),
+      fontSize = 24.75.sp,
+      lineHeight = 24.75.sp * 1.8,
+      platformStyle = PlatformTextStyle(includeFontPadding = false),
+      textDirection = TextDirection.Rtl
+    )
+  }
+
+  CompositionLocalProvider(LocalQuranTextStyle provides style, content = content)
+}
+
+
+@Composable
+fun ProviderPage604QuranTextStyle(
+  content: @Composable () -> Unit
+) {
+
+  val style = remember {
+    TextStyle(
+      fontFamily = FontFamily(Font(R.font.p604)),
+      fontSize = 24.75.sp,
+      lineHeight = 24.75.sp * 1.8,
+      platformStyle = PlatformTextStyle(includeFontPadding = false),
+      textDirection = TextDirection.Rtl
+    )
   }
 
   CompositionLocalProvider(LocalQuranTextStyle provides style, content = content)

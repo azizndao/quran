@@ -1,6 +1,6 @@
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-  id("muslimapp.android.library")
+  id("quran.android.library")
   alias(libs.plugins.protobuf)
   id("kotlinx-serialization")
 }
@@ -20,8 +20,6 @@ dependencies {
   api(libs.datastore.preferences)
 
   api(libs.protobuf.kotlin.lite)
-
-  implementation(libs.koin.android)
 }
 
 protobuf {

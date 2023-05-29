@@ -1,7 +1,7 @@
 @Suppress("DSL_SCOPE_VIOLATION") // TODO: Remove once KTIJ-19369 is fixed
 plugins {
-  id("muslimapp.android.application")
-  id("muslimapp.android.application.compose")
+  id("quran.android.application")
+  id("quran.android.application.compose")
   id("kotlinx-serialization")
   alias(libs.plugins.ksp)
 }
@@ -15,7 +15,7 @@ android {
 
   defaultConfig {
     applicationId = "org.alquran"
-    versionCode = 12
+    versionCode = 16
     versionName = "1.0.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

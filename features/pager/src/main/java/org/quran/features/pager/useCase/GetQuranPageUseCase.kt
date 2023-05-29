@@ -13,12 +13,12 @@ import org.quram.common.repositories.SurahRepository
 import org.quram.common.utils.QuranDisplayData
 import org.quran.bookmarks.repository.BookmarkRepository
 import org.quran.core.audio.PlaybackConnection
-import org.quran.features.pager.uiState.MushafPage
-import org.quran.features.pager.uiState.QuranPageItem
+import org.quran.features.pager.uiState.QuranPage
+import org.quran.features.pager.uiState.PageItem
 import org.quran.features.pager.uiState.QuranSelection
 import org.quran.features.pager.uiState.toUiState
 
-class GetMushafPage(
+class GetQuranPageUseCase(
   private val verseRepository: VerseRepository,
   private val bookmarkRepository: BookmarkRepository,
   private val surahRepository: SurahRepository,
@@ -31,9 +31,9 @@ class GetMushafPage(
     page: Int,
     version: Int,
     selection: MutableStateFlow<QuranSelection>
-  ): Flow<MushafPage> {
+  ): Flow<QuranPage> {
 
-    var pageHeader: QuranPageItem.Header? = null
+    var pageHeader: PageItem.Header? = null
 
     var suras: List<Sura>? = null
 
@@ -68,15 +68,15 @@ class GetMushafPage(
 
           if (firstWord.position == 1 && aya == 1) {
             if (firstWord.line >= 3 || firstWord.key.sura == 1 || firstWord.key.sura == 9) {
-              add(MushafPage.ChapterLine(size + 1, sura))
+              add(QuranPage.ChapterLine(size + 1, sura))
             }
             if (sura != 1 && sura != 9 && firstWord.line >= 2) {
-              add(MushafPage.Basmallah(size + 1))
+              add(QuranPage.Basmallah(size + 1))
             }
           }
 
           add(
-            MushafPage.TextLine(
+            QuranPage.TextLine(
               line = lineNumber,
               words = words.map {
 
@@ -95,13 +95,13 @@ class GetMushafPage(
         }
 
         if (size == 14) {
-          val lastLine = last() as MushafPage.TextLine
-          val line = MushafPage.ChapterLine(size + 1, lastLine.words[0].key.sura + 1)
+          val lastLine = last() as QuranPage.TextLine
+          val line = QuranPage.ChapterLine(size + 1, lastLine.words[0].key.sura + 1)
           add(line)
         }
       }
 
-      MushafPage(
+      QuranPage(
         header = pageHeader!!,
         page = page,
         lines = data.toPersistentList(),

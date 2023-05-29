@@ -41,32 +41,32 @@ import org.quran.features.pager.components.AudioBottomBar
 import org.quran.features.pager.components.DisplayModeButton
 import org.quran.features.pager.components.ProviderQuranTextStyle
 import org.quran.features.pager.components.menu.AddNoteBottomSheet
+import org.quran.features.pager.components.menu.AudioMenuSheet
 import org.quran.features.pager.components.menu.SelectBookmarkTagSheet
 import org.quran.features.pager.components.menu.ShowBookmarksSheet
 import org.quran.features.pager.components.menu.VerseMenuSheet
 import org.quran.features.pager.components.menu.VerseTafsirSheet
-import org.quran.features.pager.components.pages.MushafPageView
+import org.quran.features.pager.components.pages.QuranPageView
 import org.quran.features.pager.components.pages.TranslationPageItem
 import org.quran.features.pager.uiState.DialogUiState
-import org.quran.features.pager.uiState.MushafPage
+import org.quran.features.pager.uiState.PageItem
 import org.quran.features.pager.uiState.QuranEvent
-import org.quran.features.pager.uiState.QuranPageItem
+import org.quran.features.pager.uiState.QuranPage
 import org.quran.features.pager.uiState.QuranPagerUiState
 import org.quran.features.pager.uiState.TranslationPage
+import org.quran.ui.R
 import org.quran.ui.components.AnimatedCounter
 import org.quran.ui.components.BackButton
 import org.quran.ui.components.MuslimsTopAppBarDefaults
 import org.quran.ui.components.SearchButton
 import kotlin.math.abs
-import org.quran.ui.R
 
 
 @Composable
 internal fun QuranPagerScreen(
   viewModel: QuranPagerViewModel,
   popBackStack: () -> Unit,
-  pageProvider: @Composable (DisplayMode, page: Int, version: Int) -> QuranPageItem?,
-  pagerState: PagerState = rememberPagerState(viewModel.args.page - 1) { 604 },
+  pagerState: PagerState = rememberPagerState(viewModel.initialPage - 1) { 604 },
   navigateToSearch: () -> Unit,
   navigateToTranslations: () -> Unit,
   navigateToShare: (verse: VerseKey) -> Unit,
@@ -93,8 +93,9 @@ internal fun QuranPagerScreen(
       pagerState = pagerState,
       uiState = uiState,
       onEvent = viewModel::onEvent,
-      pageProvider = pageProvider,
-    )
+    ) { mode, page, version ->
+      viewModel.pageFactory(mode, page, version)
+    }
 
     DialogHandler(viewModel, navigateToShare = navigateToShare)
 
@@ -127,7 +128,11 @@ internal fun QuranPagerScreen(
       exit = slideOutVertically { it },
       modifier = Modifier.align(Alignment.BottomCenter)
     ) {
-      AudioBottomBar(uiState = nowPlaying!!, onEvent = { viewModel.onEvent(it) }) {}
+      AudioBottomBar(
+        uiState = nowPlaying!!,
+        onEvent = viewModel::onEvent,
+        onExpand =  viewModel::showAudioMenu,
+      )
     }
   }
 }
@@ -169,6 +174,14 @@ internal fun DialogHandler(viewModel: QuranPagerViewModel, navigateToShare: (Ver
       onDismissRequest = viewModel::onDismissRequest
     )
 
+    is DialogUiState.AudioMenu -> AudioMenuSheet(
+      uiState = uiState,
+      onEvent = viewModel::onEvent,
+      onDismissRequest = viewModel::onDismissRequest,
+      showReciter = {},
+      onPositionChange = {},
+    )
+
     DialogUiState.None -> {}
   }
 }
@@ -179,7 +192,7 @@ private fun QuranPaged(
   pagerState: PagerState,
   uiState: QuranPagerUiState,
   onEvent: (QuranEvent) -> Unit,
-  pageProvider: @Composable (DisplayMode, page: Int, version: Int) -> QuranPageItem?
+  pageProvider: @Composable (DisplayMode, page: Int, version: Int) -> PageItem?
 ) {
 
   val currentOnQuranEvent by rememberUpdatedState(onEvent)
@@ -187,7 +200,7 @@ private fun QuranPaged(
   HorizontalPager(
     state = pagerState,
     reverseLayout = true,
-    beyondBoundsPageCount = 1,
+    // beyondBoundsPageCount = 1,
     pageSpacing = 1.dp,
     key = { it },
     modifier = modifier
@@ -197,7 +210,7 @@ private fun QuranPaged(
       ProviderQuranTextStyle(page = pageIndex + 1, fontScale = uiState.quranFontScale) {
 
         when (val page = pageProvider(uiState.displayMode, pageIndex + 1, uiState.version)) {
-          is MushafPage -> MushafPageView(page = page, onAyahEvent = currentOnQuranEvent)
+          is QuranPage -> QuranPageView(page = page, onAyahEvent = currentOnQuranEvent)
 
           is TranslationPage -> TranslationPageItem(page = page, onEvent = currentOnQuranEvent)
 

@@ -16,9 +16,7 @@ data class QuranPosition(
 
     if (sura != other.sura) return false
     if (ayah != other.ayah) return false
-    if (page != other.page) return false
-
-    return true
+    return page == other.page
   }
 
   override fun hashCode(): Int {

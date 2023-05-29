@@ -1,6 +1,6 @@
 plugins {
-  id("muslimapp.android.feature")
-  id("muslimapp.android.library.compose")
+  id("quran.android.feature")
+  id("quran.android.library.compose")
 }
 
 android {
