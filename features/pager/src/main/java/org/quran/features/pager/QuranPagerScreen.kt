@@ -18,6 +18,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
@@ -221,12 +222,16 @@ private fun HandleFullscreen(
     WindowCompat.getInsetsController(activity.window, view)
   }
 
-  LaunchedEffect(isFullscreen) {
+  DisposableEffect(isFullscreen) {
     insetsController.systemBarsBehavior =
       WindowInsetsControllerCompat.BEHAVIOR_SHOW_TRANSIENT_BARS_BY_SWIPE
     if (isFullscreen) {
       insetsController.hide(WindowInsetsCompat.Type.systemBars())
     } else {
+      insetsController.show(WindowInsetsCompat.Type.systemBars())
+    }
+
+    onDispose {
       insetsController.show(WindowInsetsCompat.Type.systemBars())
     }
   }
