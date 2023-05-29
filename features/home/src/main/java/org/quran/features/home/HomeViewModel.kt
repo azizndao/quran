@@ -6,6 +6,7 @@ import androidx.lifecycle.viewModelScope
 import arg.quran.models.HizbQuarter
 import arg.quran.models.QuarterMapping
 import arg.quran.models.quran.VerseKey
+import kotlinx.collections.immutable.persistentListOf
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -13,11 +14,13 @@ import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.alquran.verses.repository.VerseRepository
 import org.quram.common.core.QuranInfo
 import org.quram.common.repositories.SurahRepository
+import org.quran.bookmarks.repository.BookmarkRepository
 import org.quran.features.home.juzs.JuzListUiState
 import org.quran.features.home.surahs.SurahListUiState
 
@@ -25,6 +28,7 @@ internal class HomeViewModel(
   private val quranInfo: QuranInfo,
   private val verseRepository: VerseRepository,
   private val surahRepository: SurahRepository,
+  bookmarkRepository: BookmarkRepository,
   app: Application,
 ) : AndroidViewModel(app) {
 
@@ -37,6 +41,10 @@ internal class HomeViewModel(
 
   val hibzUiStateFlow = MutableStateFlow(JuzListUiState(data = getListOfHizb(), loading = false))
 
+
+  val bookmarkUiStateFlow = bookmarkRepository.observeTabWithBookmarks().map { tags ->
+    tags.toPersistentList()
+  }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), persistentListOf())
 
   init {
     viewModelScope.launch {
@@ -72,4 +80,8 @@ internal class HomeViewModel(
       )
     }
   }.toPersistentList()
+
+  fun getPage(verse: VerseKey): Int {
+    return quranInfo.getPageFromSuraAyah(verse.sura, verse.sura)
+  }
 }

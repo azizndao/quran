@@ -2,8 +2,6 @@ package org.quran.core.audio
 
 import android.content.ComponentName
 import android.content.Context
-import androidx.lifecycle.DefaultLifecycleObserver
-import androidx.lifecycle.LifecycleOwner
 import androidx.media3.common.MediaItem
 import androidx.media3.common.Player
 import androidx.media3.session.MediaController
@@ -47,11 +45,12 @@ class PlaybackConnection(
   private val audioSettings: AudioPreferencesRepository,
   private val timingRepository: TimingRepository,
   private val quranDisplayData: QuranDisplayData,
-) : DefaultLifecycleObserver {
+) {
 
   private lateinit var coroutineScope: CoroutineScope
 
   private val _isConnected = MutableStateFlow(false)
+  val isConnected = _isConnected.asStateFlow()
 
   private val _playingState = MutableStateFlow(AudioState())
   val playingState = _playingState.asStateFlow()
@@ -71,35 +70,28 @@ class PlaybackConnection(
 
   private lateinit var mediaController: MediaController
 
-  override fun onStart(owner: LifecycleOwner) {
-    connect()
-  }
-
-  override fun onStop(owner: LifecycleOwner) {
-    release()
-  }
-
-  private fun connect() {
+  fun connect() {
     coroutineScope = CoroutineScope(Dispatchers.Main + Job())
     mediaControllerFuture = MediaController.Builder(
-      context, SessionToken(context, ComponentName(context, PlaybackService::class.java))
+      context,
+      SessionToken(context, ComponentName(context, PlaybackService::class.java))
     ).buildAsync()
+
     mediaControllerFuture?.addListener({
       if (mediaControllerFuture!!.isDone) {
         mediaController = mediaControllerFuture!!.get()
         mediaController.addListener(PlayerListener())
-        _isConnected.value = true
         _currentMediaItem.value = mediaController.currentMediaItem
 
         nowPlaying = getPlayingStateFlow()
         currentAyah = nowPlaying.map { playing -> playing?.let { VerseKey(it.sura, it.ayah) } }
           .distinctUntilChanged()
+        _isConnected.value = true
       }
     }, DirectExecutor.INSTANCE)
   }
 
-
-  private fun release() {
+  fun release() {
     coroutineScope.cancel()
     mediaControllerFuture?.let { MediaController.releaseFuture(it) }
   }

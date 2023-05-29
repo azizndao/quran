@@ -13,7 +13,6 @@ import org.quran.features.home.HomeQuranRoute
 import org.quran.features.home.homeDestination
 import org.quran.features.pager.navigateToPage
 import org.quran.features.pager.quranPagerDestination
-import org.quran.features.saved.savedDestination
 import org.quran.features.settings.navigateToSettings
 import org.quran.features.settings.settingsDirection
 import org.quran.features.share.navigation.navigateToShareAyah
@@ -25,19 +24,13 @@ fun NabGraph(
   contentPadding: PaddingValues = PaddingValues(),
   playbackConnection: PlaybackConnection,
   navController: NavHostController,
+  onFullscreen: (Boolean) -> Unit,
 ) {
   NavHost(
     navController = navController,
     startDestination = HomeQuranRoute,
   ) {
     homeDestination(
-      contentPadding = contentPadding,
-      navigateToMore = navController::navigateToSettings,
-      navigateToSearch = navController::navigateToSearch,
-      navigateToPage = navController::navigateToPage
-    )
-
-    savedDestination(
       contentPadding = contentPadding,
       navigateToMore = navController::navigateToSettings,
       navigateToSearch = navController::navigateToSearch,
@@ -55,6 +48,7 @@ fun NabGraph(
       navigateToSearch = navController::navigateToSearch,
       navigateToTranslations = navController::navigateToTranslations,
       navigateToShare = navController::navigateToShareAyah,
+      onFullscreen = onFullscreen
     )
 
     translationDestination(navController::popBackStack)

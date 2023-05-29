@@ -31,11 +31,9 @@ import org.quran.bookmarks.models.Bookmark
 import org.quran.bookmarks.models.BookmarkTag
 import org.quran.bookmarks.repository.BookmarkRepository
 import org.quran.core.audio.PlaybackConnection
-import org.quran.core.audio.repositories.QariRepository
 import org.quran.datastore.DisplayMode
 import org.quran.datastore.repositories.AudioPreferencesRepository
 import org.quran.datastore.repositories.QuranPreferencesRepository
-import org.quran.features.pager.uiState.AudioUiState
 import org.quran.features.pager.uiState.DialogUiState
 import org.quran.features.pager.uiState.PageItem
 import org.quran.features.pager.uiState.QuranEvent
@@ -56,16 +54,12 @@ internal class QuranPagerViewModel(
   private val getQuranPage: GetQuranPageUseCase,
   private val bookmarkRepository: BookmarkRepository,
   private val quranDisplayData: QuranDisplayData,
-  private val qariRepository: QariRepository,
   private val audioPreferences: AudioPreferencesRepository,
   translationRepository: TranslationsRepository
 ) : ViewModel() {
 
   val initialPage = getInitialPage(savedStateHandle)
   private val initialVerse = getInitialVerse(savedStateHandle)
-
-  val nowPlayingFlow =
-    playbackConnection.nowPlaying.stateIn(viewModelScope, SharingStarted.WhileSubscribed(), null)
 
   val playingPageFlow = playbackConnection.nowPlaying.map { key ->
     key?.let { quranInfo.getPageFromSuraAyah(it.sura, it.ayah) }
@@ -239,27 +233,6 @@ internal class QuranPagerViewModel(
         )
       )
     }
-  }
-
-  fun showAudioMenu() {
-    dialogUiState = DialogUiState.AudioMenu(
-      qaris = qariRepository.getQariList().toPersistentList(),
-      nowPlaying = combine(
-        audioPreferences.getCurrentReciter(),
-        playbackConnection.playingState,
-        playbackConnection.nowPlaying,
-        playbackConnection.repeatMode,
-      ) { currentReciterId, isPlaying, mediaItem, repeatMode ->
-
-        AudioUiState(
-          loading = false,
-          playing = mediaItem!!,
-          currentReciterId = currentReciterId,
-          audioState = isPlaying,
-          repeatMode = repeatMode
-        )
-      }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), AudioUiState())
-    )
   }
 }
 

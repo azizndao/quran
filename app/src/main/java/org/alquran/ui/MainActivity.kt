@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.runtime.CompositionLocalProvider
+import androidx.compose.runtime.DisposableEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFontFamilyResolver
@@ -29,8 +30,13 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
   override fun onCreate(savedInstanceState: Bundle?) {
     WindowCompat.setDecorFitsSystemWindows(window, false)
     super.onCreate(savedInstanceState)
-    lifecycle.addObserver(playbackConnection)
     setContent {
+      DisposableEffect(playbackConnection) {
+        playbackConnection.connect()
+
+        onDispose { playbackConnection.release() }
+      }
+
       CompositionLocalProvider(
         LocalFontFamilyResolver provides createFontFamilyResolver(
           LocalContext.current, QuranFontFamilies.handler
@@ -41,7 +47,7 @@ class MainActivity : ComponentActivity(), AndroidScopeComponent {
             modifier = Modifier.fillMaxSize(),
             color = MaterialTheme.colorScheme.background
           ) {
-            QuranApp(playbackConnection)
+            QuranApp(playbackConnection = playbackConnection)
           }
         }
       }

@@ -7,9 +7,9 @@ import org.muslimsapp.quran.search.FeatureSearchModule
 import org.muslimsapp.quran.translations.FeatureTranslationModule
 import org.quran.core.audio.AudioCoreModule
 import org.quran.core.audio.PlaybackConnection
+import org.quran.features.audio.FeatureAudioModule
 import org.quran.features.home.FeatureHomeModule
 import org.quran.features.pager.FeaturePagerModule
-import org.quran.features.saved.FeatureSavedModule
 import org.quran.features.settings.FeatureSettingsModule
 import org.quran.features.share.FeatureShareModule
 
@@ -19,7 +19,7 @@ val AppModule = module {
     AudioCoreModule,
 
     FeatureHomeModule,
-    FeatureSavedModule,
+    FeatureAudioModule,
     FeatureSearchModule,
     FeatureShareModule,
     FeaturePagerModule,

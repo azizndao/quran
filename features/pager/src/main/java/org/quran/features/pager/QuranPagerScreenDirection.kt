@@ -18,6 +18,7 @@ import org.quran.ui.theme.LocalTranslationTextStyle
 
 private const val PARAM_PAGE = "page"
 private const val PARAM_VERSE = "verse"
+const val PagerRoute = "quran/{${PARAM_PAGE}}?ayah={$PARAM_VERSE}"
 
 fun NavController.navigateToPage(page: Int, verseKey: VerseKey? = null) {
   return navigate("quran/$page?ayah=${verseKey ?: ""}") {
@@ -25,7 +26,8 @@ fun NavController.navigateToPage(page: Int, verseKey: VerseKey? = null) {
   }
 }
 
-internal fun getInitialPage(savedStateHandle: SavedStateHandle) = savedStateHandle.get<Int>(PARAM_PAGE)!!
+internal fun getInitialPage(savedStateHandle: SavedStateHandle) =
+  savedStateHandle.get<Int>(PARAM_PAGE)!!
 
 internal fun getInitialVerse(savedStateHandle: SavedStateHandle) = savedStateHandle
   .get<String>(PARAM_VERSE)?.let(VerseKey.Companion::fromString)
@@ -36,9 +38,10 @@ fun NavGraphBuilder.quranPagerDestination(
   navigateToSearch: () -> Unit,
   navigateToTranslations: () -> Unit,
   navigateToShare: (verse: VerseKey) -> Unit,
+  onFullscreen: (Boolean) -> Unit,
 ) {
   composable(
-    route = "quran/{${PARAM_PAGE}}?ayah={$PARAM_VERSE}",
+    route = PagerRoute,
     arguments = listOf(
       navArgument(PARAM_PAGE) { type = NavType.IntType },
       navArgument(PARAM_VERSE) { type = NavType.StringType; nullable = true }
@@ -56,7 +59,8 @@ fun NavGraphBuilder.quranPagerDestination(
         popBackStack = popBackStack,
         navigateToSearch = navigateToSearch,
         navigateToTranslations = navigateToTranslations,
-        navigateToShare = navigateToShare
+        navigateToShare = navigateToShare,
+        onFullscreen = onFullscreen
       )
     }
   }

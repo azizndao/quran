@@ -26,16 +26,17 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.launch
+import org.quran.features.home.juzs.ListJuzs
+import org.quran.features.home.surahs.SurahList
+import org.quran.features.home.bookmarks.BookmarkTabView
+import org.quran.ui.components.MuslimsTopAppBarDefaults
 import org.quran.ui.components.TabBar
 import org.quran.ui.components.TabItem
 import org.quran.ui.components.pagerTabIndicatorOffset
-import org.quran.features.home.juzs.ListJuzs
-import org.quran.features.home.surahs.SurahList
-import org.quran.ui.components.MuslimsTopAppBarDefaults
 import org.quran.ui.R as Ui
 
 
-val tabItems = listOf(Ui.string.surats, Ui.string.juzs)
+val tabItems = listOf(Ui.string.surats, Ui.string.juzs, Ui.string.bookmarks)
 
 @Composable
 internal fun HomeScreen(
@@ -72,6 +73,14 @@ internal fun HomeScreen(
             uiStateFlow = viewModel.hibzUiStateFlow,
             onNavigate = { navigateToPage(it.page, null) }
           )
+
+
+          2 -> BookmarkTabView(
+            contentPadding = contentPadding,
+            uiStateFlow = viewModel.bookmarkUiStateFlow
+          ) {
+            navigateToPage(viewModel.getPage(it.key), it.key)
+          }
 
           else -> throw IndexOutOfBoundsException()
         }

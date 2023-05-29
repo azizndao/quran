@@ -10,4 +10,5 @@ android {
 
 dependencies {
   implementation(project(":core:verses"))
+  implementation(project(":core:bookmarks"))
 }

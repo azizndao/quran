@@ -1,5 +1,6 @@
 package org.quran.features.home.surahs
 
+import android.content.res.Configuration
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -22,6 +23,7 @@ import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -31,23 +33,28 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextDirection
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import arg.quran.models.SuraWithTranslation
+import arg.quran.models.SurahMapping
 import arg.quran.models.firstPage
 import arg.quran.models.quran.VerseKey
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.StateFlow
 import org.alquran.ui.components.LineSeparator
 import org.quran.features.home.juzs.JuzHeader
 import org.quran.ui.components.CircularProgressLoader
 import org.quran.ui.components.SectionTitle
 import org.quran.ui.theme.QuranFontFamilies
+import org.quran.ui.theme.QuranTheme
 import org.quran.ui.utils.extensions.add
 
 @Composable
 fun SurahList(
-  contentPadding: PaddingValues,
   modifier: Modifier = Modifier,
+  contentPadding: PaddingValues = PaddingValues(),
   uiStateFlow: StateFlow<SurahListUiState>,
   onNavigate: (Int, VerseKey?) -> Unit,
 ) {
@@ -55,7 +62,7 @@ fun SurahList(
   val uiState by uiStateFlow.collectAsStateWithLifecycle()
 
   CircularProgressLoader(uiState.loading, modifier = modifier) {
-    SurahList(
+    SurahListContent(
       contentPadding = contentPadding,
       uiState = uiState,
       onNavigate = onNavigate
@@ -64,9 +71,9 @@ fun SurahList(
 }
 
 @Composable
-private fun SurahList(
+private fun SurahListContent(
   modifier: Modifier = Modifier,
-  contentPadding: PaddingValues,
+  contentPadding: PaddingValues = PaddingValues(),
   state: LazyListState = rememberLazyListState(),
   uiState: SurahListUiState,
   onNavigate: (Int, VerseKey?) -> Unit,
@@ -83,7 +90,7 @@ private fun SurahList(
     modifier = modifier.testTag("quran:surahList"),
     contentPadding = contentPadding
       .add(top = 16.dp, bottom = 16.dp, start = 12.dp, end = 12.dp),
-      state = state,
+    state = state,
   ) {
 
     uiState.recentSurah?.let { recentSura ->
@@ -142,23 +149,23 @@ private fun SurahList(
   }
 }
 
-//@Preview(showBackground = true)
-//@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES)
-//@Composable
-//fun ListSurahPreview(
-//    @PreviewParameter(
-//        SurahListPreviewParameterProvider::class, limit = 1
-//    ) surahs: List<SurahMapping>,
-//) {
-//
-//    val uiState = SurahListUiState(loading = false, juzs = surahs)
-//
-//    QuranTheme {
-//        CompositionLocalProvider(LocalInsetsPadding provides WindowInsets(0.dp)) {
-//            SurahList(uiState = uiState, onNavigate = { _, _ -> })
-//        }
-//    }
-//}
+@Preview(showBackground = true, name = "Light Mode")
+@Preview(showBackground = true, uiMode = Configuration.UI_MODE_NIGHT_YES, name = "Dark Mode")
+@Composable
+fun ListSurahPreview(
+  @PreviewParameter(
+    SurahListPreviewParameterProvider::class, limit = 1
+  ) surahs: List<SurahMapping>,
+) {
+
+  val uiState = remember { SurahListUiState(loading = false, juzs = surahs.toPersistentList()) }
+
+  QuranTheme {
+    Surface(color = MaterialTheme.colorScheme.background) {
+      SurahListContent(uiState = uiState) { _, _ -> }
+    }
+  }
+}
 
 @Composable
 fun SurahItem(

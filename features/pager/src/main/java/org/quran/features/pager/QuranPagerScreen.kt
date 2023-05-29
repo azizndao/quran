@@ -37,7 +37,6 @@ import arg.quran.models.quran.VerseKey
 import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.flow.filter
 import org.quran.datastore.DisplayMode
-import org.quran.features.pager.components.AudioBottomBar
 import org.quran.features.pager.components.DisplayModeButton
 import org.quran.features.pager.components.ProviderQuranTextStyle
 import org.quran.features.pager.components.menu.AddNoteBottomSheet
@@ -70,12 +69,19 @@ internal fun QuranPagerScreen(
   navigateToSearch: () -> Unit,
   navigateToTranslations: () -> Unit,
   navigateToShare: (verse: VerseKey) -> Unit,
+  onFullscreen: (Boolean) -> Unit,
 ) {
 
   Box {
     val currentPage by remember { derivedStateOf { pagerState.currentPage + 1 } }
 
-    HandleFullscreen(viewModel.isFullscreen) { viewModel.toggleFullscreen() }
+    HandleFullscreen(viewModel.isFullscreen) {
+      viewModel.toggleFullscreen()
+    }
+
+    LaunchedEffect(viewModel.isFullscreen) {
+      onFullscreen(viewModel.isFullscreen)
+    }
 
     LaunchedEffect(Unit) {
       viewModel.playingPageFlow
@@ -112,26 +118,6 @@ internal fun QuranPagerScreen(
         navigateToTranslations = navigateToTranslations,
         onPopBackStack = popBackStack,
         onDisplayModeChange = viewModel::changeDisplayMode,
-      )
-    }
-
-    val nowPlaying by viewModel.nowPlayingFlow.collectAsStateWithLifecycle()
-    val visible by remember(viewModel, nowPlaying) {
-      derivedStateOf {
-        !viewModel.isFullscreen && nowPlaying != null
-      }
-    }
-
-    AnimatedVisibility(
-      visible = visible,
-      enter = slideInVertically { it },
-      exit = slideOutVertically { it },
-      modifier = Modifier.align(Alignment.BottomCenter)
-    ) {
-      AudioBottomBar(
-        uiState = nowPlaying!!,
-        onEvent = viewModel::onEvent,
-        onExpand =  viewModel::showAudioMenu,
       )
     }
   }

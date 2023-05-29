@@ -62,9 +62,9 @@ dependencies {
   implementation(project(":core:audio"))
   implementation(project(":core:models"))
 
+  implementation(project(":features:audio"))
   implementation(project(":features:home"))
   implementation(project(":features:search"))
-  implementation(project(":features:saved"))
   implementation(project(":features:share"))
   implementation(project(":features:pager"))
   implementation(project(":features:translations"))
