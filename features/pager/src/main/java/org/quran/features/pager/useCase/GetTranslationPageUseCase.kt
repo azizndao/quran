@@ -123,14 +123,14 @@ class GetTranslationPageUseCase(
 
         if (key.aya == 1) {
           val surah = suras!!.find { it.number == key.sura }!!
-          data.add(TranslationPage.Chapter(surah.number, surah.nameSimple))
+          data.add(TranslationPage.Chapter(surah.number, surah.nameComplex))
         }
 
         if (index > 0 && verse.ayah != 1) data.add(TranslationPage.Divider("d$index"))
 
         val isPlaying = key == playingVerse
 
-        val highLighted = key.aya == selectedVerse?.aya && key.sura == selectedVerse.aya
+        val highLighted = key.aya == selectedVerse?.aya && key.sura == selectedVerse.sura
 
         val isBookmarked = bookmarks.any {
           key.aya == it.key.aya && it.key.sura == key.sura
@@ -147,7 +147,8 @@ class GetTranslationPageUseCase(
         )
 
         if (isPlaying || highLighted && scrollIndex == -1) {
-          scrollIndex = data.size
+          scrollIndex = if (key.aya == 1) data.size - 1 else data.size
+          if (index == 0) scrollIndex--
         }
 
         for ((edition, verseTranslations) in translations) {

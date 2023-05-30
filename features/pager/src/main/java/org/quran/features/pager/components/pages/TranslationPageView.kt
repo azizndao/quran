@@ -62,7 +62,7 @@ fun TranslationPageItem(
   )
 
   LaunchedEffect(page) {
-    if (page.scrollIndex >= 1) {
+    if (page.scrollIndex >= 1 && !page.firstItem) {
       listState.animateScrollToItem(page.scrollIndex)
     }
   }
@@ -70,70 +70,40 @@ fun TranslationPageItem(
   val interactionSource = remember { MutableInteractionSource() }
 
   LazyColumn(
-    modifier = modifier.fillMaxSize(),
-    contentPadding = WindowInsets.displayCutout.asPaddingValues()
-      .add(bottom = 16.dp),
+    modifier = modifier
+      .fillMaxSize()
+      .clickable(
+        interactionSource = interactionSource,
+        indication = null,
+        onClick = { currentOnEvent(QuranEvent.AyahPressed) }
+      ),
+    contentPadding = WindowInsets.displayCutout.asPaddingValues().add(bottom = 16.dp),
     state = listState,
     verticalArrangement = spacedByWithFooter(0.dp),
   ) {
 
     item(key = "header") {
-      PageHeaderView(
-        header = page.header,
-        modifier = Modifier.padding(8.dp)
-      )
+      PageHeaderView(header = page.header, modifier = Modifier.padding(8.dp))
     }
 
     items(page.items, contentType = { it::class.simpleName }, key = { it.key }) { row ->
       when (row) {
-        is TranslationPage.Chapter -> SurahHeader(
-          surahName = row.name,
-          suraNumber = row.number,
-          modifier = Modifier.clickable(
-            interactionSource,
-            indication = null,
-            onClick = { currentOnEvent(QuranEvent.AyahPressed) }
-          )
-        )
+        is TranslationPage.Chapter -> SurahHeader(surahName = row.name, suraNumber = row.number)
 
-        is TranslationPage.Verse -> VerseItemView(
-          verse = row,
-          modifier = Modifier.clickable(
-            interactionSource,
-            indication = null,
-            onClick = { currentOnEvent(QuranEvent.AyahPressed) }
-          )
-        )
+        is TranslationPage.Verse -> VerseItemView(verse = row)
 
-        is TranslationPage.Divider -> LineSeparator(
-          modifier = Modifier.padding(horizontal = 12.dp),
-        )
+        is TranslationPage.Divider -> LineSeparator(Modifier.padding(horizontal = 8.dp))
 
-        is TranslationPage.TranslatedVerse -> TranslationItemView(
-          translation = row,
-          modifier = Modifier.clickable(
-            interactionSource,
-            indication = null,
-            onClick = { currentOnEvent(QuranEvent.AyahPressed) }
-          )
-        )
+        is TranslationPage.TranslatedVerse -> TranslationItemView(translation = row)
 
-        is TranslationPage.VerseToolbar -> VerseToolbarView(
-          verse = row, onEvent = currentOnEvent,
-          modifier = Modifier.clickable(
-            interactionSource,
-            indication = null,
-            onClick = { currentOnEvent(QuranEvent.AyahPressed) }
-          )
-        )
+        is TranslationPage.VerseToolbar -> VerseToolbarView(verse = row, onEvent = currentOnEvent)
       }
     }
 
     item(key = "footer") {
       Text(
         page.page.toString(),
-        modifier = Modifier
-          .fillMaxWidth(),
+        modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.labelLarge
       )
