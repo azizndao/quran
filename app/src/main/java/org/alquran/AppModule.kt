@@ -10,6 +10,7 @@ import org.quran.core.audio.PlaybackConnection
 import org.quran.features.audio.FeatureAudioModule
 import org.quran.features.home.FeatureHomeModule
 import org.quran.features.pager.FeaturePagerModule
+import org.quran.features.reciter.QariFeatureModule
 import org.quran.features.settings.FeatureSettingsModule
 import org.quran.features.share.FeatureShareModule
 
@@ -24,7 +25,8 @@ val AppModule = module {
     FeatureShareModule,
     FeaturePagerModule,
     FeatureTranslationModule,
-    FeatureSettingsModule
+    FeatureSettingsModule,
+    QariFeatureModule
   )
 
   scope<MainActivity> { scopedOf(::PlaybackConnection) }

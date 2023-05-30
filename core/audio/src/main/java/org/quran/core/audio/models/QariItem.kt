@@ -30,7 +30,7 @@ data class QariItem(
         id = qari.id,
         name = context.getString(qari.nameResource),
         url = qari.url,
-        path = qari.path,
+        path = qari.slug,
         db = qari.db,
         imageUri = qari.imageUrl
       )

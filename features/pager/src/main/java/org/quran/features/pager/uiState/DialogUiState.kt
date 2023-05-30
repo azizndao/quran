@@ -25,11 +25,6 @@ sealed class DialogUiState {
     val tags: PersistentList<BookmarkTag>,
   ) : DialogUiState()
 
-  data class CreateNote(
-    val verse: VerseKey,
-  ) : DialogUiState()
-
-  data class VerseTafsir(val verse: VerseKey) : DialogUiState()
 
   data class AudioMenu(
     val qaris: PersistentList<Qari>,

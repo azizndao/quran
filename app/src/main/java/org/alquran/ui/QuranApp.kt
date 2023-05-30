@@ -26,6 +26,7 @@ import org.quran.features.audio.AudioMenuSheet
 import org.quran.features.audio.AudioViewModel
 import org.quran.features.home.HomeQuranRoute
 import org.quran.features.pager.PagerRoute
+import org.quran.features.reciter.navigation.navigateToReciter
 
 
 @Composable
@@ -44,14 +45,14 @@ fun QuranApp(
           visible = entry.destination.route in listOf(HomeQuranRoute, PagerRoute)
         }
       }
-      AudioBottomBar(visible = visible, viewModel = audioViewModel) {}
+      AudioBottomBar(visible = visible, viewModel = audioViewModel, navigateToReciter = navController::navigateToReciter)
     },
   ) { innerPadding ->
     NabGraph(
       contentPadding = innerPadding,
       playbackConnection = playbackConnection,
       navController = navController,
-    onFullscreen = { fullscreen -> visible = !fullscreen }
+      onFullscreen = { fullscreen -> visible = !fullscreen }
     )
   }
 }

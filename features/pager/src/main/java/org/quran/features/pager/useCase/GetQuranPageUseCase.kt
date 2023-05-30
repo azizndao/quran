@@ -5,17 +5,14 @@ import arg.quran.models.Sura
 import arg.quran.models.quran.VerseKey
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
-import kotlinx.coroutines.flow.map
 import org.alquran.verses.repository.VerseRepository
 import org.quram.common.repositories.SurahRepository
 import org.quram.common.utils.QuranDisplayData
 import org.quran.bookmarks.repository.BookmarkRepository
 import org.quran.core.audio.PlaybackConnection
-import org.quran.features.pager.uiState.QuranPage
 import org.quran.features.pager.uiState.PageItem
-import org.quran.features.pager.uiState.QuranSelection
+import org.quran.features.pager.uiState.QuranPage
 import org.quran.features.pager.uiState.toUiState
 
 class GetQuranPageUseCase(
@@ -27,10 +24,11 @@ class GetQuranPageUseCase(
   private val playbackConnection: PlaybackConnection,
 ) {
 
+  @Suppress("UNUSED_PARAMETER")
   operator fun invoke(
     page: Int,
     version: Int,
-    selection: MutableStateFlow<QuranSelection>
+    selectionFlow: Flow<VerseKey?>
   ): Flow<QuranPage> {
 
     var pageHeader: PageItem.Header? = null
@@ -38,14 +36,6 @@ class GetQuranPageUseCase(
     var suras: List<Sura>? = null
 
     val keys = quranDisplayData.getAyahKeysOnPage(page)
-
-    val selectionFlow = selection.map {
-      when (it) {
-        is QuranSelection.InitialVerse -> it.key
-        is QuranSelection.Highlight -> it.key
-        else -> null
-      }
-    }
 
     return combine(
       verseRepository.getVersesWordsByPage(page),

@@ -75,7 +75,7 @@ class AudioViewModel(
         AudioEvent.SkipToNext -> playbackConnection.skipToNextSurah()
         AudioEvent.SkipToPrevious -> playbackConnection.skipToPreviousSurah()
         AudioEvent.SetRepeatMode -> playbackConnection.setRepeatMode()
-        is AudioEvent.ChangeReciter -> audioSettings.setCurrentReciter(event.reciter.path)
+        is AudioEvent.ChangeReciter -> audioSettings.setCurrentReciter(event.reciter.slug)
         is AudioEvent.PositionChanged -> playbackConnection.seekToPosition(event.position)
         is AudioEvent.Play -> playbackConnection.onPlaySurah(
           reciterId = event.reciter,

@@ -40,12 +40,10 @@ import kotlinx.coroutines.flow.filter
 import org.quran.datastore.DisplayMode
 import org.quran.features.pager.components.DisplayModeButton
 import org.quran.features.pager.components.ProviderQuranTextStyle
-import org.quran.features.pager.components.menu.AddNoteBottomSheet
 import org.quran.features.pager.components.menu.AudioMenuSheet
 import org.quran.features.pager.components.menu.SelectBookmarkTagSheet
 import org.quran.features.pager.components.menu.ShowBookmarksSheet
 import org.quran.features.pager.components.menu.VerseMenuSheet
-import org.quran.features.pager.components.menu.VerseTafsirSheet
 import org.quran.features.pager.components.pages.QuranPageView
 import org.quran.features.pager.components.pages.TranslationPageItem
 import org.quran.features.pager.uiState.DialogUiState
@@ -66,7 +64,7 @@ import kotlin.math.abs
 internal fun QuranPagerScreen(
   viewModel: QuranPagerViewModel,
   popBackStack: () -> Unit,
-  pagerState: PagerState = rememberPagerState(viewModel.initialPage - 1) { 604 },
+  pagerState: PagerState = rememberPagerState(viewModel.initialPage - 1) { viewModel.numberOfPage },
   navigateToSearch: () -> Unit,
   navigateToTranslations: () -> Unit,
   navigateToShare: (verse: VerseKey) -> Unit,
@@ -127,12 +125,6 @@ internal fun QuranPagerScreen(
 @Composable
 internal fun DialogHandler(viewModel: QuranPagerViewModel, navigateToShare: (VerseKey) -> Unit) {
   when (val uiState = viewModel.dialogUiState) {
-    is DialogUiState.CreateNote -> AddNoteBottomSheet(
-      verse = uiState.verse,
-      onDismissRequest = viewModel::onDismissRequest,
-      onCreate = viewModel::createNote
-    )
-
     is DialogUiState.SelectBookmarkTab -> SelectBookmarkTagSheet(
       uiState = uiState,
       onDismissRequest = viewModel::onDismissRequest,
@@ -154,11 +146,6 @@ internal fun DialogHandler(viewModel: QuranPagerViewModel, navigateToShare: (Ver
         viewModel.onDismissRequest()
         navigateToShare(uiState.verse)
       },
-    )
-
-    is DialogUiState.VerseTafsir -> VerseTafsirSheet(
-      uiState = uiState,
-      onDismissRequest = viewModel::onDismissRequest
     )
 
     is DialogUiState.AudioMenu -> AudioMenuSheet(

@@ -40,7 +40,7 @@ class QuranDisplayData internal constructor(
     if (sura < Constants.SURA_FIRST || sura > Constants.SURA_LAST) return ""
 
     val builder = StringBuilder()
-    val suraNames = resources.getStringArray(R.array.sura_names)
+    val suraNames = resources.getStringArray(R.array.sura_names_complex)
     if (wantPrefix) {
       builder.append(
         resources.getString(

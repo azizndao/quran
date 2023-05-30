@@ -210,7 +210,7 @@ class PlaybackService : MediaLibraryService() {
             .build()
         }
 
-        qariRepository.getQariList().any { it.path == parentId } -> runBlocking {
+        qariRepository.getQariList().any { it.slug == parentId } -> runBlocking {
           recitationRepository.getRecitations(parentId)
         }
 

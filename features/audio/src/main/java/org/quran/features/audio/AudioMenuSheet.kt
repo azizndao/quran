@@ -159,7 +159,7 @@ private fun ReciterList(
   onReciterChange: (Qari) -> Unit,
   showReciter: (Qari) -> Unit,
 ) {
-  val index = remember { qaris.indexOfFirst { uiState.currentReciterId == it.path } }
+  val index = remember { qaris.indexOfFirst { uiState.currentReciterId == it.slug } }
 
   val state = rememberLazyListState(
     if (index == -1) 0 else index,
@@ -175,7 +175,7 @@ private fun ReciterList(
       items(qaris) { reciter ->
         ReciterItem(
           reciter = reciter,
-          selected = uiState.currentReciterId == reciter.path,
+          selected = uiState.currentReciterId == reciter.slug,
           onClick = { onReciterChange(reciter) }
         ) { showReciter(reciter) }
       }
@@ -295,7 +295,7 @@ private fun PlayerControlBar(
 
     IconButton(onClick = { onUiEvent(AudioEvent.SkipToNext) }) {
       Icon(
-        painter = painterResource(id = org.quran.ui.R.drawable.ic_shuffle),
+        painter = painterResource(id = org.quran.ui.R.drawable.timer),
         contentDescription = null,
       )
     }

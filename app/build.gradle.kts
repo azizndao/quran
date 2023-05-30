@@ -69,6 +69,7 @@ dependencies {
   implementation(project(":features:pager"))
   implementation(project(":features:translations"))
   implementation(project(":features:settings"))
+  implementation(project(":features:qari"))
 
   implementation(libs.navigation.compose)
 

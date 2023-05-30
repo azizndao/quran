@@ -7,9 +7,8 @@ data class Qari(
   @StringRes val nameResource: Int,
   val imageUrl: String? = null,
   val url: String,
-  val path: String,
+  val slug: String,
   val db: String? = null
 ) {
-  val databaseName = if (db.isNullOrEmpty()) path else db
-  val isGapless: Boolean = true
+  val databaseName = if (db.isNullOrEmpty()) slug else db
 }

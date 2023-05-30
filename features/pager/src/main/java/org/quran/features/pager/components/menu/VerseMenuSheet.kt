@@ -47,22 +47,11 @@ fun VerseMenuSheet(
     )
     LineSeparator(modifier = Modifier.padding(start = 58.dp, end = 16.dp))
     ListItem(
-      leadingContent = { Icon(painterResource(id = R.drawable.menu_book), null) },
-      headlineContent = { Text(stringResource(id = R.string.tafsir)) },
-      modifier = Modifier.clickable { onEvent(QuranEvent.VerseTafsir(uiState.verse)) }
-    )
-    LineSeparator(modifier = Modifier.padding(start = 58.dp, end = 16.dp))
-    ListItem(
       leadingContent = { Icon(painterResource(id = R.drawable.content_copy), null) },
       headlineContent = { Text(stringResource(id = R.string.copy)) },
       modifier = Modifier.clickable { }
     )
     LineSeparator(modifier = Modifier.padding(start = 58.dp, end = 16.dp))
-    ListItem(
-      leadingContent = { Icon(painterResource(id = R.drawable.ic_edit), null) },
-      headlineContent = { Text(stringResource(id = R.string.add_note)) },
-      modifier = Modifier.clickable { onEvent(QuranEvent.VerseNote(uiState.verse)) }
-    )
     BookmarkListItem(
       isBookmarked = uiState.bookmarked,
       modifier = Modifier.clickable {

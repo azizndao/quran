@@ -39,7 +39,7 @@ internal class RecitationsDataSource(
   @SuppressLint("UnsafeOptInUsageError")
   fun downloadRecitation(reciter: Qari, sura: Sura) {
 
-    val mediaId = MediaId(sura = sura.number, reciter = reciter.path, ayah = 0).toString()
+    val mediaId = MediaId(sura = sura.number, reciter = reciter.slug, ayah = 0).toString()
 
     val mediaUri =
       Uri.parse("${reciter.url}/${sura.number.toString().padStart(3, '0')}.mp3")

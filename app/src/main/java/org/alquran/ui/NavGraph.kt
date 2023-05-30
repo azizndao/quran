@@ -13,6 +13,7 @@ import org.quran.features.home.HomeQuranRoute
 import org.quran.features.home.homeDestination
 import org.quran.features.pager.navigateToPage
 import org.quran.features.pager.quranPagerDestination
+import org.quran.features.reciter.navigation.reciterDestination
 import org.quran.features.settings.navigateToSettings
 import org.quran.features.settings.settingsDirection
 import org.quran.features.share.navigation.navigateToShareAyah
@@ -56,6 +57,8 @@ fun NabGraph(
     shareAyahDestination(navController::popBackStack)
 
     settingsDirection(popBackStack = navController::popBackStack)
+
+    reciterDestination(navController::popBackStack)
   }
 }
 

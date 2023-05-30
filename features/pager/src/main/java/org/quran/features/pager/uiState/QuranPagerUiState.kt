@@ -18,8 +18,8 @@ data class QuranPagerUiState(
 )
 
 sealed class QuranSelection {
-  data class InitialVerse(val key: VerseKey) : QuranSelection()
-  data class Highlight(val key: VerseKey, val word: Int?, val isBookmarked: Boolean) :
+  data class InitialVerse(val verse: VerseKey) : QuranSelection()
+  data class Highlight(val verse: VerseKey, val word: Int?, val isBookmarked: Boolean) :
     QuranSelection()
 
   object None : QuranSelection()

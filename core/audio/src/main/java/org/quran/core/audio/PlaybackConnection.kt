@@ -184,8 +184,8 @@ class PlaybackConnection(
     startAyah: Int = 0,
   ) {
     withContext(Dispatchers.IO) {
-      val mediaItems = recitationRepository.getRecitations(reciter.path)
-      val position = timingRepository.getPosition(reciter.path, surah, startAyah)
+      val mediaItems = recitationRepository.getRecitations(reciter.slug)
+      val position = timingRepository.getPosition(reciter.slug, surah, startAyah)
       prepareAndPlay(mediaItems, surah, position)
     }
   }

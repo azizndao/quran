@@ -5,6 +5,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.runtime.snapshotFlow
 import androidx.lifecycle.SavedStateHandle
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -13,7 +14,6 @@ import arg.quran.models.quran.VerseKey
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.catch
 import kotlinx.coroutines.flow.combine
@@ -23,7 +23,6 @@ import kotlinx.coroutines.flow.flowOf
 import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import org.quram.common.core.QuranInfo
 import org.quram.common.utils.QuranDisplayData
@@ -58,6 +57,8 @@ internal class QuranPagerViewModel(
   translationRepository: TranslationsRepository
 ) : ViewModel() {
 
+  val numberOfPage = quranInfo.numberOfPages
+
   val initialPage = getInitialPage(savedStateHandle)
   private val initialVerse = getInitialVerse(savedStateHandle)
 
@@ -66,15 +67,15 @@ internal class QuranPagerViewModel(
   }.distinctUntilChanged().filterNotNull()
 
 
-  private val selectionFlow = MutableStateFlow(
-    if (initialVerse != null) QuranSelection.InitialVerse(initialVerse) else QuranSelection.None
-  )
-
   var isFullscreen by mutableStateOf(false)
     private set
 
   var dialogUiState: DialogUiState by mutableStateOf(DialogUiState.None)
     private set
+
+  private var selection by mutableStateOf(
+    if (initialVerse != null) QuranSelection.InitialVerse(initialVerse) else QuranSelection.None
+  )
 
   val uiStateFlow = combine(
     quranPreferences.getAllPreferences(),
@@ -99,8 +100,8 @@ internal class QuranPagerViewModel(
     getTranslationPage.coroutineScope = viewModelScope
     viewModelScope.launch {
       delay(5000)
-      if (selectionFlow.value is QuranSelection.InitialVerse) {
-        selectionFlow.value = QuranSelection.None
+      if (selection is QuranSelection.InitialVerse) {
+        selection = QuranSelection.None
       }
     }
   }
@@ -109,18 +110,22 @@ internal class QuranPagerViewModel(
     isFullscreen = !isFullscreen
   }
 
+
+  val selectionFlow = snapshotFlow { selection }.map {
+    when (it) {
+      is QuranSelection.InitialVerse -> it.verse
+      is QuranSelection.Highlight -> it.verse
+      else -> null
+    }
+  }
+
   @Composable
   fun pageFactory(mode: DisplayMode, page: Int, version: Int): PageItem? {
     val itemFlow = remember(mode, page) {
 
       when (mode) {
         DisplayMode.QURAN_TRANSLATION -> {
-          val selectedVerse = when (val s = selectionFlow.value) {
-            is QuranSelection.InitialVerse -> s.key
-            is QuranSelection.Highlight -> s.key
-            else -> null
-          }
-          getTranslationPage(page, selectedVerse, version).catch { Timber.e(it) }
+          getTranslationPage(page, selectionFlow, version).catch { Timber.e(it) }
         }
 
         DisplayMode.QURAN -> getQuranPage(page, version, selectionFlow)
@@ -148,28 +153,24 @@ internal class QuranPagerViewModel(
       is QuranEvent.Play -> playbackConnection.onPlaySurah(event.key)
 
       is QuranEvent.AyahLongPressed -> viewModelScope.launch {
-        selectionFlow.value = QuranSelection.Highlight(event.key, event.word, event.bookmarked)
+        selection = QuranSelection.Highlight(event.key, event.word, event.bookmarked)
         dialogUiState = DialogUiState.VerseMenu(event.key, event.bookmarked)
       }
 
       QuranEvent.AyahPressed -> {
-        if (selectionFlow.value == QuranSelection.None) {
+        if (selection == QuranSelection.None) {
           toggleFullscreen()
         } else {
-          selectionFlow.update { QuranSelection.None }
+          selection = QuranSelection.None
         }
       }
 
-      is QuranEvent.Selection -> selectionFlow.value = event.selection
+      is QuranEvent.Selection -> selection = event.selection
       QuranEvent.PlayOrPause -> playbackConnection.playOrPause()
       QuranEvent.SkipToNext -> playbackConnection.skipToNextSurah()
       QuranEvent.SkipToPrevious -> playbackConnection.skipToPreviousSurah()
-      is QuranEvent.VerseNote -> dialogUiState = DialogUiState.CreateNote(event.key)
-
-      is QuranEvent.VerseTafsir -> dialogUiState = DialogUiState.VerseTafsir(event.key)
-
       is QuranEvent.ChangeReciter -> viewModelScope.launch {
-        audioPreferences.setCurrentReciter(event.qari.path)
+        audioPreferences.setCurrentReciter(event.qari.slug)
       }
     }
   }
@@ -194,11 +195,7 @@ internal class QuranPagerViewModel(
 
   fun onDismissRequest() {
     dialogUiState = DialogUiState.None
-    selectionFlow.value = QuranSelection.None
-  }
-
-  fun createNote(verse: VerseKey, note: String) {
-    TODO()
+    selection = QuranSelection.None
   }
 
   fun removeBookmark(verse: VerseKey, tag: BookmarkTag) {

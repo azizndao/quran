@@ -71,7 +71,8 @@ fun QuranPageView(
     ) {
 
       PageHeaderView(
-        header = page.header, modifier = Modifier
+        header = page.header,
+        modifier = Modifier
           .height(lineHeight)
           .fillMaxWidth()
       )

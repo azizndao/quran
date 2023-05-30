@@ -85,7 +85,12 @@ class GetTranslationPageUseCase(
     }
   }
 
-  operator fun invoke(page: Int, selectedVerse: VerseKey?, version: Int): Flow<TranslationPage> {
+  @Suppress("UNUSED_PARAMETER")
+  operator fun invoke(
+    page: Int,
+    selectionFlow: Flow<VerseKey?>,
+    version: Int
+  ): Flow<TranslationPage> {
     val keys = quranDisplayData.getAyahKeysOnPage(page)
 
     var pageHeader: PageItem.Header? = null
@@ -101,15 +106,12 @@ class GetTranslationPageUseCase(
       observeSelectedTranslationEditions(range).filter(List<LocalTranslationContent>::isNotEmpty),
       bookmarkRepository.observeBookmarksWithKeys(keys),
       playbackConnection.currentAyah,
-    ) { verses, translations, bookmarks, playingVerse ->
+      selectionFlow
+    ) { verses, translations, bookmarks, playingVerse, selectedVerse ->
 
-      if (suras == null) {
-        suras = surahRepository.getSurahsInPage(page)
-      }
+      if (suras == null) suras = surahRepository.getSurahsInPage(page)
 
-      if (pageHeader == null) {
-        pageHeader = pageHeaderUseCase(page)
-      }
+      if (pageHeader == null) pageHeader = pageHeaderUseCase(page)
 
       val data = mutableListOf<TranslationPage.Row>()
 

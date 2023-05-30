@@ -22,9 +22,5 @@ sealed class QuranEvent {
 
   object SkipToNext : QuranEvent()
 
-  class VerseTafsir(val key: VerseKey) : QuranEvent()
-
-  class VerseNote(val key: VerseKey) : QuranEvent()
-
   class ChangeReciter(val qari: Qari) : QuranEvent()
 }
