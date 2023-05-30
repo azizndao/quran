@@ -1,6 +1,5 @@
 package org.quran.ui.theme
 
-import android.annotation.SuppressLint
 import android.app.Activity
 import android.os.Build
 import androidx.compose.foundation.isSystemInDarkTheme
@@ -24,7 +23,6 @@ import androidx.compose.ui.unit.dp
 import androidx.core.view.WindowCompat
 import kotlin.math.ln
 
-@SuppressLint("NewApi")
 @Composable
 fun QuranTheme(
   darkTheme: Boolean = isSystemInDarkTheme(),
@@ -33,15 +31,12 @@ fun QuranTheme(
   content: @Composable () -> Unit,
 ) {
 
-
   var colorScheme = when {
-    dynamicColor -> {
-      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
-        val context = LocalContext.current
-        if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
-      } else {
-        if (darkTheme) DarkDefaultThemeColors else LightDefaultThemeColors
-      }
+    dynamicColor -> if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+      val context = LocalContext.current
+      if (darkTheme) dynamicDarkColorScheme(context) else dynamicLightColorScheme(context)
+    } else {
+      if (darkTheme) DarkDefaultThemeColors else LightDefaultThemeColors
     }
 
     else -> if (darkTheme) DarkDefaultThemeColors else LightDefaultThemeColors
@@ -62,11 +57,10 @@ fun QuranTheme(
       insetsController.isAppearanceLightNavigationBars = !darkTheme
       insetsController.isAppearanceLightStatusBars = !darkTheme
       window.statusBarColor = Color.Transparent.toArgb()
-      window.isNavigationBarContrastEnforced = false
-      window.navigationBarColor = when {
-        darkTheme -> colorScheme.surface.copy(alpha = 0.9f)
-        else -> colorScheme.background.copy(alpha = 0.9f)
-      }.toArgb()
+      window.navigationBarColor = colorScheme.background.copy(alpha = 0.85f).toArgb()
+      if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q) {
+        window.isNavigationBarContrastEnforced = false
+      }
     }
   }
 

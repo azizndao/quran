@@ -68,18 +68,19 @@ class GetTranslationPageUseCase(
   ): Flow<List<LocalTranslationContent>> {
     return _caches.map { caches ->
       caches.map { (locale, verses) ->
-        val pageVerses = if (range.startSura == range.endingSura) {
-          verses.filter { verse ->
+        val pageVerses = when (range.startSura) {
+          range.endingSura -> verses.filter { verse ->
             verse.sura == range.endingSura &&
               verse.ayah >= range.startAyah &&
               verse.ayah <= range.endingAyah
           }
-        } else
-          verses.filter { verse ->
+
+          else -> verses.filter { verse ->
             verse.sura == range.startSura && verse.ayah >= range.startAyah ||
               verse.sura == range.endingSura && verse.ayah <= range.endingAyah ||
               verse.sura > range.startSura && verse.sura < range.endingSura
           }.take(range.versesInRange)
+        }
         LocalTranslationContent(locale, pageVerses)
       }
     }
