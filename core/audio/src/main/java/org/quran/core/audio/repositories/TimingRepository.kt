@@ -4,7 +4,6 @@ import android.content.Context
 import android.widget.Toast
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
-import kotlinx.serialization.json.Json
 import org.quran.core.audio.api.AudioApiService
 import org.quran.core.audio.databases.TimingDatabase
 import org.quran.core.audio.models.AyahTiming
@@ -14,7 +13,6 @@ import timber.log.Timber
 class TimingRepository(
   private val context: Context,
   private val apiService: AudioApiService,
-  private val json: Json,
 ) {
   private var timings: List<AyahTiming> = emptyList()
 
@@ -49,7 +47,6 @@ class TimingRepository(
 
   private suspend fun downloadTimingData(reciterId: String) {
     val timings = apiService.getTimingsData(reciterId)
-//    val timings: List<AyahTiming> = json.decodeFromString(content)
     val database = TimingDatabase.getInstance(context, reciterId)
     database.timingDao.insertTimings(timings)
   }

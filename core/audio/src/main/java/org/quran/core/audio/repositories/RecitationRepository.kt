@@ -5,22 +5,19 @@ import androidx.core.net.toUri
 import androidx.media3.common.MediaItem
 import androidx.media3.common.MediaMetadata
 import androidx.media3.exoplayer.offline.Download
-import arg.quran.models.Sura
 import arg.quran.models.audio.Qari
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.coroutineScope
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.withContext
-import org.quran.core.audio.models.MediaId
-import org.quram.common.repositories.SurahRepository
 import org.quram.common.utils.QuranDisplayData
 import org.quran.core.audio.datasources.RecitationsDataSource
+import org.quran.core.audio.models.MediaId
 import org.quran.core.audio.models.QariItem
 
 
 class RecitationRepository internal constructor(
   private val recitationsDataSource: RecitationsDataSource,
-  private val surahRepository: SurahRepository,
   private val qariRepository: QariRepository,
   private val quranDisplayData: QuranDisplayData,
 ) {
@@ -29,14 +26,14 @@ class RecitationRepository internal constructor(
     recitationsDataSource.downloadRecitation(mediaItems)
   }
 
-  fun downloadRecitation(reciter: Qari, surah: Sura) {
+  fun downloadRecitation(reciter: Qari, surah: Int) {
     return recitationsDataSource.downloadRecitation(reciter, surah)
   }
 
   fun downloadRecitation(sura: Int, slug: String) {
     recitationsDataSource.downloadRecitation(
       reciter = qariRepository.getQari(slug),
-      sura = surahRepository.getSurah(sura)
+      sura = sura
     )
   }
 
@@ -51,7 +48,7 @@ class RecitationRepository internal constructor(
   suspend fun getRecitations(slug: String): List<MediaItem> = withContext(Dispatchers.IO) {
     val mediaItems = mutableListOf<MediaItem>()
     for (sura in 1..114) {
-      val suraName = surahRepository.getSurah(sura).nameSimple
+      val suraName = quranDisplayData.getSuraName(sura, true)
       val mediaItem = buildMediaItem(qariRepository.getQariItem(slug), suraName, sura)
       mediaItems.add(mediaItem)
     }

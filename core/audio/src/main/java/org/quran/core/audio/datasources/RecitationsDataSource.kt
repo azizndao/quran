@@ -7,13 +7,11 @@ import androidx.media3.common.MediaItem
 import androidx.media3.common.util.UnstableApi
 import androidx.media3.exoplayer.offline.*
 import androidx.media3.exoplayer.scheduler.Requirements
-import arg.quran.models.Sura
 import arg.quran.models.audio.Qari
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
-import kotlinx.coroutines.flow.debounce
 import org.quran.core.audio.MediaDownloadService
 import org.quran.core.audio.models.MediaId
 import timber.log.Timber
@@ -29,20 +27,16 @@ internal class RecitationsDataSource(
   fun getDownloadedRecitations() = downloadManager.filter { true }
 
   fun getDownloadedRecitations(reciter: String) = downloadManager.filter {
-    val b = MediaId.fromString(it.request.id).reciter == reciter
-    if (b) {
-      Timber.tag(tab).d(it.request.id)
-    }
-    b
+    MediaId.fromString(it.request.id).reciter == reciter
   }
 
   @SuppressLint("UnsafeOptInUsageError")
-  fun downloadRecitation(reciter: Qari, sura: Sura) {
+  fun downloadRecitation(reciter: Qari, sura: Int) {
 
-    val mediaId = MediaId(sura = sura.number, reciter = reciter.slug, ayah = 0).toString()
+    val mediaId = MediaId(sura = sura, reciter = reciter.slug, ayah = 0).toString()
 
     val mediaUri =
-      Uri.parse("${reciter.url}/${sura.number.toString().padStart(3, '0')}.mp3")
+      Uri.parse("${reciter.url}/${sura.toString().padStart(3, '0')}.mp3")
 
     val requestMetadata = MediaItem.RequestMetadata.Builder()
       .setMediaUri(mediaUri)
@@ -95,7 +89,6 @@ internal class RecitationsDataSource(
 
 
 @SuppressLint("UnsafeOptInUsageError")
-@OptIn(FlowPreview::class)
 fun DownloadManager.filter(
   @Download.State vararg state: Int,
   predicate: (Download) -> Boolean = { true },
@@ -114,16 +107,25 @@ fun DownloadManager.filter(
       job?.cancel()
       job = launch {
         if (finalException != null) throw finalException
-
-        send(downloadIndex.parse(*state, predicate = predicate))
+        if (downloadManager.currentDownloads.isNotEmpty()) {
+          while (true) {
+            send(downloadIndex.parse(*state, predicate = predicate))
+            delay(500)
+          }
+        } else {
+          send(downloadIndex.parse(*state, predicate = predicate))
+        }
       }
     }
   }
 
   addListener(listener)
 
-  awaitClose { removeListener(listener) }
-}.debounce(200L)
+  awaitClose {
+    removeListener(listener)
+    job?.cancel()
+  }
+}
 
 @SuppressLint("UnsafeOptInUsageError")
 private suspend fun DownloadIndex.parse(

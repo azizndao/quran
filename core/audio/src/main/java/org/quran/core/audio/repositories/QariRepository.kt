@@ -29,7 +29,6 @@ class QariRepository internal constructor(
   /**
    * Get a list of all available qaris as [QariItem]s
    *
-   * @param context the current context
    * @return a list of [QariItem] representing the qaris to show.
    */
   fun getQariItemList(): List<QariItem> {
@@ -71,13 +70,13 @@ class QariRepository internal constructor(
         nameResource = R.string.qari_abdulbaset_mujawwad_gapless,
         url = "https://download.quranicaudio.com/quran/abdulbaset_mujawwad",
       ),
-      Qari(
-        id = 4,
-        slug = "abdul_basit_murattal",
-        imageUrl = "https://raw.githubusercontent.com/azizndao/quran_data/dev/images/2.png",
-        nameResource = R.string.qari_abdulbaset_gapless,
-        url = "https://download.quranicaudio.com/quran/abdul_basit_murattal",
-      ),
+//      Qari(
+//        id = 4,
+//        slug = "abdul_basit_murattal",
+//        imageUrl = "https://raw.githubusercontent.com/azizndao/quran_data/dev/images/2.png",
+//        nameResource = R.string.qari_abdulbaset_gapless,
+//        url = "https://download.quranicaudio.com/quran/abdul_basit_murattal",
+//      ),
       Qari(
         id = 5,
         slug = "mishari_alafasy",
@@ -85,13 +84,13 @@ class QariRepository internal constructor(
         nameResource = R.string.qari_afasy_gapless,
         url = "https://download.quranicaudio.com/quran/mishaari_raashid_al_3afaasee",
       ),
-      Qari(
-        id = 6,
-        slug = "mishari_alafasy_cali",
-        imageUrl = "https://raw.githubusercontent.com/azizndao/quran_data/dev/images/8.png",
-        nameResource = R.string.qari_afasy_cali_gapless,
-        url = "https://download.quranicaudio.com/quran/mishaari_california",
-      ),
+//      Qari(
+//        id = 6,
+//        slug = "mishari_alafasy_cali",
+//        imageUrl = "https://raw.githubusercontent.com/azizndao/quran_data/dev/images/8.png",
+//        nameResource = R.string.qari_afasy_cali_gapless,
+//        url = "https://download.quranicaudio.com/quran/mishaari_california",
+//      ),
       Qari(
         id = 7,
         slug = "mishari_walk",

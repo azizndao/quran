@@ -2,6 +2,7 @@ package org.quran.features.reciter
 
 import android.content.res.Configuration
 import androidx.annotation.OptIn
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -37,6 +38,7 @@ import androidx.compose.material3.TopAppBarDefaults
 import androidx.compose.material3.rememberTopAppBarState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -289,8 +291,12 @@ fun TrailingButton(
     }
 
     else -> Box {
+      val progress by animateFloatAsState(
+        targetValue = download.percentDownloaded / 100f,
+        label = "progress"
+      )
       CircularProgressIndicator(
-        progress = download.percentDownloaded / 100,
+        progress = progress,
         modifier = Modifier.matchParentSize(),
       )
       IconButton(onClick = { /*TODO*/ }) {

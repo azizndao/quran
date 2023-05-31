@@ -26,6 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.GlideImage
 import org.quran.core.audio.models.NowPlaying
@@ -66,15 +67,20 @@ fun AudioBottomBar(
       }
 
       Column(
-        modifier = Modifier.weight(1f), verticalArrangement = Arrangement.Center
+        modifier = Modifier.weight(1f),
+        verticalArrangement = Arrangement.Center
       ) {
         Text(
           text = uiState.title,
-          style = MaterialTheme.typography.titleSmall
+          style = MaterialTheme.typography.titleSmall,
+          overflow = TextOverflow.Ellipsis,
+          maxLines = 1,
         )
         Text(
           text = uiState.reciterName,
-          style = MaterialTheme.typography.bodyMedium
+          style = MaterialTheme.typography.bodyMedium,
+          overflow = TextOverflow.Ellipsis,
+          maxLines = 1,
         )
       }
 

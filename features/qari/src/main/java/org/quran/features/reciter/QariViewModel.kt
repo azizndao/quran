@@ -35,11 +35,11 @@ class QariViewModel(
     recitationRepository.getDownloadedRecitations(slug)
   ) { surahs, downloadedMediaItems ->
 
-    surahs.map { surah ->
+    surahs.map { sura ->
       val download = downloadedMediaItems.find {
-        MediaId.fromString(it.request.id).sura == surah.number
+        MediaId.fromString(it.request.id).sura == sura.number
       }
-      SurahUiState(surah = surah, download = download)
+      SurahUiState(surah = sura, download = download)
     }
   }
 
@@ -67,7 +67,7 @@ class QariViewModel(
       val surah = recitation.surah
       Timber.tag("RecitationViewModel")
         .i("Downloading surah ${surah.nameSimple}, reciter = ${reciter.databaseName} (${reciter.id})")
-      recitationRepository.downloadRecitation(reciter, surah)
+      recitationRepository.downloadRecitation(reciter, surah.number)
     }
   }
 }
