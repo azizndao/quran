@@ -31,7 +31,10 @@ fun ProviderQuranTextStyle(
   val style by remember(fontScale, page, oldStyle) {
     derivedStateOf {
       val fontFamily = FontFamily(
-        Font("v1/fonts/ttf/p${page}.ttf", assetManager = context.assets)
+        Font(
+          "v1/fonts/ttf/p${page}.ttf",
+          assetManager = context.assets,
+        )
       )
 
       val fontSize = when (fontScale) {

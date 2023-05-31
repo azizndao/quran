@@ -102,7 +102,7 @@ fun TranslationPageItem(
 
     item(key = "footer") {
       Text(
-        page.page.toString(),
+        text = page.page.toString(),
         modifier = Modifier.fillMaxWidth(),
         textAlign = TextAlign.Center,
         style = MaterialTheme.typography.labelLarge
@@ -146,7 +146,7 @@ fun PageHeaderView(header: PageItem.Header, modifier: Modifier = Modifier) {
   Row(
     modifier = modifier
       .fillMaxWidth()
-      .padding(horizontal = 8.dp),
+      .padding(vertical = 8.dp, horizontal = 12.dp),
     verticalAlignment = Alignment.CenterVertically,
     horizontalArrangement = Arrangement.SpaceBetween,
   ) {

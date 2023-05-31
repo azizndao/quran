@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.displayCutoutPadding
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.layout.wrapContentWidth
@@ -73,7 +72,6 @@ fun QuranPageView(
       PageHeaderView(
         header = page.header,
         modifier = Modifier
-          .height(lineHeight)
           .fillMaxWidth()
       )
       Spacer(modifier = Modifier.weight(1f))
@@ -119,7 +117,7 @@ fun QuranPageView(
       Text(
         page.page.toString(),
         modifier = Modifier
-          .heightIn(lineHeight)
+          .padding(vertical = 8.dp)
           .fillMaxWidth()
           .wrapContentHeight(),
         textAlign = TextAlign.Center,
@@ -157,7 +155,7 @@ fun QuranChapterLine(
 fun QuranTextLine(
   line: QuranPage.TextLine,
   modifier: Modifier = Modifier,
-  style: TextStyle = LocalQuranTextStyle.current,
+  style: TextStyle = LocalQuranTextStyle.current.copy(textAlign = TextAlign.Justify),
   colorScheme: ColorScheme = MaterialTheme.colorScheme,
   onAyahEvent: (QuranEvent) -> Unit,
 ) {
