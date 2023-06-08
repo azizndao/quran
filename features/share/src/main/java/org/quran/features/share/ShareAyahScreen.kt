@@ -202,7 +202,9 @@ private fun ShareCard(
       AnimatedVisibility(visible = uiState.translation != null) {
         Text(
           text = htmlToAnnotatedString(uiState.translation!!, secondaryTextStyle),
-          modifier = Modifier.padding(top = 8.dp),
+          modifier = Modifier
+            .padding(top = 8.dp)
+            .fillMaxWidth(),
           style = secondaryTextStyle,
           textAlign = TextAlign.Center
         )

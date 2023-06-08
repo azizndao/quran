@@ -22,19 +22,24 @@ import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.text.style.TextDecoration
 import androidx.core.text.HtmlCompat
 
-fun String.htmlToAnnotatedString(colorScheme: ColorScheme, style: TextStyle): AnnotatedString {
+fun String.htmlToAnnotatedString(
+  colorScheme: ColorScheme,
+  style: TextStyle,
+  highLightBold: Boolean = false
+): AnnotatedString {
   return HtmlCompat.fromHtml(this, HtmlCompat.FROM_HTML_MODE_COMPACT)
-    .toAnnotatedString(colorScheme, style)
+    .toAnnotatedString(colorScheme, style, highLightBold)
 }
 
 @Composable
 fun htmlToAnnotatedString(
   html: String,
-  style: TextStyle = MaterialTheme.typography.bodyMedium
+  style: TextStyle = MaterialTheme.typography.bodyMedium,
+  highLightBold: Boolean = false
 ): AnnotatedString {
   val colorScheme = MaterialTheme.colorScheme
   return remember(html) {
-    html.htmlToAnnotatedString(colorScheme, style)
+    html.htmlToAnnotatedString(colorScheme, style, highLightBold)
   }
 }
 

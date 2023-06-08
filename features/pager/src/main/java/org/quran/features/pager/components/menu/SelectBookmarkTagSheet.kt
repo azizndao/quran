@@ -29,7 +29,7 @@ import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.unit.dp
 import arg.quran.models.quran.VerseKey
-import org.alquran.ui.components.LineSeparator
+import org.quran.ui.components.LineSeparator
 import org.quran.features.pager.uiState.DialogUiState
 import org.quran.ui.R
 

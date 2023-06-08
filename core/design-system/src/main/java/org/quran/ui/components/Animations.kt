@@ -1,18 +1,28 @@
 package org.quran.ui.components
 
 import androidx.annotation.DrawableRes
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.Crossfade
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.animateColor
-import androidx.compose.animation.core.*
+import androidx.compose.animation.core.FiniteAnimationSpec
+import androidx.compose.animation.core.MutableTransitionState
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.animateInt
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.tween
+import androidx.compose.animation.core.updateTransition
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.runtime.*
+import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
@@ -42,7 +52,6 @@ fun <T> SmoothCrossFade(
 }
 
 
-@OptIn(ExperimentalAnimationApi::class)
 @Composable
 private fun BoundsButton(
   modifier: Modifier = Modifier,
@@ -79,90 +88,11 @@ private fun BoundsButton(
     if (it.currentState) enabledIconId else disabledIconId
   }
 
-  transition.AnimatedContent(contentAlignment = Alignment.Center) {
-    IconButton(modifier = modifier.scale(iconSize), onClick = onClick) {
-      Icon(
-        painter = painterResource(id = drawableId),
-        contentDescription = null,
-        tint = iconTint,
-      )
-    }
-  }
-}
-
-
-@Composable
-fun CircularProgressbar1(
-  size: Dp = 260.dp,
-  foregroundIndicatorColor: Color = MaterialTheme.colorScheme.primary,
-  shadowColor: Color = MaterialTheme.colorScheme.primaryContainer,
-  indicatorThickness: Dp = 24.dp,
-  dataUsage: Float = 60f,
-  animationDuration: Int = 1000,
-) {
-
-  // It remembers the data usage value
-  var dataUsageRemember by remember {
-    mutableStateOf(-1f)
-  }
-
-  // This is to animate the foreground indicator
-  val dataUsageAnimate = animateFloatAsState(
-    targetValue = dataUsageRemember, animationSpec = tween(
-      durationMillis = animationDuration
-    ),
-    label = "CircularProgressbar1"
-  )
-
-  // This is to start the animation when the activity is opened
-  LaunchedEffect(Unit) {
-    dataUsageRemember = dataUsage
-  }
-
-  Box(
-    modifier = Modifier.size(size), contentAlignment = Alignment.Center
-  ) {
-
-    Canvas(
-      modifier = Modifier.size(size)
-    ) {
-
-      // For shadow
-      drawCircle(
-        brush = Brush.radialGradient(
-          colors = listOf(shadowColor, Color.White),
-          center = Offset(x = this.size.width / 2, y = this.size.height / 2),
-          radius = this.size.height / 2
-        ),
-        radius = this.size.height / 2,
-        center = Offset(x = this.size.width / 2, y = this.size.height / 2)
-      )
-
-      // This is the white circle that appears on the top of the shadow circle
-      drawCircle(
-        color = Color.White,
-        radius = (size / 2 - indicatorThickness).toPx(),
-        center = Offset(x = this.size.width / 2, y = this.size.height / 2)
-      )
-
-      // Convert the dataUsage to angle
-      val sweepAngle = (dataUsageAnimate.value) * 360 / 100
-
-      // Foreground indicator
-      drawArc(
-        color = foregroundIndicatorColor,
-        startAngle = -90f,
-        sweepAngle = sweepAngle,
-        useCenter = false,
-        style = Stroke(width = indicatorThickness.toPx(), cap = StrokeCap.Round),
-        size = Size(
-          width = (size - indicatorThickness).toPx(),
-          height = (size - indicatorThickness).toPx()
-        ),
-        topLeft = Offset(
-          x = (indicatorThickness / 2).toPx(), y = (indicatorThickness / 2).toPx()
-        )
-      )
-    }
+  IconButton(modifier = modifier.scale(iconSize), onClick = onClick) {
+    Icon(
+      painter = painterResource(id = drawableId),
+      contentDescription = null,
+      tint = iconTint,
+    )
   }
 }

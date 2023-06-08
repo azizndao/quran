@@ -36,10 +36,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import arg.quran.models.quran.VerseKey
-import org.alquran.ui.components.LineSeparator
-import org.quran.ui.theme.quran
+import org.quran.ui.components.LineSeparator
 import org.quran.search.R
 import org.quran.ui.components.BackButton
+import org.quran.ui.theme.quran
 import org.quran.ui.utils.extensions.htmlToAnnotatedString
 
 @Composable
@@ -157,7 +157,7 @@ fun SearchResultItem(
     Spacer(modifier = Modifier.height(8.dp))
 
     Text(
-      text = htmlToAnnotatedString(uiState.text),
+      text = htmlToAnnotatedString(uiState.text, highLightBold = true),
       style = when (uiState.type) {
         SearchResult.Type.QURAN -> MaterialTheme.typography.quran
         SearchResult.Type.TRANSLATION -> LocalTextStyle.current

@@ -43,7 +43,7 @@ import arg.quran.models.firstPage
 import arg.quran.models.quran.VerseKey
 import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.flow.StateFlow
-import org.alquran.ui.components.LineSeparator
+import org.quran.ui.components.LineSeparator
 import org.quran.features.home.juzs.JuzHeader
 import org.quran.ui.components.CircularProgressLoader
 import org.quran.ui.components.SectionTitle

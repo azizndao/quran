@@ -1,4 +1,4 @@
-package org.alquran.ui.components
+package org.quran.ui.components
 
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.padding

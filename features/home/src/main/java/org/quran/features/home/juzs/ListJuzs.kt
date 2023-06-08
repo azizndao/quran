@@ -7,7 +7,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -36,7 +35,7 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import arg.quran.models.HizbQuarter
 import kotlinx.coroutines.flow.StateFlow
-import org.alquran.ui.components.LineSeparator
+import org.quran.ui.components.LineSeparator
 import org.quran.ui.components.CircularProgressLoader
 import org.quran.ui.utils.extensions.add
 import org.quran.ui.R as Ui

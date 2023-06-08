@@ -1,4 +1,4 @@
-package org.muslimapp.core.audio.databases
+package org.quran.core.audio.databases
 
 import android.database.Cursor
 import android.database.DefaultDatabaseErrorHandler

@@ -31,7 +31,7 @@ import androidx.compose.ui.tooling.preview.PreviewParameter
 import androidx.compose.ui.unit.Density
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import org.alquran.ui.components.LineSeparator
+import org.quran.ui.components.LineSeparator
 import org.quran.features.pager.components.ProviderPage77QuranTextStyle
 import org.quran.features.pager.components.SurahHeader
 import org.quran.features.pager.components.TranslationItemView

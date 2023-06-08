@@ -1,4 +1,4 @@
-package org.alquran.ui.components
+package org.quran.ui.components
 
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.interaction.MutableInteractionSource

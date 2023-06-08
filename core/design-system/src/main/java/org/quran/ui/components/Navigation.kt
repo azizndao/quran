@@ -1,4 +1,4 @@
-package org.alquran.ui.components
+package org.quran.ui.components
 
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.RowScope

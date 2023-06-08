@@ -6,10 +6,12 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.collections.immutable.toImmutableList
+import kotlinx.collections.immutable.toPersistentList
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.flowOf
+import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.launch
 import org.quram.common.repositories.SurahRepository
 import org.quran.core.audio.models.MediaId
@@ -19,51 +21,35 @@ import timber.log.Timber
 
 @SuppressLint("UnsafeOptInUsageError")
 class QariViewModel(
-  private val slug: String,
+  slug: String,
   surahRepository: SurahRepository,
   private val recitationRepository: RecitationRepository,
-  private val qariRepository: QariRepository,
+  qariRepository: QariRepository,
 ) : ViewModel() {
 
-  var uiState by mutableStateOf(QariUiState())
-    private set
 
-  private var job: Job? = null
-
-  private val dataFlow = combine(
+  val uiStateFlow = combine(
+    flowOf(qariRepository.getQari(slug)),
     flowOf(surahRepository.getAllSurahs()),
     recitationRepository.getDownloadedRecitations(slug)
-  ) { surahs, downloadedMediaItems ->
+  ) { qari, surahs, downloadedMediaItems ->
 
-    surahs.map { sura ->
-      val download = downloadedMediaItems.find {
-        MediaId.fromString(it.request.id).sura == sura.number
-      }
-      SurahUiState(surah = sura, download = download)
-    }
-  }
+    QariUiState(
+      loading = false,
+      reciter = qari,
+      recitations = surahs.map { sura ->
+        val download = downloadedMediaItems.find {
+          MediaId.fromString(it.request.id).sura == sura.number
+        }
+        SurahUiState(surah = sura, download = download)
+      }.toPersistentList()
+    )
+  }.stateIn(viewModelScope, SharingStarted.WhileSubscribed(5_000), QariUiState())
 
-  init {
-    refresh()
-  }
-
-  private fun refresh() {
-    job?.cancel()
-    uiState = uiState.copy(loading = true)
-    job = viewModelScope.launch {
-      dataFlow.collect { recitations ->
-        uiState = QariUiState(
-          loading = false,
-          reciter = qariRepository.getQari(slug),
-          recitations = recitations.toImmutableList()
-        )
-      }
-    }
-  }
 
   fun download(recitation: SurahUiState) {
     viewModelScope.launch {
-      val reciter = uiState.reciter!!
+      val reciter = uiStateFlow.value.reciter!!
       val surah = recitation.surah
       Timber.tag("RecitationViewModel")
         .i("Downloading surah ${surah.nameSimple}, reciter = ${reciter.databaseName} (${reciter.id})")

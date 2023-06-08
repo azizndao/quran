@@ -23,8 +23,8 @@ import androidx.compose.ui.unit.dp
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import kotlinx.collections.immutable.PersistentList
 import kotlinx.coroutines.flow.StateFlow
-import org.alquran.ui.components.LineSeparator
-import org.alquran.ui.components.SurfaceCard
+import org.quran.ui.components.LineSeparator
+import org.quran.ui.components.SurfaceCard
 import org.quran.bookmarks.models.Bookmark
 import org.quran.bookmarks.models.TabWithBookmarks
 import org.quran.ui.R

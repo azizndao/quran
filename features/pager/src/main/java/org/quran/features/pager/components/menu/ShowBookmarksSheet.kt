@@ -21,7 +21,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import arg.quran.models.quran.VerseKey
-import org.alquran.ui.components.LineSeparator
+import org.quran.ui.components.LineSeparator
 import org.quran.bookmarks.models.BookmarkTag
 import org.quran.features.pager.uiState.DialogUiState
 import org.quran.ui.R

@@ -46,8 +46,8 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import com.bumptech.glide.integration.compose.GlideImage
-import org.alquran.ui.components.LineSeparator
-import org.alquran.ui.components.SurfaceCard
+import org.quran.ui.components.LineSeparator
+import org.quran.ui.components.SurfaceCard
 import org.alquran.utils.getLanguageFlag
 import org.quram.common.extensions.capital
 import org.quran.ui.R

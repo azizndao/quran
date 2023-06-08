@@ -1,5 +1,7 @@
 package org.quran.features.reciter.navigation
 
+import androidx.compose.runtime.getValue
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -17,8 +19,9 @@ fun NavGraphBuilder.reciterDestination(popBackStack: () -> Unit) {
       parametersOf(it.arguments!!.getString("slug"))
     }
 
+    val uiState by viewModel.uiStateFlow.collectAsStateWithLifecycle()
     QariScreen(
-      uiState = viewModel.uiState,
+      uiState = uiState,
       download = viewModel::download,
       popBackStack = popBackStack
     )

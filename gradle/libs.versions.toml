@@ -2,7 +2,7 @@
 activity = "1.7.2"
 accompanist = "0.31.2-alpha"
 androidxStartup = "1.1.1"
-androidGradlePlugin = "8.0.1"
+androidGradlePlugin = "8.0.2"
 datastore = "1.0.0"
 composeBom = "2023.05.01"
 composeCompiler = "1.4.7"
