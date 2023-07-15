@@ -163,7 +163,7 @@ fun QuranTextLine(
   val text = remember(line) {
     buildAnnotatedString {
       line.words.forEach { word ->
-        val color = when {
+        val background = when {
           word.playing -> colorScheme.surfaceColorAtElevation(2.dp)
           word.selected -> colorScheme.surfaceVariant
           word.bookmarked -> colorScheme.surfaceColorAtElevation(3.dp)
@@ -172,8 +172,11 @@ fun QuranTextLine(
 
         withStyle(
           SpanStyle(
-            background = color,
-            color = colorScheme.contentColorFor(backgroundColor = color)
+            background = background,
+            color = when {
+              word.selected -> colorScheme.onSurfaceVariant
+              else -> colorScheme.onSurface
+            }
           )
         ) {
           append(word.text)

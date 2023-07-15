@@ -15,7 +15,7 @@ android {
 
   defaultConfig {
     applicationId = "org.alquran"
-    versionCode = 16
+    versionCode = 18
     versionName = "1.0.0"
 
     testInstrumentationRunner = "androidx.test.runner.AndroidJUnitRunner"

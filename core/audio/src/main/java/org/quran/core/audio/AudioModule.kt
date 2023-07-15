@@ -25,7 +25,7 @@ import org.quran.core.audio.repositories.QariRepository
 import org.quran.core.audio.api.AudioApiService
 import org.quran.core.audio.datasources.RecitationsDataSource
 import org.quran.core.audio.repositories.RecitationRepository
-import org.quran.core.audio.repositories.TimingRepository
+import org.quran.core.audio.repositories.TimingHelper
 import org.quran.network.NetworkModule
 import retrofit2.Retrofit
 import retrofit2.create
@@ -38,7 +38,7 @@ val AudioCoreModule = module {
 
   factory {
     Retrofit.Builder()
-      .baseUrl("https://raw.githubusercontent.com/azizndao/quran_data/dev/")
+      .baseUrl("https://quran-data-alpha.vercel.app/")
       .addConverterFactory(get<Json>().asConverterFactory("application/json".toMediaType()))
       .build()
       .create<AudioApiService>()
@@ -46,7 +46,7 @@ val AudioCoreModule = module {
 
   factoryOf(::QariRepository)
   factoryOf(::RecitationRepository)
-  factoryOf(::TimingRepository)
+  factoryOf(::TimingHelper)
   factoryOf(::RecitationsDataSource)
 
   // factoryOf(::PlaybackConnection)

@@ -36,14 +36,14 @@ import org.quran.core.audio.models.AyahTiming
 import org.quran.core.audio.models.MediaId
 import org.quran.core.audio.models.NowPlaying
 import org.quran.core.audio.repositories.RecitationRepository
-import org.quran.core.audio.repositories.TimingRepository
+import org.quran.core.audio.repositories.TimingHelper
 import org.quran.datastore.repositories.AudioPreferencesRepository
 
 class PlaybackConnection(
   private val context: Context,
   private val recitationRepository: RecitationRepository,
   private val audioSettings: AudioPreferencesRepository,
-  private val timingRepository: TimingRepository,
+  private val timingHelper: TimingHelper,
   private val quranDisplayData: QuranDisplayData,
 ) {
 
@@ -129,7 +129,7 @@ class PlaybackConnection(
         while (true) {
           val mediaId = MediaId.fromString(mediaItem.mediaId)
 
-          val timing = timingRepository.getTiming(
+          val timing = timingHelper.getTiming(
             mediaId.reciter,
             mediaId.sura,
             withContext(Dispatchers.Main) { mediaController.currentPosition })
@@ -173,7 +173,7 @@ class PlaybackConnection(
   fun onPlaySurah(sura: Int, reciterId: String, startAya: Int = 0) {
     coroutineScope.launch(Dispatchers.Main) {
       val mediaItems = recitationRepository.getRecitations(reciterId)
-      val position = timingRepository.getPosition(reciterId, sura, startAya)
+      val position = timingHelper.getPosition(reciterId, sura, startAya)
       prepareAndPlay(mediaItems, sura, position)
     }
   }
@@ -185,7 +185,7 @@ class PlaybackConnection(
   ) {
     withContext(Dispatchers.IO) {
       val mediaItems = recitationRepository.getRecitations(reciter.slug)
-      val position = timingRepository.getPosition(reciter.slug, surah, startAyah)
+      val position = timingHelper.getPosition(reciter.slug, surah, startAyah)
       prepareAndPlay(mediaItems, surah, position)
     }
   }

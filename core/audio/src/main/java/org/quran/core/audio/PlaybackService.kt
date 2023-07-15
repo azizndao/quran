@@ -44,7 +44,7 @@ import org.koin.android.ext.android.inject
 import org.quran.core.audio.PlaybackConstants.MUSLIMS_BROWSABLE_ROOT
 import org.quran.core.audio.models.MediaId
 import org.quran.core.audio.repositories.QariRepository
-import org.quran.core.audio.repositories.TimingRepository
+import org.quran.core.audio.repositories.TimingHelper
 import org.quran.core.audio.repositories.RecitationRepository
 import org.quran.datastore.repositories.AudioPreferencesRepository
 import java.util.concurrent.Callable
@@ -68,7 +68,7 @@ class PlaybackService : MediaLibraryService() {
 
  private val audioPreferences: AudioPreferencesRepository by inject()
 
-  private val timingRepository: TimingRepository by inject()
+  private val timingHelper: TimingHelper by inject()
 
   private val qariRepository: QariRepository by inject()
 
@@ -117,7 +117,7 @@ class PlaybackService : MediaLibraryService() {
       val history = audioPreferences.getPlaybackHistory().first()
       val mediaItems = recitationRepository.getRecitations(history.reciterId)
       val position =
-        timingRepository.getPosition(history.reciterId, history.surah, history.ayah)
+        timingHelper.getPosition(history.reciterId, history.surah, history.ayah)
 
       player.setMediaItems(mediaItems, history.surah - 1, position)
       player.prepare()
@@ -144,7 +144,7 @@ class PlaybackService : MediaLibraryService() {
         }
         val mediaId = MediaId.fromString(mediaItem.mediaId)
 
-        val timing = timingRepository.getTiming(
+        val timing = timingHelper.getTiming(
           mediaId.reciter,
           mediaId.sura,
           withContext(Dispatchers.Main) { player.currentPosition })
@@ -164,13 +164,6 @@ class PlaybackService : MediaLibraryService() {
   }
 
   inner class MediaSessionCallback : MediaLibrarySession.Callback {
-
-    override fun onConnect(
-      session: MediaSession,
-      controller: MediaSession.ControllerInfo
-    ): MediaSession.ConnectionResult {
-      return super.onConnect(session, controller)
-    }
 
     override fun onGetLibraryRoot(
       session: MediaLibrarySession,
@@ -218,14 +211,6 @@ class PlaybackService : MediaLibraryService() {
       }
       LibraryResult.ofItemList(mediaItem, params)
     }, Executors.newSingleThreadExecutor())
-
-    override fun onGetItem(
-      session: MediaLibrarySession,
-      browser: MediaSession.ControllerInfo,
-      mediaId: String
-    ): ListenableFuture<LibraryResult<MediaItem>> {
-      return super.onGetItem(session, browser, mediaId)
-    }
 
     override fun onSubscribe(
       session: MediaLibrarySession,
